@@ -34,6 +34,6 @@ jobs:
           server: vs0hny.ftp.infomaniak.com
           port: 22
           local_path: "./out/"
-          remote_path: "/sites/brianbanna.com/"
-          sftp_only: false
+          remote_path: "sites/brianbanna.com/"
+          sftp_only: true
           password: ${{ secrets.FTP_PASSWORD }}
