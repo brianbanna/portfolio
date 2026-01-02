@@ -29,7 +29,7 @@ export const HeroSection: React.FC = () => {
       <div className="hidden w-screen h-px animate-glow md:block animate-fade-right bg-gradient-to-r from-fg/0 via-fg/50 to-fg/0" />
       <div className="my-16 text-center animate-fade-in z-10 max-w-2xl px-6">
         <h2 className="text-base md:text-lg text-fg/50">
-          Data Science master's student at EPFL focused on quantitative finance, systematic trading and commodities.
+          I'm a Data Science master's student at EPFL focused on quantitative finance, systematic trading and commodities.
         </h2>
       </div>
     </section>
