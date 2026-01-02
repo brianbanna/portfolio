@@ -26,17 +26,37 @@ export default function Particles({
 	const mouse = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
 	const canvasSize = useRef<{ w: number; h: number }>({ w: 0, h: 0 });
 	const dpr = typeof window !== "undefined" ? window.devicePixelRatio : 1;
+	const particleColor = useRef<string>("255, 255, 255");
+
+	const getParticleColor = () => {
+		if (typeof window !== "undefined") {
+			const style = getComputedStyle(document.documentElement);
+			const color = style.getPropertyValue("--color-fg").trim();
+			if (color) {
+				// Convert space-separated to comma-separated for rgba()
+				return color.split(" ").join(", ");
+			}
+		}
+		return "255, 255, 255";
+	};
 
 	useEffect(() => {
 		if (canvasRef.current) {
 			context.current = canvasRef.current.getContext("2d");
 		}
+		particleColor.current = getParticleColor();
 		initCanvas();
 		animate();
 		window.addEventListener("resize", initCanvas);
 
+		const observer = new MutationObserver(() => {
+			particleColor.current = getParticleColor();
+		});
+		observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+
 		return () => {
 			window.removeEventListener("resize", initCanvas);
+			observer.disconnect();
 		};
 	}, []);
 
@@ -124,7 +144,7 @@ export default function Particles({
 			context.current.translate(translateX, translateY);
 			context.current.beginPath();
 			context.current.arc(x, y, size, 0, 2 * Math.PI);
-			context.current.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+			context.current.fillStyle = `rgba(${particleColor.current}, ${alpha})`;
 			context.current.fill();
 			context.current.setTransform(dpr, 0, 0, dpr, 0, 0);
 
