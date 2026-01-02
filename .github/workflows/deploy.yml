@@ -27,14 +27,13 @@ jobs:
       - name: Build static site
         run: pnpm build
 
-      - name: Deploy via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name: Deploy via SFTP
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
-          server: brianbanna.com
           username: ${{ secrets.FTP_USERNAME }}
+          server: brianbanna.com
+          port: 22
+          local_path: "./out/*"
+          remote_path: "/"
+          sftp_only: true
           password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftps
-          port: 21
-          local-dir: ./out/
-          server-dir: /
-          dangerous-clean-slate: true
