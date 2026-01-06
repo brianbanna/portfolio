@@ -51,21 +51,20 @@ export const AboutSection: React.FC = () => {
           <div className="flex flex-col justify-between min-w-0 gap-8">
             <div className="space-y-4 text-fg/70 leading-relaxed text-justify">
               <p>
-                Master's student in Data Science with a minor in Financial Engineering at EPFL. 
-                I'm looking for a 2026 internship or off-cycle role in quantitative analysis, 
-                quantitative trading, or financial analytics.
+                I work on quantitative research and systematic modeling, mainly in commodities 
+                and macro markets. I'm pursuing a Master's in Data Science with a minor in 
+                Financial Engineering at EPFL.
               </p>
               <p>
-                I combine quantitative methods, financial mathematics, and programming to build 
-                models that support data-driven decisions in finance.
+                I use statistical methods, time series analysis, and financial mathematics to 
+                build models that support data driven decisions in trading and market analysis.
               </p>
               <p>
-                My work focuses on statistical modeling, time-series analysis, and systematic 
-                strategy design. I study market dynamics, develop analytical frameworks, and 
-                backtest strategies grounded in data and financial logic.
+                My work focuses on designing strategies, studying market behavior, and backtesting 
+                ideas using clear data and financial logic.
               </p>
               <p>
-                I've built several projects across commodities, equities and macros.
+                I have built and tested projects across commodities, equities, and macro markets.
               </p>
             </div>
 
