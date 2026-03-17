@@ -51,20 +51,20 @@ export const AboutSection: React.FC = () => {
           <div className="flex flex-col justify-between min-w-0 gap-8">
             <div className="space-y-4 text-fg/70 leading-relaxed text-justify">
               <p>
-                I work on quantitative research and systematic modeling, mainly in commodities 
-                and macro markets. I'm pursuing a Master's in Data Science with a minor in 
-                Financial Engineering at EPFL.
+                My work focuses on quantitative modeling and financial data analysis. I develop
+                systematic models and research frameworks to study market dynamics, with a
+                particular interest in commodities and trading strategies.
               </p>
               <p>
-                I use statistical methods, time series analysis, and financial mathematics to 
-                build models that support data driven decisions in trading and market analysis.
+                I previously worked in quantitative research related to commodity markets, building
+                market signals from production data, refining capacity and global trade flows. In
+                parallel, I have developed research projects around systematic trading — including
+                market regime modeling, futures curve factor strategies and statistical arbitrage.
               </p>
               <p>
-                My work focuses on designing strategies, studying market behavior, and backtesting 
-                ideas using clear data and financial logic.
-              </p>
-              <p>
-                I have built and tested projects across commodities, equities, and macro markets.
+                Previously, I served as President and Head of Sales at Junior Entreprise EPFL,
+                Switzerland's largest student-run consultancy, leading a 35-person team and
+                managing over CHF 500k in project volume across finance, commodities and energy.
               </p>
             </div>
 

@@ -23,7 +23,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
             Projects
           </h2>
           <p className="text-fg/60">
-            A collection of my work in quantitative finance and systematic trading.
+            Selected research projects in systematic trading and quantitative modeling.
           </p>
         </div>
 
