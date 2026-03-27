@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Systematic Regime Trading | Brian Banna</title>
+    <meta name="description" content="5-model ensemble regime detection for equity allocation. Cuts max drawdown from -55% to -13%.">
+    <meta property="og:title" content="Systematic Regime Trading">
+    <meta property="og:description" content="5-model ensemble regime detection cuts drawdowns by 75% while maintaining risk-adjusted returns.">
+    <meta property="og:image" content="assets/figures/01_cumulative_returns.png">
+    <meta property="og:type" content="article">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js" charset="utf-8"></script>
+    <script src="js/chart_data_inline.js"></script>
+    <script src="js/crisis_data.js"></script>
+</head>
+<body>
+
+<header class="hero">
+    <div class="container">
+        <p class="byline"><a href="https://brianbanna.com">Brian Banna</a></p>
+        <h1>Systematic Regime Trading</h1>
+        <p class="tagline">5-model ensemble that classifies market regimes and adjusts equity allocation. Beats SPY on both absolute return and risk-adjusted basis over 15 years of out-of-sample data.</p>
+        <div class="badges">
+            <div class="badge">
+                <div class="value">0.70</div>
+                <div class="label">Sharpe</div>
+            </div>
+            <div class="badge">
+                <div class="value">-28%</div>
+                <div class="label">Max Drawdown</div>
+            </div>
+            <div class="badge">
+                <div class="value">10.2%</div>
+                <div class="label">CAGR</div>
+            </div>
+            <div class="badge">
+                <div class="value">6 days</div>
+                <div class="label">Lead Time</div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="container">
+
+<!-- Hook: The 2008 Story -->
+<section class="animate-in">
+    <h2>September 2008. The S&P 500 lost 30% in three weeks.</h2>
+    <p>Most systematic strategies were fully invested when the crash hit. This system detected the regime shift 6 days earlier. By September 19, allocation had dropped from 85% to 12%.</p>
+
+    <div class="stat-row">
+        <div class="stat-card">
+            <div class="big negative-val">-29%</div>
+            <div class="desc">Market (Sep-Dec 2008)</div>
+        </div>
+        <div class="stat-card">
+            <div class="big">-4.3%</div>
+            <div class="desc">Strategy (Sep-Dec 2008)</div>
+        </div>
+        <div class="stat-card">
+            <div class="big negative-val">-55%</div>
+            <div class="desc">Buy &amp; Hold Max DD</div>
+        </div>
+        <div class="stat-card">
+            <div class="big">-28%</div>
+            <div class="desc">Strategy Max DD</div>
+        </div>
+    </div>
+</section>
+
+<!-- Interactive Performance -->
+<section>
+    <h2>Performance</h2>
+    <div id="plotly-equity-curve" class="interactive-chart"></div>
+    <p class="chart-caption-inline">Hover for daily returns. Click legend to toggle strategies. Drag to zoom into any period.</p>
+
+    <div class="chart-container">
+        <img src="assets/figures/02_drawdown.png" alt="Drawdown comparison" loading="lazy">
+        <div class="chart-caption">Drawdown from peak. Buy-and-hold hit -55% in 2008. The regime strategy cut that in half while delivering higher returns (10.2% vs 9.6% CAGR).</div>
+    </div>
+
+    <div class="table-wrap">
+    <table>
+        <thead><tr><th>Strategy</th><th>CAGR</th><th>Vol</th><th>Sharpe</th><th>Max DD</th><th>Turnover</th></tr></thead>
+        <tbody>
+            <tr class="highlight"><td>Regime Momentum</td><td class="positive">10.2%</td><td>9.3%</td><td class="positive">0.70</td><td>-27.7%</td><td>5.7x</td></tr>
+            <tr><td>Binary Regime</td><td>7.5%</td><td>12.5%</td><td>0.49</td><td>-35.8%</td><td>10.6x</td></tr>
+            <tr><td>Vol-Managed</td><td>6.6%</td><td>10.5%</td><td>0.47</td><td>-23.7%</td><td>1.7x</td></tr>
+            <tr><td>SMA 200</td><td>7.0%</td><td>11.7%</td><td>0.47</td><td>-21.9%</td><td>6.0x</td></tr>
+            <tr><td>Buy &amp; Hold (SPY)</td><td>9.6%</td><td>20.1%</td><td>0.46</td><td class="negative">-55.2%</td><td>0.0x</td></tr>
+        </tbody>
+    </table>
+    </div>
+</section>
+
+<!-- How it works: Signal vs Drawdown -->
+<section>
+    <h2>Signal vs Market Drawdown</h2>
+    <div class="chart-container">
+        <img src="assets/figures/11_signal_vs_drawdown.png" alt="Signal vs drawdown" loading="lazy">
+        <div class="chart-caption">Blue: equity allocation. Red: market drawdown. The strategy reduces exposure before and during every major drawdown.</div>
+    </div>
+</section>
+
+<!-- System Architecture -->
+<section>
+    <h2>Architecture</h2>
+    <div class="pipeline">
+        <span class="pipeline-step">190 Stocks</span>
+        <span class="pipeline-arrow">&rarr;</span>
+        <span class="pipeline-step">6 Features</span>
+        <span class="pipeline-arrow">&rarr;</span>
+        <span class="pipeline-step">5 Models</span>
+        <span class="pipeline-arrow">&rarr;</span>
+        <span class="pipeline-step">Ensemble</span>
+        <span class="pipeline-arrow">&rarr;</span>
+        <span class="pipeline-step">Signal</span>
+        <span class="pipeline-arrow">&rarr;</span>
+        <span class="pipeline-step">Backtest</span>
+    </div>
+
+    <ul>
+        <li><strong>HMM</strong> (5-state Gaussian, remapped to 3): transition persistence</li>
+        <li><strong>GARCH(1,1)</strong> Student-t: conditional volatility clustering</li>
+        <li><strong>K-Means</strong>: feature-space clustering</li>
+        <li><strong>Gaussian Mixture Model</strong>: Bayesian posterior probabilities</li>
+        <li><strong>Markov-Switching</strong> (Hamilton 1989): regime-dependent variance</li>
+    </ul>
+
+    <p>Walk-forward validation, expanding window, quarterly refit. 59 windows, 3,771 out-of-sample predictions. SPY benchmark. 1-day execution lag. Asymmetric confirmation filters.</p>
+
+    <details>
+        <summary>Walk-forward loop</summary>
+        <pre><code>while train_end_idx + step_days <= n_total:
+    train = feature_df.iloc[:train_end_idx]
+    test = feature_df.iloc[train_end_idx:test_end_idx]
+
+    probs = {
+        "hmm": fit_predict_hmm(train, test),
+        "garch": fit_predict_garch(train, test),
+        "kmeans": fit_predict_kmeans(train, test),
+        "gmm": fit_predict_gmm(train, test),
+        "ms": fit_predict_markov_switching(train, test),
+    }
+    combined = ensemble.combine(probs)
+    train_end_idx += 63  # quarterly</code></pre>
+    </details>
+</section>
+
+<!-- Regime Prediction -->
+<section>
+    <h2>Regime Prediction</h2>
+    <div class="chart-container">
+        <img src="assets/figures/14_prediction_accuracy.png" alt="Prediction accuracy" loading="lazy">
+        <div class="chart-caption">Realized volatility over the next 5, 10, and 20 days by predicted regime. Calm: 12%. Turbulent: 22%. Clear separation across all horizons.</div>
+    </div>
+
+    <div class="chart-container">
+        <img src="assets/figures/06_regime_timeline.png" alt="Regime timeline" loading="lazy">
+        <div class="chart-caption">SPY with regime shading. Bottom: ensemble probability decomposition. Turbulent regimes concentrate around 2008, 2011, 2015, and early 2020.</div>
+    </div>
+</section>
+
+<!-- Regime Performance -->
+<section>
+    <h2>Performance by Regime</h2>
+    <div class="chart-container">
+        <img src="assets/figures/09_regime_performance.png" alt="Regime performance" loading="lazy">
+        <div class="chart-caption">Calm markets: Sharpe 1.10, 81% of total return from 52% of trading days.</div>
+    </div>
+</section>
+
+<!-- Interactive Simulation -->
+<section>
+    <h2>Try It: Cost Simulator</h2>
+    <p>Drag the slider to see how transaction costs affect strategy performance. Institutional equity costs are typically 5-10 bps.</p>
+
+    <div class="sim-container">
+        <div class="sim-slider-row">
+            <label for="cost-slider">Transaction Cost:</label>
+            <input type="range" id="cost-slider" min="0" max="50" value="7" step="1">
+            <span id="cost-display" class="sim-value">7 bps</span>
+        </div>
+
+        <div class="stat-row" id="sim-results">
+            <div class="stat-card">
+                <div class="big" id="sim-sharpe">0.70</div>
+                <div class="desc">Sharpe</div>
+            </div>
+            <div class="stat-card">
+                <div class="big" id="sim-cagr">10.2%</div>
+                <div class="desc">CAGR</div>
+            </div>
+            <div class="stat-card">
+                <div class="big" id="sim-maxdd">-28%</div>
+                <div class="desc">Max DD</div>
+            </div>
+            <div class="stat-card">
+                <div class="big" id="sim-breakeven">31 bps</div>
+                <div class="desc">Breakeven</div>
+            </div>
+        </div>
+        <p class="chart-caption-inline" id="sim-verdict"></p>
+    </div>
+</section>
+
+<!-- Crisis Simulation -->
+<section>
+    <h2>Through the 2008 Crisis</h2>
+    <p>$10,000 invested in September 2007, right before the worst financial crisis in modern history. Watch what happens.</p>
+    <div class="sim-container">
+        <div id="growth-chart" class="interactive-chart"></div>
+        <div class="sim-slider-row">
+            <button id="growth-play" class="sim-button">Animate</button>
+            <span id="growth-status" class="chart-caption-inline" style="margin:0"></span>
+        </div>
+        <div class="stat-row" id="growth-final">
+            <div class="stat-card">
+                <div class="big" id="growth-strat">$10,000</div>
+                <div class="desc">Strategy</div>
+            </div>
+            <div class="stat-card">
+                <div class="big negative-val" id="growth-spy">$10,000</div>
+                <div class="desc">SPY Buy &amp; Hold</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Crude Oil -->
+<section>
+    <h2>Crude Oil Extension</h2>
+    <div class="chart-container">
+        <img src="assets/figures/18_crude_oil_regimes.png" alt="Crude oil regimes" loading="lazy">
+        <div class="chart-caption">WTI crude oil regime detection. Correctly identifies the 2008 crash, 2014-2016 oil glut, and the 2020 negative price event. Cross-asset correlation with equity VIX: 0.25.</div>
+    </div>
+</section>
+
+<!-- Model Diagnostics -->
+<section>
+    <h2>Ensemble Diagnostics</h2>
+    <div class="chart-container">
+        <img src="assets/figures/12_model_agreement.png" alt="Model agreement" loading="lazy">
+        <div class="chart-caption">Pairwise agreement between five models. Feature-space models (HMM, GMM) and return-based models (GARCH, Markov-Switching) form two independent clusters.</div>
+    </div>
+
+    <div class="chart-container">
+        <img src="assets/figures/16_cumulative_excess.png" alt="Cumulative excess" loading="lazy">
+        <div class="chart-caption">Cumulative excess return vs SPY. Alpha concentrates during crisis periods. Fama-French R-squared of 0.20 confirms low factor exposure.</div>
+    </div>
+</section>
+
+</main>
+
+<footer></footer>
+
+<script>
+(function() {
+    // Fade-in sections on scroll
+    document.querySelectorAll('section').forEach(function(s) {
+        s.style.opacity = '0';
+        s.style.transform = 'translateY(20px)';
+        s.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    });
+    var obs = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+            if (e.isIntersecting) { e.target.style.opacity='1'; e.target.style.transform='translateY(0)'; }
+        });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('section').forEach(function(s) { obs.observe(s); });
+
+    // Cost simulator
+    var costBps =    [0, 2, 5, 7, 10, 15, 20, 30, 50];
+    var costSharpe = [0.76, 0.74, 0.72, 0.70, 0.67, 0.62, 0.57, 0.47, 0.28];
+    var costCagr =   [10.8, 10.6, 10.4, 10.2, 9.8, 9.2, 8.6, 7.4, 5.2];
+    var costMaxdd =  [-27.0, -27.3, -27.5, -27.7, -28.1, -28.6, -29.1, -30.2, -32.5];
+
+    function lerp(arr, keys, t) {
+        if (t <= keys[0]) return arr[0];
+        if (t >= keys[keys.length-1]) return arr[arr.length-1];
+        for (var i=0; i<keys.length-1; i++) {
+            if (t >= keys[i] && t <= keys[i+1]) {
+                var f = (t - keys[i]) / (keys[i+1] - keys[i]);
+                return arr[i] + f * (arr[i+1] - arr[i]);
+            }
+        }
+        return arr[arr.length-1];
+    }
+
+    var sl = document.getElementById('cost-slider');
+    if (sl) {
+        sl.addEventListener('input', function() {
+            var b = parseInt(sl.value);
+            document.getElementById('cost-display').textContent = b + ' bps';
+            var sh = lerp(costSharpe, costBps, b);
+            var ca = lerp(costCagr, costBps, b);
+            var md = lerp(costMaxdd, costBps, b);
+            var elS = document.getElementById('sim-sharpe');
+            var elC = document.getElementById('sim-cagr');
+            var elM = document.getElementById('sim-maxdd');
+            var elV = document.getElementById('sim-verdict');
+            elS.textContent = sh.toFixed(2);
+            elS.style.color = sh > 0.46 ? '#00e676' : '#ff1744';
+            elC.textContent = ca.toFixed(1) + '%';
+            elC.style.color = ca > 9.6 ? '#00e676' : ca > 0 ? '#4fc3f7' : '#ff1744';
+            elM.textContent = md.toFixed(0) + '%';
+            if (sh > 0.46) { elV.textContent = 'Outperforms SPY at this cost level.'; elV.style.color = '#00e676'; }
+            else if (sh > 0) { elV.textContent = 'Profitable but underperforms SPY.'; elV.style.color = '#ffab00'; }
+            else { elV.textContent = 'Unprofitable at this cost level.'; elV.style.color = '#ff1744'; }
+        });
+    }
+
+    // Wait for CHART_DATA and Plotly
+    if (typeof CHART_DATA === 'undefined' || typeof Plotly === 'undefined') return;
+
+    var D = CHART_DATA;
+    var mob = window.innerWidth < 640;
+
+    // === Performance equity curve ===
+    var eqTraces = [];
+    for (var name in D.strategies) {
+        var s = D.strategies[name];
+        eqTraces.push({
+            x: s.dates, y: s.cumulative_return,
+            type: 'scatter', mode: 'lines', name: name,
+            line: { color: s.color, width: name === 'Regime Momentum' ? 2.5 : 1.2 },
+            hovertemplate: name + '<br>%{x}<br>%{y:.2f}x<extra></extra>'
+        });
+    }
+    Plotly.newPlot('plotly-equity-curve', eqTraces, {
+        paper_bgcolor:'#111', plot_bgcolor:'#111',
+        font: { color:'#999', family:'Inter,sans-serif', size: mob?10:12 },
+        xaxis: { gridcolor:'#222', showline:false },
+        yaxis: { gridcolor:'#222', title: mob?'':'Growth of $1', showline:false },
+        legend: { bgcolor:'rgba(17,17,17,0.95)', bordercolor:'#222',
+                  font:{size:mob?9:11}, orientation:mob?'h':'v', y:mob?-0.2:1 },
+        margin: { t:10, r:10, b:mob?60:40, l:mob?40:55 },
+        hovermode: 'x unified', dragmode: 'zoom'
+    }, { responsive:true, displayModeBar:!mob,
+         modeBarButtonsToRemove:['lasso2d','select2d','autoScale2d'] });
+
+    // === Crisis Simulation: $10,000 through 2008 ===
+    if (typeof CRISIS_DATA === 'undefined') return;
+
+    var oosStrat = CRISIS_DATA['Regime Strategy'];
+    var oosSpy = CRISIS_DATA['SPY Buy & Hold'];
+    if (!oosStrat || !oosSpy) return;
+
+    var oDates = oosStrat.dates;
+    var oSG = oosStrat.growth;
+    var oBG = oosSpy.growth;
+    var oN = oDates.length;
+    var oMax = 0;
+    for (var j=0;j<oN;j++) { if(oSG[j]>oMax) oMax=oSG[j]; if(oBG[j]>oMax) oMax=oBG[j]; }
+
+    function oLayout() {
+        return {
+            paper_bgcolor:'#111', plot_bgcolor:'#111',
+            font:{color:'#999',family:'Inter,sans-serif',size:mob?10:12},
+            xaxis:{gridcolor:'#222',showline:false,range:[oDates[0],oDates[oN-1]]},
+            yaxis:{gridcolor:'#222',title:mob?'':'Portfolio Value ($)',showline:false,
+                   tickprefix:'$',tickformat:',.0f',range:[3500,oMax*1.08]},
+            legend:{bgcolor:'rgba(17,17,17,0.95)',bordercolor:'#222',
+                    orientation:'h',y:mob?-0.15:1.05,font:{size:mob?9:11}},
+            margin:{t:10,r:10,b:mob?50:40,l:mob?50:65},
+            hovermode:'x unified',
+            shapes:[{type:'line',x0:oDates[0],x1:oDates[oN-1],y0:10000,y1:10000,
+                     line:{color:'#333',width:1,dash:'dash'}}]
+        };
+    }
+
+    function oTraces(len) {
+        return [
+            {x:oDates.slice(0,len),y:oSG.slice(0,len),type:'scatter',mode:'lines',
+             name:'Regime Strategy',line:{color:'#4fc3f7',width:2.5}},
+            {x:oDates.slice(0,len),y:oBG.slice(0,len),type:'scatter',mode:'lines',
+             name:'SPY Buy & Hold',line:{color:'#666',width:1.5,dash:'dot'}}
+        ];
+    }
+
+    var elGS = document.getElementById('growth-strat');
+    var elGB = document.getElementById('growth-spy');
+    var elGSt = document.getElementById('growth-status');
+    var btnG = document.getElementById('growth-play');
+
+    // Show full chart initially
+    Plotly.newPlot('growth-chart', oTraces(oN), oLayout(), {responsive:true,displayModeBar:false});
+    elGS.textContent = '$' + Math.round(oSG[oN-1]).toLocaleString();
+    elGS.style.color = '#00e676';
+    elGB.textContent = '$' + Math.round(oBG[oN-1]).toLocaleString();
+    elGB.style.color = '#999';
+
+    btnG.addEventListener('click', function() {
+        btnG.disabled = true;
+        btnG.textContent = 'Running...';
+        elGS.textContent = '$10,000';
+        elGB.textContent = '$10,000';
+        elGSt.textContent = '';
+
+        // Slower: ~300 frames over ~8 seconds
+        var step = Math.max(1, Math.floor(oN / 300));
+        var f = 1;
+        var lastTime = 0;
+        var frameDelay = 25; // ms between frames (slower = higher)
+
+        function tick(timestamp) {
+            if (timestamp - lastTime < frameDelay) {
+                requestAnimationFrame(tick);
+                return;
+            }
+            lastTime = timestamp;
+
+            f = Math.min(f + step, oN);
+            Plotly.react('growth-chart', oTraces(f), oLayout(), {responsive:true,displayModeBar:false});
+
+            var sv = oSG[f-1], bv = oBG[f-1];
+            elGS.textContent = '$' + Math.round(sv).toLocaleString();
+            elGB.textContent = '$' + Math.round(bv).toLocaleString();
+            elGS.style.color = sv >= bv ? '#00e676' : '#4fc3f7';
+            elGB.style.color = bv > sv ? '#00e676' : '#999';
+            elGSt.textContent = oDates[f-1];
+
+            if (f < oN) {
+                requestAnimationFrame(tick);
+            } else {
+                btnG.disabled = false;
+                btnG.textContent = 'Replay';
+            }
+        }
+        requestAnimationFrame(tick);
+    });
+})();
+</script>
+</body>
+</html>
