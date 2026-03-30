@@ -180,23 +180,25 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                               {slide.description}
                             </motion.p>
                           )}
-                          {slide.url && index === currentIndex && (
+                          {(slide.url || slide.repository) && index === currentIndex && (
                             <motion.div
                               initial={{ opacity: 0, y: 10 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ delay: 0.1 }}
                               className="flex items-center gap-3"
                             >
-                              <a
-                                href={slide.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                onClick={(e) => e.stopPropagation()}
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-fg/10 border border-fg/20 text-fg/80 hover:text-fg hover:bg-fg/20 text-xs font-medium transition-all"
-                              >
-                                <Globe className="w-3.5 h-3.5" />
-                                Website
-                              </a>
+                              {slide.url && (
+                                <a
+                                  href={slide.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-fg/10 border border-fg/20 text-fg/80 hover:text-fg hover:bg-fg/20 text-xs font-medium transition-all"
+                                >
+                                  <Globe className="w-3.5 h-3.5" />
+                                  Website
+                                </a>
+                              )}
                               {slide.repository && (
                                 <a
                                   href={`https://github.com/${slide.repository}`}
@@ -224,23 +226,25 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                           </p>
                         </div>
                         
-                        {slide.url && index === currentIndex && (
+                        {(slide.url || slide.repository) && index === currentIndex && (
                           <motion.div
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
                             className="flex items-center gap-3"
                           >
-                            <a
-                              href={slide.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-fg/10 border border-fg/20 text-fg/80 hover:text-fg hover:bg-fg/20 text-xs font-medium transition-all"
-                            >
-                              <Globe className="w-3.5 h-3.5" />
-                              Website
-                            </a>
+                            {slide.url && (
+                              <a
+                                href={slide.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-fg/10 border border-fg/20 text-fg/80 hover:text-fg hover:bg-fg/20 text-xs font-medium transition-all"
+                              >
+                                <Globe className="w-3.5 h-3.5" />
+                                Website
+                              </a>
+                            )}
                             {slide.repository && (
                               <a
                                 href={`https://github.com/${slide.repository}`}

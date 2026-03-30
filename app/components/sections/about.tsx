@@ -35,11 +35,11 @@ export const AboutSection: React.FC = () => {
         
         <div className="grid md:grid-cols-[280px_1fr] gap-8 lg:gap-12 items-stretch">
           <div className="flex flex-col items-center md:items-start">
-            <div className="w-full h-full min-h-[280px] rounded-2xl bg-gradient-to-br from-fg/20 to-fg/5 border border-fg/20 flex items-center justify-center overflow-hidden shadow-2xl">
+            <div className="w-[280px] aspect-square rounded-2xl bg-gradient-to-br from-fg/20 to-fg/5 border border-fg/20 flex items-center justify-center overflow-hidden shadow-2xl">
               <img 
                 src="/profile.jpg" 
                 alt="Brian Banna"
-                className="w-full h-full object-cover scale-90"
+                className="w-full h-full object-cover"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
                   const fallback = document.createElement('span');

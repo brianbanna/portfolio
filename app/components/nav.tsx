@@ -138,7 +138,7 @@ export const Navigation: React.FC = () => {
               onClick={(e) => handleClick(e, "#contact")}
               className="px-8 py-4 text-lg font-medium text-bg bg-fg rounded-full hover:opacity-90 transition-all duration-200 shadow-lg shadow-fg/20"
             >
-              Get in Touch
+              Get in touch
             </Link>
           </div>
         </div>

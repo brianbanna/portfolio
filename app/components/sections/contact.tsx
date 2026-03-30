@@ -45,7 +45,7 @@ export const ContactSection: React.FC = () => {
       <div className="container px-4 mx-auto">
         <div className="max-w-2xl mx-auto mb-16 text-center">
           <h2 className="text-3xl font-bold tracking-tight text-fg sm:text-4xl mb-4">
-            Get in Touch
+            Get in touch
           </h2>
           <p className="text-fg/60">
             Feel free to reach out for collaborations or just a friendly chat.
