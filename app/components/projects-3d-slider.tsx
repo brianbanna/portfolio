@@ -1,7 +1,7 @@
 "use client";
 import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Globe, Github } from "lucide-react";
 
 interface ProjectData {
   title: string;
@@ -125,7 +125,6 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
           <AnimatePresence mode="popLayout">
             {slides.map((slide, index) => {
               const style = getSlideStyle(index);
-              const projectLink = slide.url || (slide.repository ? `https://github.com/${slide.repository}` : undefined);
               
               return (
                 <motion.div
@@ -181,15 +180,36 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                               {slide.description}
                             </motion.p>
                           )}
-                          {projectLink && index === currentIndex && (
-                            <motion.span
+                          {slide.url && index === currentIndex && (
+                            <motion.div
                               initial={{ opacity: 0, y: 10 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ delay: 0.1 }}
-                              className="inline-flex items-center gap-2 text-fg/80 group-hover:text-fg text-sm font-medium transition-colors"
+                              className="flex items-center gap-3"
                             >
-                              {slide.url ? "View Project" : "View Repository"} →
-                            </motion.span>
+                              <a
+                                href={slide.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-fg/10 border border-fg/20 text-fg/80 hover:text-fg hover:bg-fg/20 text-xs font-medium transition-all"
+                              >
+                                <Globe className="w-3.5 h-3.5" />
+                                Website
+                              </a>
+                              {slide.repository && (
+                                <a
+                                  href={`https://github.com/${slide.repository}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-fg/10 border border-fg/20 text-fg/80 hover:text-fg hover:bg-fg/20 text-xs font-medium transition-all"
+                                >
+                                  <Github className="w-3.5 h-3.5" />
+                                  GitHub
+                                </a>
+                              )}
+                            </motion.div>
                           )}
                         </div>
                       </>
@@ -204,15 +224,36 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                           </p>
                         </div>
                         
-                        {projectLink && index === currentIndex && (
-                          <motion.span
+                        {slide.url && index === currentIndex && (
+                          <motion.div
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="inline-flex items-center gap-2 text-fg/80 group-hover:text-fg text-sm font-medium transition-colors"
+                            className="flex items-center gap-3"
                           >
-                            {slide.url ? "View Project" : "View Repository"} →
-                          </motion.span>
+                            <a
+                              href={slide.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-fg/10 border border-fg/20 text-fg/80 hover:text-fg hover:bg-fg/20 text-xs font-medium transition-all"
+                            >
+                              <Globe className="w-3.5 h-3.5" />
+                              Website
+                            </a>
+                            {slide.repository && (
+                              <a
+                                href={`https://github.com/${slide.repository}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-fg/10 border border-fg/20 text-fg/80 hover:text-fg hover:bg-fg/20 text-xs font-medium transition-all"
+                              >
+                                <Github className="w-3.5 h-3.5" />
+                                GitHub
+                              </a>
+                            )}
+                          </motion.div>
                         )}
                       </div>
                     )}

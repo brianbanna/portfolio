@@ -39,10 +39,13 @@ export const AboutSection: React.FC = () => {
               <img 
                 src="/profile.jpg" 
                 alt="Brian Banna"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover scale-90"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
-                  e.currentTarget.parentElement!.innerHTML = '<span class="text-5xl text-fg/30">BB</span>';
+                  const fallback = document.createElement('span');
+                  fallback.className = 'text-5xl text-fg/30';
+                  fallback.textContent = 'BB';
+                  e.currentTarget.parentElement!.appendChild(fallback);
                 }}
               />
             </div>
