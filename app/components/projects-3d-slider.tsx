@@ -44,52 +44,39 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
   const getSlideStyle = (index: number) => {
     const totalSlides = slides.length;
     let diff = index - currentIndex;
-    
+
     if (diff > totalSlides / 2) diff -= totalSlides;
     if (diff < -totalSlides / 2) diff += totalSlides;
 
-    const isActive = diff === 0;
     const isAdjacent = Math.abs(diff) === 1;
     const isSecondary = Math.abs(diff) === 2;
 
     let x = diff * 280;
-    let z = 0;
     let rotateY = 0;
     let scale = 1;
     let opacity = 1;
 
-    if (isActive) {
-      z = 100;
+    if (diff === 0) {
       scale = 1;
       opacity = 1;
     } else if (isAdjacent) {
       x = diff * 320;
-      z = -100;
       rotateY = diff * -35;
       scale = 0.85;
-      opacity = 0.8;
+      opacity = 0.7;
     } else if (isSecondary) {
       x = diff * 280;
-      z = -200;
       rotateY = diff * -45;
       scale = 0.7;
-      opacity = 0.5;
+      opacity = 0.4;
     } else {
       x = diff * 250;
-      z = -300;
       rotateY = diff * -50;
       scale = 0.5;
       opacity = 0;
     }
 
-    return {
-      x,
-      z,
-      rotateY,
-      scale,
-      opacity,
-      zIndex: 10 - Math.abs(diff),
-    };
+    return { x, rotateY, scale, opacity, zIndex: 10 - Math.abs(diff) };
   };
 
   if (slides.length === 0) {
@@ -100,133 +87,160 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
     );
   }
 
-  const activeSlide = slides[currentIndex];
-
   return (
-    <div 
+    <div
       className="relative w-full h-[500px] md:h-[600px] flex items-center justify-center overflow-hidden"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="absolute inset-0 bg-gradient-to-r from-bg via-transparent to-bg z-20 pointer-events-none" />
-      
-      <div 
-        className="relative w-full h-full flex items-center justify-center pointer-events-none"
+
+      <div
+        className="relative w-full h-full flex items-center justify-center"
         style={{ perspective: "1200px" }}
       >
-        <div 
-          className="relative flex items-center justify-center"
-          style={{ transformStyle: "preserve-3d" }}
-        >
-          <AnimatePresence mode="popLayout">
-            {slides.map((slide, index) => {
-              const style = getSlideStyle(index);
-              
-              return (
-                <motion.div
-                  key={slide.id}
-                  className="absolute pointer-events-none"
-                  initial={false}
-                  animate={{
-                    x: style.x,
-                    z: style.z,
-                    rotateY: style.rotateY,
-                    scale: style.scale,
-                    opacity: style.opacity,
-                  }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 300,
-                    damping: 30,
-                    mass: 1,
-                  }}
+        <AnimatePresence mode="popLayout">
+          {slides.map((slide, index) => {
+            const style = getSlideStyle(index);
+            const isActive = index === currentIndex;
+
+            return (
+              <motion.div
+                key={slide.id}
+                className="absolute"
+                initial={false}
+                animate={{
+                  x: style.x,
+                  rotateY: style.rotateY,
+                  scale: style.scale,
+                  opacity: style.opacity,
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 30,
+                  mass: 1,
+                }}
+                style={{
+                  zIndex: isActive ? 15 : style.zIndex,
+                  pointerEvents: isActive ? "auto" : "none",
+                }}
+              >
+                <div
+                  className="relative w-[300px] md:w-[450px] aspect-[4/3] rounded-xl overflow-hidden group"
                   style={{
-                    zIndex: style.zIndex,
+                    boxShadow: isActive
+                      ? "0 25px 50px -12px rgba(0,0,0,0.8), 0 0 60px -15px rgba(255,255,255,0.1)"
+                      : "0 20px 40px -12px rgba(0,0,0,0.6)",
                   }}
                 >
-                  <div 
-                    className="relative w-[300px] md:w-[450px] aspect-[4/3] rounded-xl overflow-hidden"
-                    style={{
-                      boxShadow: index === currentIndex 
-                        ? "0 25px 50px -12px rgba(0,0,0,0.8), 0 0 60px -15px rgba(255,255,255,0.1)"
-                        : "0 20px 40px -12px rgba(0,0,0,0.6)",
-                    }}
-                  >
-                    {slide.image ? (
-                      <>
-                        <img
-                          src={slide.image}
-                          alt={slide.title}
-                          className="w-full h-full object-cover"
-                          draggable={false}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/50 to-transparent" />
-                        <div className="absolute bottom-0 left-0 right-0 p-6">
-                          <h3 className="font-display text-lg md:text-xl font-bold text-fg mb-2">
-                            {slide.title}
-                          </h3>
-                          {index === currentIndex && (
-                            <motion.p
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              className="text-fg/70 text-sm leading-relaxed line-clamp-2 mb-10"
-                            >
-                              {slide.description}
-                            </motion.p>
-                          )}
-                        </div>
-                      </>
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-fg/10 to-fg/5 flex flex-col justify-between p-6 md:p-8 border border-fg/20 rounded-xl">
-                        <div>
-                          <h3 className="font-display text-xl md:text-2xl font-bold text-fg mb-3">
-                            {slide.title}
-                          </h3>
-                          <p className="text-fg/60 text-sm md:text-base leading-relaxed line-clamp-4">
+                  {slide.image ? (
+                    <>
+                      <img
+                        src={slide.image}
+                        alt={slide.title}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        draggable={false}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/50 to-transparent pointer-events-none" />
+                      <div className="absolute bottom-0 left-0 right-0 p-6">
+                        <h3 className="font-display text-lg md:text-xl font-bold text-fg mb-2">
+                          {slide.title}
+                        </h3>
+                        {isActive && (
+                          <motion.p
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-fg/70 text-sm leading-relaxed line-clamp-2 mb-3"
+                          >
                             {slide.description}
-                          </p>
-                        </div>
+                          </motion.p>
+                        )}
+                        {(slide.url || slide.repository) && isActive && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 }}
+                            className="flex items-center gap-3"
+                          >
+                            {slide.url && (
+                              <a
+                                href={slide.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={actionButtonClassName}
+                              >
+                                <Globe className="w-3.5 h-3.5" />
+                                Website
+                              </a>
+                            )}
+                            {slide.repository && (
+                              <a
+                                href={`https://github.com/${slide.repository}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={actionButtonClassName}
+                              >
+                                <Github className="w-3.5 h-3.5" />
+                                GitHub
+                              </a>
+                            )}
+                          </motion.div>
+                        )}
                       </div>
-                    )}
+                    </>
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-fg/10 to-fg/5 flex flex-col justify-between p-6 md:p-8 border border-fg/20 rounded-xl">
+                      <div>
+                        <h3 className="font-display text-xl md:text-2xl font-bold text-fg mb-3">
+                          {slide.title}
+                        </h3>
+                        <p className="text-fg/60 text-sm md:text-base leading-relaxed line-clamp-4">
+                          {slide.description}
+                        </p>
+                      </div>
 
-                    <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-fg/10" />
-                  </div>
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
-        </div>
+                      {(slide.url || slide.repository) && isActive && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.2 }}
+                          className="flex items-center gap-3"
+                        >
+                          {slide.url && (
+                            <a
+                              href={slide.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={actionButtonClassName}
+                            >
+                              <Globe className="w-3.5 h-3.5" />
+                              Website
+                            </a>
+                          )}
+                          {slide.repository && (
+                            <a
+                              href={`https://github.com/${slide.repository}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={actionButtonClassName}
+                            >
+                              <Github className="w-3.5 h-3.5" />
+                              GitHub
+                            </a>
+                          )}
+                        </motion.div>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-fg/10 pointer-events-none" />
+                </div>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
       </div>
-
-      {(activeSlide.url || activeSlide.repository) && (
-        <div
-          className="absolute z-30 flex items-center gap-3 left-1/2 -translate-x-1/2"
-          style={{ bottom: "calc(2rem + 28px)" }}
-        >
-          {activeSlide.url && (
-            <a
-              href={activeSlide.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={actionButtonClassName}
-            >
-              <Globe className="w-3.5 h-3.5" />
-              Website
-            </a>
-          )}
-          {activeSlide.repository && (
-            <a
-              href={`https://github.com/${activeSlide.repository}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={actionButtonClassName}
-            >
-              <Github className="w-3.5 h-3.5" />
-              GitHub
-            </a>
-          )}
-        </div>
-      )}
 
       <button
         onClick={slidePrev}
@@ -235,7 +249,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
       >
         <ChevronLeft className="w-5 h-5 text-fg/70 group-hover:text-fg transition-colors" />
       </button>
-      
+
       <button
         onClick={slideNext}
         className="absolute right-4 md:right-8 z-30 p-3 rounded-full bg-fg/10 backdrop-blur-sm border border-fg/20 hover:bg-fg/20 transition-all duration-200 hover:scale-110 group"
@@ -250,8 +264,8 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
             key={index}
             onClick={() => setCurrentIndex(index)}
             className={`w-2 h-2 rounded-full transition-all duration-300 ${
-              index === currentIndex 
-                ? "bg-fg w-6" 
+              index === currentIndex
+                ? "bg-fg w-6"
                 : "bg-fg/30 hover:bg-fg/50"
             }`}
             aria-label={`Go to slide ${index + 1}`}
