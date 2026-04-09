@@ -21,7 +21,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
 
   const slides = projects.map((p, i) => ({ ...p, id: i }));
   const actionButtonClassName =
-    "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-fg/10 border border-fg/20 text-fg/80 text-xs font-medium cursor-pointer transition-all duration-200 hover:bg-fg/20 hover:border-fg/40 hover:text-fg hover:-translate-y-0.5";
+    "inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-fg/10 border border-fg/20 text-fg/80 text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-fg/25 hover:border-fg/50 hover:text-fg hover:-translate-y-0.5 hover:shadow-lg hover:shadow-fg/5";
 
   const slideNext = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % slides.length);
@@ -31,7 +31,6 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
     setCurrentIndex((prev) => (prev - 1 + slides.length) % slides.length);
   }, [slides.length]);
 
-  // Auto-scroll every 3 seconds
   useEffect(() => {
     if (isHovered || slides.length === 0) return;
 
@@ -101,6 +100,8 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
     );
   }
 
+  const activeSlide = slides[currentIndex];
+
   return (
     <div 
       className="relative w-full h-[500px] md:h-[600px] flex items-center justify-center overflow-hidden"
@@ -110,7 +111,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
       <div className="absolute inset-0 bg-gradient-to-r from-bg via-transparent to-bg z-20 pointer-events-none" />
       
       <div 
-        className="relative w-full h-full flex items-center justify-center"
+        className="relative w-full h-full flex items-center justify-center pointer-events-none"
         style={{ perspective: "1200px" }}
       >
         <div 
@@ -124,7 +125,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
               return (
                 <motion.div
                   key={slide.id}
-                  className="absolute"
+                  className="absolute pointer-events-none"
                   initial={false}
                   animate={{
                     x: style.x,
@@ -141,12 +142,10 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                   }}
                   style={{
                     zIndex: style.zIndex,
-                    transformStyle: "preserve-3d",
-                    pointerEvents: index === currentIndex ? "auto" : "none",
                   }}
                 >
                   <div 
-                    className="relative w-[300px] md:w-[450px] aspect-[4/3] rounded-xl overflow-hidden group"
+                    className="relative w-[300px] md:w-[450px] aspect-[4/3] rounded-xl overflow-hidden"
                     style={{
                       boxShadow: index === currentIndex 
                         ? "0 25px 50px -12px rgba(0,0,0,0.8), 0 0 60px -15px rgba(255,255,255,0.1)"
@@ -158,11 +157,11 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                         <img
                           src={slide.image}
                           alt={slide.title}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          className="w-full h-full object-cover"
                           draggable={false}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/50 to-transparent" />
-                        <div className="absolute bottom-0 left-0 right-0 z-10 p-6">
+                        <div className="absolute bottom-0 left-0 right-0 p-6">
                           <h3 className="font-display text-lg md:text-xl font-bold text-fg mb-2">
                             {slide.title}
                           </h3>
@@ -170,41 +169,10 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                             <motion.p
                               initial={{ opacity: 0, y: 10 }}
                               animate={{ opacity: 1, y: 0 }}
-                              className="text-fg/70 text-sm leading-relaxed line-clamp-2 mb-3"
+                              className="text-fg/70 text-sm leading-relaxed line-clamp-2 mb-10"
                             >
                               {slide.description}
                             </motion.p>
-                          )}
-                          {(slide.url || slide.repository) && index === currentIndex && (
-                            <motion.div
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: 0.1 }}
-                              className="relative z-20 flex items-center gap-3"
-                            >
-                              {slide.url && (
-                                <a
-                                  href={slide.url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className={actionButtonClassName}
-                                >
-                                  <Globe className="w-3.5 h-3.5" />
-                                  Website
-                                </a>
-                              )}
-                              {slide.repository && (
-                                <a
-                                  href={`https://github.com/${slide.repository}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className={actionButtonClassName}
-                                >
-                                  <Github className="w-3.5 h-3.5" />
-                                  GitHub
-                                </a>
-                              )}
-                            </motion.div>
                           )}
                         </div>
                       </>
@@ -218,42 +186,10 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                             {slide.description}
                           </p>
                         </div>
-                        
-                        {(slide.url || slide.repository) && index === currentIndex && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2 }}
-                            className="relative z-20 flex items-center gap-3"
-                          >
-                            {slide.url && (
-                              <a
-                                href={slide.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className={actionButtonClassName}
-                              >
-                                <Globe className="w-3.5 h-3.5" />
-                                Website
-                              </a>
-                            )}
-                            {slide.repository && (
-                              <a
-                                href={`https://github.com/${slide.repository}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className={actionButtonClassName}
-                              >
-                                <Github className="w-3.5 h-3.5" />
-                                GitHub
-                              </a>
-                            )}
-                          </motion.div>
-                        )}
                       </div>
                     )}
 
-                    <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-fg/10 pointer-events-none" />
+                    <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-fg/10" />
                   </div>
                 </motion.div>
               );
@@ -261,6 +197,36 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
           </AnimatePresence>
         </div>
       </div>
+
+      {(activeSlide.url || activeSlide.repository) && (
+        <div
+          className="absolute z-30 flex items-center gap-3 left-1/2 -translate-x-1/2"
+          style={{ bottom: "calc(2rem + 28px)" }}
+        >
+          {activeSlide.url && (
+            <a
+              href={activeSlide.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={actionButtonClassName}
+            >
+              <Globe className="w-3.5 h-3.5" />
+              Website
+            </a>
+          )}
+          {activeSlide.repository && (
+            <a
+              href={`https://github.com/${activeSlide.repository}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={actionButtonClassName}
+            >
+              <Github className="w-3.5 h-3.5" />
+              GitHub
+            </a>
+          )}
+        </div>
+      )}
 
       <button
         onClick={slidePrev}
