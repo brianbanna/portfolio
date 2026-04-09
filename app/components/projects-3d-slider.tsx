@@ -21,7 +21,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
 
   const slides = projects.map((p, i) => ({ ...p, id: i }));
   const actionButtonClassName =
-    "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-fg/8 border border-fg/15 text-fg/75 text-xs font-medium transition-colors duration-200 hover:bg-fg/14 hover:border-fg/30 hover:text-fg";
+    "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-fg/10 border border-fg/20 text-fg/80 text-xs font-medium cursor-pointer transition-all duration-200 hover:bg-fg/20 hover:border-fg/40 hover:text-fg hover:-translate-y-0.5";
 
   const slideNext = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % slides.length);
@@ -142,6 +142,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                   style={{
                     zIndex: style.zIndex,
                     transformStyle: "preserve-3d",
+                    pointerEvents: index === currentIndex ? "auto" : "none",
                   }}
                 >
                   <div 
@@ -161,7 +162,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                           draggable={false}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/50 to-transparent" />
-                        <div className="absolute bottom-0 left-0 right-0 p-6">
+                        <div className="absolute bottom-0 left-0 right-0 z-10 p-6">
                           <h3 className="font-display text-lg md:text-xl font-bold text-fg mb-2">
                             {slide.title}
                           </h3>
@@ -179,7 +180,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                               initial={{ opacity: 0, y: 10 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ delay: 0.1 }}
-                              className="flex items-center gap-3"
+                              className="relative z-20 flex items-center gap-3"
                             >
                               {slide.url && (
                                 <a
@@ -223,7 +224,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="flex items-center gap-3"
+                            className="relative z-20 flex items-center gap-3"
                           >
                             {slide.url && (
                               <a
