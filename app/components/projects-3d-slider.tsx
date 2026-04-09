@@ -20,6 +20,8 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
   const slides = projects.map((p, i) => ({ ...p, id: i }));
+  const actionButtonClassName =
+    "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-fg/8 border border-fg/15 text-fg/75 text-xs font-medium transition-colors duration-200 hover:bg-fg/14 hover:border-fg/30 hover:text-fg";
 
   const slideNext = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % slides.length);
@@ -91,13 +93,6 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
     };
   };
 
-  const handleCardClick = (slide: typeof slides[0]) => {
-    const projectLink = slide.url || (slide.repository ? `https://github.com/${slide.repository}` : undefined);
-    if (projectLink) {
-      window.open(projectLink, '_blank', 'noopener,noreferrer');
-    }
-  };
-
   if (slides.length === 0) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -129,7 +124,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
               return (
                 <motion.div
                   key={slide.id}
-                  className="absolute cursor-pointer"
+                  className="absolute"
                   initial={false}
                   animate={{
                     x: style.x,
@@ -148,7 +143,6 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                     zIndex: style.zIndex,
                     transformStyle: "preserve-3d",
                   }}
-                  onClick={() => handleCardClick(slide)}
                 >
                   <div 
                     className="relative w-[300px] md:w-[450px] aspect-[4/3] rounded-xl overflow-hidden group"
@@ -192,8 +186,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                                   href={slide.url}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  onClick={(e) => e.stopPropagation()}
-                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-fg/10 border border-fg/20 text-fg/80 hover:text-fg hover:bg-fg/20 text-xs font-medium transition-all"
+                                  className={actionButtonClassName}
                                 >
                                   <Globe className="w-3.5 h-3.5" />
                                   Website
@@ -204,8 +197,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                                   href={`https://github.com/${slide.repository}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  onClick={(e) => e.stopPropagation()}
-                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-fg/10 border border-fg/20 text-fg/80 hover:text-fg hover:bg-fg/20 text-xs font-medium transition-all"
+                                  className={actionButtonClassName}
                                 >
                                   <Github className="w-3.5 h-3.5" />
                                   GitHub
@@ -238,8 +230,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                                 href={slide.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                onClick={(e) => e.stopPropagation()}
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-fg/10 border border-fg/20 text-fg/80 hover:text-fg hover:bg-fg/20 text-xs font-medium transition-all"
+                                className={actionButtonClassName}
                               >
                                 <Globe className="w-3.5 h-3.5" />
                                 Website
@@ -250,8 +241,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                                 href={`https://github.com/${slide.repository}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                onClick={(e) => e.stopPropagation()}
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-fg/10 border border-fg/20 text-fg/80 hover:text-fg hover:bg-fg/20 text-xs font-medium transition-all"
+                                className={actionButtonClassName}
                               >
                                 <Github className="w-3.5 h-3.5" />
                                 GitHub
