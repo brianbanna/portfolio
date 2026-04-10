@@ -30,15 +30,12 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
             <div className="section-marker">§ 02 — Selected Work</div>
           </div>
           <div className="col-span-12 md:col-span-9">
-            <h2 className="display text-[clamp(2.5rem,6vw,5.25rem)] text-fg leading-[0.95] text-balance">
-              Research in <span className="italic-accent text-accent">systematic</span> trading
-              &{" "}
-              <br className="hidden md:block" />
-              quantitative modelling.
+            <h2 className="display text-[clamp(2.5rem,6vw,5rem)] text-fg leading-[0.95] text-balance">
+              A few things I&apos;ve built.
             </h2>
-            <p className="mt-8 max-w-xl font-serif text-lg text-fg/60 leading-relaxed">
-              Four selected projects across regime detection, factor construction,
-              statistical arbitrage, and real-time signal processing.
+            <p className="mt-6 max-w-xl font-serif text-lg text-fg/60 leading-relaxed">
+              Selected research projects in systematic trading, regime
+              detection, and real-time signal processing.
             </p>
           </div>
         </div>
@@ -46,15 +43,6 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
 
       <div className="py-12 md:py-16">
         <Projects3DSlider projects={projects} />
-      </div>
-
-      {/* Trailing marker */}
-      <div className="editorial py-16 border-t border-fg/10">
-        <div className="flex items-center justify-between label">
-          <span>END § 02</span>
-          <span className="text-accent">◆</span>
-          <span>↓ CONTINUE</span>
-        </div>
       </div>
     </section>
   );

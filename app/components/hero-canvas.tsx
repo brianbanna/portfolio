@@ -11,11 +11,19 @@ import React, { useEffect, useRef } from "react";
  *
  * Inexpensive — canvas2D, GPU-compositable, single RAF loop. Degrades to
  * blank on reduced motion.
+ *
+ * "Curve Whisper": accepts an optional getVelocity callback read each
+ * frame inside the RAF loop. Scroll velocity is smoothed and modulates
+ * slope tilt, accent glow, and tenor dot pulse.
  */
-export const HeroCanvas: React.FC<{ className?: string }> = ({
-  className = "",
-}) => {
+export const HeroCanvas: React.FC<{
+  className?: string;
+  getVelocity?: () => number;
+}> = ({ className = "", getVelocity }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  // Keep a ref to the latest getVelocity so we never re-run the effect.
+  const getVelocityRef = useRef(getVelocity);
+  getVelocityRef.current = getVelocity;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -64,11 +72,21 @@ export const HeroCanvas: React.FC<{ className?: string }> = ({
       curvature: 0.25 + Math.random() * 0.3,
     }));
 
-    // Term-structure function for a given curve at time t
-    const priceAt = (c: CurveParams, x: number, t: number) => {
+    // Smoothed scroll velocity — mutated in place inside the RAF loop.
+    // Negative sign on the input flips "scroll down = tilt right-downward".
+    let smoothedVel = 0;
+
+    // Term-structure function for a given curve at time t.
+    // velBias is added to slope so fast scrolling flattens/steepens curves.
+    const priceAt = (
+      c: CurveParams,
+      x: number,
+      t: number,
+      velBias: number,
+    ) => {
       // x in 0..1 (tenor)
       const regime = Math.sin(c.phase + t * c.speed); // slow oscillation
-      const slope = regime * c.slope;
+      const slope = regime * c.slope + velBias;
       // asymmetric curvature to feel organic
       const curvature =
         c.curvature * Math.sin(x * Math.PI) * (0.6 + 0.4 * Math.cos(t * 0.0003));
@@ -83,6 +101,22 @@ export const HeroCanvas: React.FC<{ className?: string }> = ({
     const draw = (now: number) => {
       const t = prefersReduced ? 0 : now - startTime;
 
+      // Read + smooth velocity. Reduced-motion users get a hard zero.
+      if (prefersReduced) {
+        smoothedVel = 0;
+      } else {
+        // Invert so positive scroll-down produces a downward-right tilt.
+        const raw = -(getVelocityRef.current?.() ?? 0);
+        // Clamp incoming to the documented range to avoid extreme values.
+        const clamped = raw < -3 ? -3 : raw > 3 ? 3 : raw;
+        smoothedVel += (clamped - smoothedVel) * 0.08;
+      }
+
+      const velBias = smoothedVel * 0.08;
+      const absVel = Math.abs(smoothedVel);
+      const glowBoost = 14 + Math.min(absVel, 2) * 14;
+      const dotScale = 1 + Math.min(absVel, 1.5) * 0.8;
+
       ctx.clearRect(0, 0, w, h);
 
       // Layout padding
@@ -95,7 +129,7 @@ export const HeroCanvas: React.FC<{ className?: string }> = ({
       ctx.lineWidth = 1;
       for (let i = 0; i < TENORS; i++) {
         const x = padX + (i / (TENORS - 1)) * plotW;
-        ctx.strokeStyle = `rgba(237, 233, 224, ${i === 0 || i === TENORS - 1 ? 0.06 : 0.025})`;
+        ctx.strokeStyle = `rgba(232, 228, 220, ${i === 0 || i === TENORS - 1 ? 0.06 : 0.025})`;
         ctx.beginPath();
         ctx.moveTo(x, padY * 0.4);
         ctx.lineTo(x, h - padY * 0.4);
@@ -103,7 +137,7 @@ export const HeroCanvas: React.FC<{ className?: string }> = ({
       }
 
       // Horizontal zero line
-      ctx.strokeStyle = "rgba(237, 233, 224, 0.04)";
+      ctx.strokeStyle = "rgba(232, 228, 220, 0.04)";
       ctx.beginPath();
       ctx.moveTo(padX, h / 2);
       ctx.lineTo(w - padX, h / 2);
@@ -123,11 +157,11 @@ export const HeroCanvas: React.FC<{ className?: string }> = ({
         ctx.lineWidth = isActive ? 1.4 : 0.8 + depth * 0.4;
 
         if (isActive) {
-          ctx.strokeStyle = `rgba(247, 185, 85, 0.85)`;
-          ctx.shadowColor = "rgba(247, 185, 85, 0.5)";
-          ctx.shadowBlur = 14;
+          ctx.strokeStyle = `rgba(214, 189, 145, 0.85)`;
+          ctx.shadowColor = "rgba(214, 189, 145, 0.5)";
+          ctx.shadowBlur = glowBoost;
         } else {
-          ctx.strokeStyle = `rgba(237, 233, 224, ${alpha})`;
+          ctx.strokeStyle = `rgba(232, 228, 220, ${alpha})`;
           ctx.shadowBlur = 0;
         }
 
@@ -135,7 +169,7 @@ export const HeroCanvas: React.FC<{ className?: string }> = ({
         const segments = 80;
         for (let s = 0; s <= segments; s++) {
           const x01 = s / segments;
-          const price = priceAt(c, x01, t + i * 120);
+          const price = priceAt(c, x01, t + i * 120, velBias);
           const px = padX + x01 * plotW;
           const py = h / 2 + yOffset - price * plotH * 0.42;
           if (s === 0) ctx.moveTo(px, py);
@@ -146,14 +180,15 @@ export const HeroCanvas: React.FC<{ className?: string }> = ({
         // Tenor ticks on active curve
         if (isActive) {
           ctx.shadowBlur = 0;
-          ctx.fillStyle = "rgba(247, 185, 85, 0.85)";
+          ctx.fillStyle = "rgba(214, 189, 145, 0.85)";
+          const dotR = 1.6 * dotScale;
           for (let i2 = 0; i2 < TENORS; i2 += 2) {
             const x01 = i2 / (TENORS - 1);
-            const price = priceAt(c, x01, t + CURVES * 120);
+            const price = priceAt(c, x01, t + CURVES * 120, velBias);
             const px = padX + x01 * plotW;
             const py = h / 2 + yOffset - price * plotH * 0.42;
             ctx.beginPath();
-            ctx.arc(px, py, 1.6, 0, Math.PI * 2);
+            ctx.arc(px, py, dotR, 0, Math.PI * 2);
             ctx.fill();
           }
         }

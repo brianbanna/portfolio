@@ -4,13 +4,13 @@
 
 @layer base {
   :root {
-    --color-bg: 10 10 11;
-    --color-fg: 237 233 224;
-    --color-paper: 18 17 18;
-    --color-ink: 12 12 14;
-    --color-accent: 247 185 85;
+    /* Refined palette — cooler ink, warmer paper, dusty-gold accent */
+    --color-bg: 9 10 12;
+    --color-fg: 232 228 220;
+    --color-paper: 17 17 19;
+    --color-ink: 11 11 13;
+    --color-accent: 214 189 145;
 
-    --font-feat: "ss01", "ss02", "cv11";
     --edge: 1px solid rgb(var(--color-fg) / 0.08);
   }
 
@@ -30,29 +30,20 @@
   }
 
   ::selection {
-    background: rgb(var(--color-accent) / 0.35);
+    background: rgb(var(--color-accent) / 0.32);
     color: rgb(var(--color-fg));
   }
 
-  /* Smooth scrollbar */
   ::-webkit-scrollbar {
     width: 10px;
     height: 10px;
   }
-  ::-webkit-scrollbar-track {
-    background: rgb(var(--color-bg));
-  }
-  ::-webkit-scrollbar-thumb {
-    background: rgb(var(--color-fg) / 0.12);
-    border-radius: 0;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgb(var(--color-fg) / 0.25);
-  }
+  ::-webkit-scrollbar-track { background: rgb(var(--color-bg)); }
+  ::-webkit-scrollbar-thumb { background: rgb(var(--color-fg) / 0.12); }
+  ::-webkit-scrollbar-thumb:hover { background: rgb(var(--color-fg) / 0.25); }
 }
 
 @layer components {
-  /* Mono label — small caps technical metadata */
   .label {
     font-family: var(--font-mono), ui-monospace, monospace;
     font-size: 10px;
@@ -62,14 +53,7 @@
     color: rgb(var(--color-fg) / 0.55);
   }
 
-  .label-sm {
-    font-family: var(--font-mono), ui-monospace, monospace;
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    color: rgb(var(--color-fg) / 0.5);
-  }
-
-  /* Editorial display headline */
+  /* Editorial display headline — uses Fraunces optical-size axis */
   .display {
     font-family: var(--font-fraunces), serif;
     font-feature-settings: "ss01", "ss02";
@@ -77,8 +61,12 @@
     letter-spacing: -0.035em;
     line-height: 0.92;
   }
+  @supports (font-variation-settings: normal) {
+    .display {
+      font-variation-settings: "opsz" 144, "SOFT" 0;
+    }
+  }
 
-  /* Container with grid gutters */
   .editorial {
     max-width: 1360px;
     margin-left: auto;
@@ -87,7 +75,6 @@
     padding-right: clamp(20px, 4vw, 56px);
   }
 
-  /* Hairline divider */
   .hairline {
     height: 1px;
     background: linear-gradient(
@@ -99,7 +86,6 @@
     );
   }
 
-  /* Section header pattern */
   .section-marker {
     display: inline-flex;
     align-items: center;
@@ -117,7 +103,6 @@
     background: rgb(var(--color-accent) / 0.85);
   }
 
-  /* Link with underline draw */
   .link-draw {
     position: relative;
     display: inline-block;
@@ -139,7 +124,6 @@
     transform-origin: left;
   }
 
-  /* Noise overlay */
   .noise {
     position: absolute;
     inset: 0;
@@ -149,7 +133,6 @@
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
   }
 
-  /* Italic accent letter */
   .italic-accent {
     font-family: var(--font-fraunces), serif;
     font-style: italic;
@@ -158,20 +141,14 @@
 }
 
 @layer utilities {
-  /* Hide OS cursor when custom cursor is active */
   .cursor-none,
   .cursor-none * {
     cursor: none !important;
   }
 
-  .text-balance {
-    text-wrap: balance;
-  }
-  .text-pretty {
-    text-wrap: pretty;
-  }
+  .text-balance { text-wrap: balance; }
+  .text-pretty { text-wrap: pretty; }
 
-  /* Scroll reveal base */
   .reveal {
     opacity: 0;
     transform: translateY(24px);
@@ -183,7 +160,6 @@
     transform: translateY(0);
   }
 
-  /* Staggered children delays */
   .stagger > * { opacity: 0; transform: translateY(18px); animation: fade-up 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
   .stagger > *:nth-child(1) { animation-delay: 0.05s; }
   .stagger > *:nth-child(2) { animation-delay: 0.15s; }
@@ -197,5 +173,18 @@
 
   @keyframes fade-up {
     to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* Accessibility — honour reduced motion site-wide */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 }

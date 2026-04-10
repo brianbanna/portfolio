@@ -65,14 +65,14 @@ export const Navigation: React.FC = () => {
         }`}
       >
         <div className="editorial flex items-center justify-between py-5">
-          {/* Monogram */}
+          {/* Monogram — no colored letters */}
           <Link
             href="#home"
             onClick={(e) => handleClick(e, "#home")}
             className="group flex items-baseline gap-2"
           >
             <span className="display text-[22px] tracking-tighter text-fg">
-              Brian<span className="italic-accent text-accent">B</span>anna
+              Brian Banna
             </span>
           </Link>
 
@@ -85,7 +85,9 @@ export const Navigation: React.FC = () => {
                   key={item.href}
                   href={item.href}
                   onClick={(e) => handleClick(e, item.href)}
-                  className="group relative px-4 py-2 font-mono text-[11px] tracking-[0.14em] uppercase transition-colors"
+                  className={`group relative px-4 py-2 font-mono text-[11px] tracking-[0.14em] uppercase transition-colors rounded-full ${
+                    isActive ? "bg-fg/[0.06]" : "hover:bg-fg/[0.03]"
+                  }`}
                 >
                   <span
                     className={`mr-1.5 tabular-nums ${
@@ -107,11 +109,7 @@ export const Navigation: React.FC = () => {
           </nav>
 
           {/* Right cluster */}
-          <div className="flex items-center gap-4">
-            <div className="hidden lg:flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-fg/40">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-              Available Q3 — 26
-            </div>
+          <div className="flex items-center">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="md:hidden text-fg p-1"
@@ -119,6 +117,8 @@ export const Navigation: React.FC = () => {
             >
               {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
+            {/* Spacer to balance the monogram width on desktop */}
+            <div className="hidden md:block w-[96px]" />
           </div>
         </div>
 
@@ -146,7 +146,7 @@ export const Navigation: React.FC = () => {
                 <span className="font-mono text-xs text-accent tabular-nums">
                   §{item.num}
                 </span>
-                <span className="display text-5xl text-fg group-hover:italic-accent transition-all">
+                <span className="display text-5xl text-fg transition-all">
                   {item.name}
                 </span>
               </Link>

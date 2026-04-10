@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Github, Linkedin, ArrowUpRight } from "lucide-react";
+import { Github, Linkedin, Mail, ArrowUpRight } from "lucide-react";
 
 const getEmail = () => {
   const user = "briannbanna";
@@ -20,7 +20,7 @@ type Channel = {
   value: string;
   href: string;
   external?: boolean;
-  icon?: React.ReactNode;
+  icon: React.ReactNode;
   onClick?: (e: React.MouseEvent) => void;
 };
 
@@ -31,6 +31,7 @@ const channels: Channel[] = [
     value: "briannbanna [at] gmail.com",
     href: "#",
     onClick: handleEmailClick,
+    icon: <Mail className="w-5 h-5" />,
   },
   {
     num: "02",
@@ -38,7 +39,7 @@ const channels: Channel[] = [
     value: "/in/brianbanna",
     href: "https://linkedin.com/in/brianbanna",
     external: true,
-    icon: <Linkedin className="w-4 h-4" />,
+    icon: <Linkedin className="w-5 h-5" />,
   },
   {
     num: "03",
@@ -46,7 +47,7 @@ const channels: Channel[] = [
     value: "/brianbanna",
     href: "https://github.com/brianbanna",
     external: true,
-    icon: <Github className="w-4 h-4" />,
+    icon: <Github className="w-5 h-5" />,
   },
 ];
 
@@ -61,72 +62,66 @@ export const ContactSection: React.FC = () => {
         aria-hidden
       />
       <div
-        className="absolute -bottom-1/3 left-1/2 -translate-x-1/2 w-[120vw] h-[70vh] bg-[radial-gradient(ellipse_at_center,rgb(247_185_85/0.08),transparent_60%)] pointer-events-none"
+        className="absolute -bottom-1/3 left-1/2 -translate-x-1/2 w-[120vw] h-[70vh] bg-[radial-gradient(ellipse_at_center,rgb(214_189_145/0.06),transparent_60%)] pointer-events-none"
         aria-hidden
       />
       <div className="noise" aria-hidden />
 
       <div className="editorial relative py-28 md:py-44">
         {/* Section header */}
-        <div className="grid grid-cols-12 gap-6 mb-16 md:mb-24">
-          <div className="col-span-12 md:col-span-3">
-            <div className="section-marker">§ 03 — Contact</div>
-          </div>
-          <div className="col-span-12 md:col-span-9">
-            <h2 className="display text-[clamp(3rem,9vw,9rem)] text-fg leading-[0.88] text-balance">
-              Let's <span className="italic-accent text-accent">talk</span>.
-            </h2>
-            <p className="mt-8 max-w-xl font-serif text-xl md:text-2xl text-fg/60 leading-[1.5]">
-              Open to research collaborations, systematic trading discussions,
-              and quant-oriented mandates — or just a conversation about
-              markets.
-            </p>
-          </div>
+        <div className="mb-14 md:mb-20">
+          <div className="section-marker mb-10">§ 03 — Contact</div>
+          <h2 className="display text-[clamp(3rem,9vw,9rem)] text-fg leading-[0.88]">
+            Let&apos;s talk.
+          </h2>
+          <p className="mt-8 max-w-xl font-serif text-xl md:text-2xl text-fg/65 leading-[1.5]">
+            Always happy to chat about markets, research, or anything in
+            between. Reach out through any of the channels below.
+          </p>
         </div>
 
-        {/* Channels tableau */}
-        <div className="grid grid-cols-12 gap-6 mt-20">
-          <div className="hidden md:block md:col-span-3" />
-          <div className="col-span-12 md:col-span-9">
-            <div className="border-t border-fg/15">
-              {channels.map((c) => {
-                const content = (
-                  <div className="group grid grid-cols-12 gap-4 md:gap-6 items-center py-7 md:py-8 border-b border-fg/15 transition-colors hover:bg-fg/[0.02]">
-                    <div className="col-span-2 md:col-span-1 font-mono text-[11px] text-fg/35 tabular-nums">
-                      ({c.num})
-                    </div>
-                    <div className="col-span-10 md:col-span-3 font-mono text-[11px] uppercase tracking-[0.18em] text-fg/55 group-hover:text-accent transition-colors">
-                      {c.label}
-                    </div>
-                    <div className="col-span-10 col-start-3 md:col-start-auto md:col-span-7 display text-2xl md:text-[32px] text-fg/90 group-hover:text-fg tracking-tight leading-none">
-                      <span className="link-draw">{c.value}</span>
-                    </div>
-                    <div className="col-span-2 md:col-span-1 flex justify-end">
-                      <ArrowUpRight className="w-5 h-5 text-fg/40 group-hover:text-accent transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                    </div>
+        {/* Channels */}
+        <div className="mt-16 md:mt-20">
+          <div className="border-t border-fg/15">
+            {channels.map((c) => {
+              const content = (
+                <div className="group grid grid-cols-12 gap-4 md:gap-6 items-center py-7 md:py-8 border-b border-fg/15 transition-colors hover:bg-fg/[0.02]">
+                  <div className="col-span-2 md:col-span-1 flex justify-start">
+                    <span className="text-fg/40 group-hover:text-accent transition-colors">
+                      {c.icon}
+                    </span>
                   </div>
-                );
-                return c.onClick ? (
-                  <button
-                    key={c.num}
-                    onClick={c.onClick}
-                    className="w-full text-left"
-                  >
-                    {content}
-                  </button>
-                ) : (
-                  <a
-                    key={c.num}
-                    href={c.href}
-                    target={c.external ? "_blank" : undefined}
-                    rel={c.external ? "noopener noreferrer" : undefined}
-                    className="block"
-                  >
-                    {content}
-                  </a>
-                );
-              })}
-            </div>
+                  <div className="col-span-10 md:col-span-3 font-mono text-[11px] uppercase tracking-[0.18em] text-fg/55 group-hover:text-fg transition-colors">
+                    {c.label}
+                  </div>
+                  <div className="col-span-10 col-start-3 md:col-start-auto md:col-span-7 display text-2xl md:text-[32px] text-fg/90 group-hover:text-fg tracking-tight leading-none">
+                    <span className="link-draw">{c.value}</span>
+                  </div>
+                  <div className="col-span-2 md:col-span-1 flex justify-end">
+                    <ArrowUpRight className="w-5 h-5 text-fg/35 group-hover:text-accent transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </div>
+                </div>
+              );
+              return c.onClick ? (
+                <button
+                  key={c.num}
+                  onClick={c.onClick}
+                  className="w-full text-left"
+                >
+                  {content}
+                </button>
+              ) : (
+                <a
+                  key={c.num}
+                  href={c.href}
+                  target={c.external ? "_blank" : undefined}
+                  rel={c.external ? "noopener noreferrer" : undefined}
+                  className="block"
+                >
+                  {content}
+                </a>
+              );
+            })}
           </div>
         </div>
       </div>

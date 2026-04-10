@@ -14,29 +14,6 @@ const stack = {
   "Data / Infra": ["PostgreSQL", "Jupyter", "Git", "Docker", "Linux", "Plotly"],
 };
 
-const timeline = [
-  {
-    year: "2024 — Now",
-    role: "MSc Data Science",
-    org: "EPFL — Financial Engineering minor",
-  },
-  {
-    year: "2024",
-    role: "Quantitative Research",
-    org: "Commodity markets · production & trade flow signals",
-  },
-  {
-    year: "2023 — 2024",
-    role: "President · Head of Sales",
-    org: "Junior Entreprise EPFL · CHF 500k project volume",
-  },
-  {
-    year: "2022 — 2024",
-    role: "BSc Communication Systems",
-    org: "EPFL",
-  },
-];
-
 export const AboutSection: React.FC = () => {
   return (
     <section
@@ -51,96 +28,74 @@ export const AboutSection: React.FC = () => {
 
       <div className="editorial relative py-28 md:py-40">
         {/* Section header */}
-        <div className="grid grid-cols-12 gap-6 mb-20 md:mb-28">
-          <div className="col-span-12 md:col-span-3">
-            <div className="section-marker">§ 01 — About</div>
-          </div>
-          <div className="col-span-12 md:col-span-9">
-            <h2 className="display text-[clamp(2.5rem,6vw,5.25rem)] text-fg text-balance leading-[0.95]">
-              A <span className="italic-accent text-accent">researcher</span> at
-              the intersection of data, markets, and models.
-            </h2>
-          </div>
+        <div className="mb-16 md:mb-20">
+          <div className="section-marker">§ 01 — About</div>
         </div>
 
         {/* Portrait + prose */}
-        <div className="grid grid-cols-12 gap-6 md:gap-10">
-          {/* Portrait column */}
-          <div className="col-span-12 md:col-span-4 lg:col-span-3">
-            <figure className="relative">
+        <div className="grid grid-cols-12 gap-8 md:gap-12">
+          {/* Portrait */}
+          <div className="col-span-12 md:col-span-4 lg:col-span-4">
+            <figure className="relative md:sticky md:top-28">
               <div className="relative aspect-[4/5] overflow-hidden bg-paper border border-fg/10">
                 <img
                   src="/profile.jpg"
                   alt="Brian Banna"
-                  className="w-full h-full object-cover grayscale contrast-[1.05] hover:grayscale-0 transition-all duration-700"
+                  className="w-full h-full object-cover transition-transform duration-[1200ms] hover:scale-[1.02]"
                 />
                 <div className="absolute inset-0 ring-1 ring-inset ring-fg/10 pointer-events-none" />
               </div>
               <figcaption className="mt-3 flex items-center justify-between label">
                 <span>Fig. 01</span>
-                <span>Lausanne, 2026</span>
+                <span>Brian Banna</span>
               </figcaption>
             </figure>
           </div>
 
-          {/* Prose + timeline */}
-          <div className="col-span-12 md:col-span-8 lg:col-span-9">
-            <div className="grid grid-cols-12 gap-6 md:gap-10">
-              <div className="col-span-12 lg:col-span-7">
-                <p className="font-serif text-2xl md:text-[28px] leading-[1.35] text-fg text-pretty mb-8">
-                  <span className="italic-accent text-accent">"</span>
-                  I build systematic models and research frameworks to study
-                  market dynamics — with a particular interest in commodities
-                  and trading strategies.
-                  <span className="italic-accent text-accent">"</span>
-                </p>
+          {/* Prose */}
+          <div className="col-span-12 md:col-span-8 lg:col-span-8">
+            <div className="space-y-6 font-serif text-[18px] md:text-[19px] leading-[1.7] text-fg/85 max-w-[62ch]">
+              <p className="text-[22px] md:text-[24px] leading-[1.5] text-fg">
+                I'm a Master's student in Data Science with a minor in
+                Financial Engineering at EPFL.
+              </p>
 
-                <div className="space-y-5 text-fg/65 leading-[1.75] text-[15px] max-w-prose">
-                  <p>
-                    Previously I worked in quantitative research on commodity
-                    markets, building market signals from production data,
-                    refining capacity, and global trade flows. In parallel I
-                    developed several research projects around systematic
-                    trading — market regime modelling, futures curve factor
-                    strategies, and statistical arbitrage on cointegrated
-                    spreads.
-                  </p>
-                  <p>
-                    Before research I served as President and Head of Sales at
-                    Junior Entreprise EPFL, Switzerland's largest student-run
-                    consultancy — leading a 35-person team, managing more than
-                    CHF 500k in project volume, driving 22% YoY revenue
-                    growth, and personally closing CHF 430k across finance,
-                    commodities and energy mandates.
-                  </p>
-                  <p>
-                    Outside of work: financial history and its links to global
-                    politics, classical and practical philosophy, horology, and
-                    tennis.
-                  </p>
-                </div>
-              </div>
+              <p>
+                My work focuses on quantitative modelling and financial data
+                analysis. I develop systematic models and research frameworks
+                to analyse market dynamics, with a particular interest in
+                commodities and trading strategies.
+              </p>
 
-              {/* Timeline */}
-              <div className="col-span-12 lg:col-span-5">
-                <div className="label mb-6">Trajectory</div>
-                <ol className="relative space-y-6 before:absolute before:left-0 before:top-1 before:bottom-1 before:w-px before:bg-fg/10">
-                  {timeline.map((t) => (
-                    <li key={t.year + t.role} className="relative pl-5 group">
-                      <span className="absolute left-0 top-2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-accent/70 group-hover:bg-accent group-hover:scale-150 transition-transform" />
-                      <div className="font-mono text-[10px] tracking-[0.18em] uppercase text-fg/45 tabular-nums mb-1">
-                        {t.year}
-                      </div>
-                      <div className="font-serif text-lg text-fg leading-tight">
-                        {t.role}
-                      </div>
-                      <div className="text-[13px] text-fg/55 mt-0.5">
-                        {t.org}
-                      </div>
-                    </li>
-                  ))}
-                </ol>
-              </div>
+              <p>
+                I previously worked in quantitative research on commodity
+                markets, where I built market signals using production data,
+                refining capacity, and global trade flows to analyse
+                supply-demand dynamics and asset dependencies.
+              </p>
+
+              <p>
+                In parallel, I have developed several research projects around
+                systematic trading strategies, including market regime
+                modelling using HMM, GARCH and regime-switching models,
+                futures curve factor strategies, and statistical arbitrage
+                models based on cointegration and Kalman filtering.
+              </p>
+
+              <p>
+                Previously, I served as President and Head of Sales at Junior
+                Entreprise EPFL, Switzerland's largest student-run consultancy.
+                I led a 35-person team and managed more than CHF 500k in
+                project volume, driving 22% YoY revenue growth and personally
+                closing CHF 430k across projects in finance, commodities and
+                energy.
+              </p>
+
+              <p>
+                Outside of work, I'm interested in financial history and its
+                links to global politics, classical and practical philosophy,
+                horology and tennis.
+              </p>
             </div>
           </div>
         </div>
@@ -150,9 +105,9 @@ export const AboutSection: React.FC = () => {
           <div className="hairline mb-10" />
           <div className="grid grid-cols-12 gap-6 md:gap-10">
             <div className="col-span-12 md:col-span-3">
-              <div className="section-marker mb-2">§ 01.1 — Stack</div>
-              <div className="font-serif text-2xl text-fg/90 leading-tight mt-4">
-                Tools of the <span className="italic-accent text-accent">trade</span>
+              <div className="label mb-4">§ 01.1 — Stack</div>
+              <div className="font-serif text-2xl text-fg/90 leading-tight">
+                Tools I work with.
               </div>
             </div>
             <div className="col-span-12 md:col-span-9">
@@ -162,16 +117,16 @@ export const AboutSection: React.FC = () => {
                     <div className="label mb-4 pb-3 border-b border-fg/10">
                       {group}
                     </div>
-                    <ul className="space-y-2">
+                    <ul className="space-y-1">
                       {items.map((item, i) => (
                         <li
                           key={item}
-                          className="flex items-baseline gap-3 font-mono text-[13px] text-fg/75"
+                          className="group flex items-baseline gap-3 font-mono text-[13px] text-fg/70 py-1 px-2 -mx-2 rounded hover:bg-fg/[0.035] hover:text-fg transition-colors"
                         >
-                          <span className="text-fg/30 tabular-nums text-[10px]">
+                          <span className="text-fg/30 group-hover:text-accent tabular-nums text-[10px] transition-colors">
                             {String(i + 1).padStart(2, "0")}
                           </span>
-                          <span className="group-hover:text-fg">{item}</span>
+                          <span>{item}</span>
                         </li>
                       ))}
                     </ul>

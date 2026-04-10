@@ -15,32 +15,28 @@ interface Projects3DSliderProps {
   projects: ProjectData[];
 }
 
-// Shared project metadata (kept in sync with the reel variant)
+// Shared project metadata
 const meta: Record<
   string,
-  { tag: string; year: string; domain: string; highlight?: string }
+  { tag: string; domain: string; highlight?: string }
 > = {
   "Market Regime Modeling for Systematic Trading": {
     tag: "Systematic / Regime",
-    year: "2024",
     domain: "Equity Indices",
-    highlight: "0.70 Sharpe · 6-day lead · 15y OOS",
+    highlight: "0.70 Sharpe · 6-day lead · 15y out-of-sample",
   },
   "Commodity Futures Curve Modeling and Factor Trading": {
     tag: "Factors / Term Structure",
-    year: "2024",
     domain: "Commodity Futures",
-    highlight: "Cross-sectional · Roll-cost adjusted",
+    highlight: "Cross-sectional, roll-cost adjusted",
   },
   "Adaptive Statistical Arbitrage in Commodity Spreads": {
     tag: "Stat Arb / Cointegration",
-    year: "2024",
     domain: "Commodity Pairs",
     highlight: "Adaptive hedge ratio",
   },
   AirJav: {
     tag: "Signal Processing",
-    year: "2024",
     domain: "ADS-B / Aviation",
     highlight: "Real-time flight tracking",
   },
@@ -151,10 +147,8 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
             </AnimatePresence>
           </div>
           <div className="flex items-center gap-6 label tabular-nums">
-            <span>{activeMeta?.year}</span>
-            <span className="text-fg/25">/</span>
             <span>
-              {activeNum} — {total}
+              {activeNum} / {total}
             </span>
           </div>
         </div>
