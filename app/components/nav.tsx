@@ -1,145 +1,156 @@
 "use client";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { Menu, X, Sun, Moon } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 const navItems = [
-  { name: "Home", href: "#home" },
-  { name: "About", href: "#about" },
-  { name: "Projects", href: "#projects" },
-  { name: "Contact", href: "#contact" },
+  { num: "01", name: "Index", href: "#home" },
+  { num: "02", name: "About", href: "#about" },
+  { num: "03", name: "Work", href: "#projects" },
+  { num: "04", name: "Contact", href: "#contact" },
 ];
 
 export const Navigation: React.FC = () => {
   const [activeSection, setActiveSection] = useState("home");
   const [scrolled, setScrolled] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isDark, setIsDark] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+      const scrollTop = window.scrollY;
+      const docHeight =
+        document.documentElement.scrollHeight - window.innerHeight;
+      setScrolled(scrollTop > 40);
+      setProgress(docHeight > 0 ? Math.min(1, scrollTop / docHeight) : 0);
     };
-
-    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.remove("light");
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      document.documentElement.classList.add("light");
-    }
-  }, [isDark]);
-
-  useEffect(() => {
     const sections = navItems.map((item) => item.href.slice(1));
     const observers: IntersectionObserver[] = [];
-
-    sections.forEach((sectionId) => {
-      const element = document.getElementById(sectionId);
-      if (element) {
-        const observer = new IntersectionObserver(
-          ([entry]) => {
-            if (entry.isIntersecting) {
-              setActiveSection(sectionId);
-            }
-          },
-          { threshold: 0.5 }
-        );
-        observer.observe(element);
-        observers.push(observer);
-      }
+    sections.forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const observer = new IntersectionObserver(
+        ([entry]) => entry.isIntersecting && setActiveSection(id),
+        { rootMargin: "-40% 0px -50% 0px" }
+      );
+      observer.observe(el);
+      observers.push(observer);
     });
-
-    return () => {
-      observers.forEach((observer) => observer.disconnect());
-    };
+    return () => observers.forEach((o) => o.disconnect());
   }, []);
 
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  const handleClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string
+  ) => {
     e.preventDefault();
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
+    const el = document.querySelector(href);
+    if (el) el.scrollIntoView({ behavior: "smooth" });
     setMobileMenuOpen(false);
   };
 
   return (
     <>
       <header
-        className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
+        className={`fixed inset-x-0 top-0 z-50 transition-[background,border,backdrop-filter] duration-500 ${
           scrolled
-            ? "bg-bg/80 backdrop-blur-md border-b border-fg/10"
+            ? "bg-bg/70 backdrop-blur-xl border-b border-fg/5"
             : "bg-transparent"
         }`}
       >
-        <nav className="container flex items-center justify-center px-6 py-4 mx-auto max-w-7xl relative">
-          <div className="hidden md:flex items-center gap-1 bg-fg/5 rounded-full px-2 py-1 border border-fg/10">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={(e) => handleClick(e, item.href)}
-                className={`px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 ${
-                  activeSection === item.href.slice(1)
-                    ? "text-fg bg-fg/10"
-                    : "text-fg/60 hover:text-fg hover:bg-fg/5"
-                }`}
-              >
-                {item.name}
-              </Link>
-            ))}
-          </div>
+        <div className="editorial flex items-center justify-between py-5">
+          {/* Monogram */}
+          <Link
+            href="#home"
+            onClick={(e) => handleClick(e, "#home")}
+            className="group flex items-baseline gap-2"
+          >
+            <span className="display text-[22px] tracking-tighter text-fg">
+              Brian<span className="italic-accent text-accent">B</span>anna
+            </span>
+          </Link>
 
-          <div className="absolute right-6 flex items-center gap-3">
-            <button
-              onClick={() => setIsDark(!isDark)}
-              className="p-2 rounded-full text-fg/60 hover:text-fg hover:bg-fg/10 transition-all duration-200"
-              aria-label="Toggle theme"
-            >
-              {isDark ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center gap-1">
+            {navItems.map((item) => {
+              const isActive = activeSection === item.href.slice(1);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={(e) => handleClick(e, item.href)}
+                  className="group relative px-4 py-2 font-mono text-[11px] tracking-[0.14em] uppercase transition-colors"
+                >
+                  <span
+                    className={`mr-1.5 tabular-nums ${
+                      isActive ? "text-accent" : "text-fg/35"
+                    } transition-colors`}
+                  >
+                    {item.num}
+                  </span>
+                  <span
+                    className={`${
+                      isActive ? "text-fg" : "text-fg/55 group-hover:text-fg"
+                    } transition-colors`}
+                  >
+                    {item.name}
+                  </span>
+                </Link>
+              );
+            })}
+          </nav>
 
+          {/* Right cluster */}
+          <div className="flex items-center gap-4">
+            <div className="hidden lg:flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-fg/40">
+              <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+              Available Q3 — 26
+            </div>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden text-fg p-2"
+              className="md:hidden text-fg p-1"
               aria-label="Toggle menu"
             >
-              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
-        </nav>
+        </div>
+
+        {/* Scroll progress hairline */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-fg/5">
+          <div
+            className="h-full bg-accent/80 origin-left transition-transform duration-150"
+            style={{ transform: `scaleX(${progress})` }}
+          />
+        </div>
       </header>
 
+      {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-40 md:hidden bg-bg/95 backdrop-blur-lg">
-          <div className="flex flex-col items-center justify-center h-full gap-8">
+        <div className="fixed inset-0 z-40 md:hidden bg-bg/98 backdrop-blur-xl">
+          <div className="flex flex-col items-start justify-center h-full gap-1 px-8">
+            <div className="label mb-8">Navigation</div>
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={(e) => handleClick(e, item.href)}
-                className={`text-2xl font-medium transition-colors duration-200 ${
-                  activeSection === item.href.slice(1)
-                    ? "text-fg"
-                    : "text-fg/60 hover:text-fg"
-                }`}
+                className="group flex items-baseline gap-5 py-2"
               >
-                {item.name}
+                <span className="font-mono text-xs text-accent tabular-nums">
+                  §{item.num}
+                </span>
+                <span className="display text-5xl text-fg group-hover:italic-accent transition-all">
+                  {item.name}
+                </span>
               </Link>
             ))}
-            <Link
-              href="#contact"
-              onClick={(e) => handleClick(e, "#contact")}
-              className="px-8 py-4 text-lg font-medium text-bg bg-fg rounded-full hover:opacity-90 transition-all duration-200 shadow-lg shadow-fg/20"
-            >
-              Get in touch
-            </Link>
           </div>
         </div>
       )}

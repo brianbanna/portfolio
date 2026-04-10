@@ -1,7 +1,7 @@
 "use client";
 import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Globe, Github } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowUpRight, Github } from "lucide-react";
 
 interface ProjectData {
   title: string;
@@ -15,13 +15,42 @@ interface Projects3DSliderProps {
   projects: ProjectData[];
 }
 
+// Shared project metadata (kept in sync with the reel variant)
+const meta: Record<
+  string,
+  { tag: string; year: string; domain: string; highlight?: string }
+> = {
+  "Market Regime Modeling for Systematic Trading": {
+    tag: "Systematic / Regime",
+    year: "2024",
+    domain: "Equity Indices",
+    highlight: "0.70 Sharpe · 6-day lead · 15y OOS",
+  },
+  "Commodity Futures Curve Modeling and Factor Trading": {
+    tag: "Factors / Term Structure",
+    year: "2024",
+    domain: "Commodity Futures",
+    highlight: "Cross-sectional · Roll-cost adjusted",
+  },
+  "Adaptive Statistical Arbitrage in Commodity Spreads": {
+    tag: "Stat Arb / Cointegration",
+    year: "2024",
+    domain: "Commodity Pairs",
+    highlight: "Adaptive hedge ratio",
+  },
+  AirJav: {
+    tag: "Signal Processing",
+    year: "2024",
+    domain: "ADS-B / Aviation",
+    highlight: "Real-time flight tracking",
+  },
+};
+
 export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
 
   const slides = projects.map((p, i) => ({ ...p, id: i }));
-  const actionButtonClassName =
-    "inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-fg/10 border border-fg/20 text-fg/80 text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-fg/25 hover:border-fg/50 hover:text-fg hover:-translate-y-0.5 hover:shadow-lg hover:shadow-fg/5";
 
   const slideNext = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % slides.length);
@@ -33,25 +62,18 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
 
   useEffect(() => {
     if (isHovered || slides.length === 0) return;
-
-    const interval = setInterval(() => {
-      slideNext();
-    }, 3000);
-
+    const interval = setInterval(slideNext, 5000);
     return () => clearInterval(interval);
   }, [isHovered, slides.length, slideNext]);
 
   const getSlideStyle = (index: number) => {
-    const totalSlides = slides.length;
+    const total = slides.length;
     let diff = index - currentIndex;
+    if (diff > total / 2) diff -= total;
+    if (diff < -total / 2) diff += total;
 
-    if (diff > totalSlides / 2) diff -= totalSlides;
-    if (diff < -totalSlides / 2) diff += totalSlides;
-
-    const isAdjacent = Math.abs(diff) === 1;
-    const isSecondary = Math.abs(diff) === 2;
-
-    let x = diff * 280;
+    const abs = Math.abs(diff);
+    let x = diff * 340;
     let rotateY = 0;
     let scale = 1;
     let opacity = 1;
@@ -59,24 +81,24 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
     if (diff === 0) {
       scale = 1;
       opacity = 1;
-    } else if (isAdjacent) {
-      x = diff * 320;
-      rotateY = diff * -35;
-      scale = 0.85;
-      opacity = 0.7;
-    } else if (isSecondary) {
-      x = diff * 280;
-      rotateY = diff * -45;
-      scale = 0.7;
-      opacity = 0.4;
+    } else if (abs === 1) {
+      x = diff * 360;
+      rotateY = diff * -32;
+      scale = 0.82;
+      opacity = 0.55;
+    } else if (abs === 2) {
+      x = diff * 310;
+      rotateY = diff * -44;
+      scale = 0.66;
+      opacity = 0.28;
     } else {
-      x = diff * 250;
+      x = diff * 260;
       rotateY = diff * -50;
       scale = 0.5;
       opacity = 0;
     }
 
-    return { x, rotateY, scale, opacity, zIndex: 10 - Math.abs(diff) };
+    return { x, rotateY, scale, opacity, zIndex: 10 - abs };
   };
 
   if (slides.length === 0) {
@@ -87,19 +109,66 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
     );
   }
 
+  const active = slides[currentIndex];
+  const activeMeta = meta[active.title];
+  const activeNum = String(currentIndex + 1).padStart(2, "0");
+  const total = String(slides.length).padStart(2, "0");
+
   return (
     <div
-      className="relative w-full h-[500px] md:h-[600px] flex items-center justify-center overflow-hidden"
+      className="relative w-full"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="absolute inset-0 bg-gradient-to-r from-bg via-transparent to-bg z-20 pointer-events-none" />
+      {/* Metadata header — reads like a research plate caption */}
+      <div className="editorial mb-8 md:mb-10">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+          <div className="flex items-center gap-5 label">
+            <span className="text-accent tabular-nums">({activeNum})</span>
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={active.title + "tag"}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.3 }}
+              >
+                {activeMeta?.tag || "Project"}
+              </motion.span>
+            </AnimatePresence>
+            <span className="text-fg/25">/</span>
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={active.title + "domain"}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.3 }}
+                className="hidden md:inline"
+              >
+                {activeMeta?.domain}
+              </motion.span>
+            </AnimatePresence>
+          </div>
+          <div className="flex items-center gap-6 label tabular-nums">
+            <span>{activeMeta?.year}</span>
+            <span className="text-fg/25">/</span>
+            <span>
+              {activeNum} — {total}
+            </span>
+          </div>
+        </div>
+      </div>
 
-      <div
-        className="relative w-full h-full flex items-center justify-center"
-        style={{ perspective: "1200px" }}
-      >
-        <AnimatePresence mode="popLayout">
+      {/* 3D carousel stage */}
+      <div className="relative w-full h-[460px] md:h-[540px] flex items-center justify-center overflow-hidden">
+        {/* Side fade masks */}
+        <div className="absolute inset-0 bg-gradient-to-r from-bg via-transparent to-bg z-20 pointer-events-none" />
+
+        <div
+          className="relative w-full h-full flex items-center justify-center"
+          style={{ perspective: "1400px" }}
+        >
           {slides.map((slide, index) => {
             const style = getSlideStyle(index);
             const isActive = index === currentIndex;
@@ -117,8 +186,8 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                 }}
                 transition={{
                   type: "spring",
-                  stiffness: 300,
-                  damping: 30,
+                  stiffness: 260,
+                  damping: 32,
                   mass: 1,
                 }}
                 style={{
@@ -127,95 +196,73 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                 }}
               >
                 <div
-                  className="relative w-[300px] md:w-[450px] aspect-[4/3] rounded-xl overflow-hidden group"
+                  className="relative w-[320px] md:w-[520px] aspect-[4/3] overflow-hidden group bg-paper border border-fg/15"
                   style={{
                     boxShadow: isActive
-                      ? "0 25px 50px -12px rgba(0,0,0,0.8), 0 0 60px -15px rgba(255,255,255,0.1)"
-                      : "0 20px 40px -12px rgba(0,0,0,0.6)",
+                      ? "0 40px 80px -20px rgba(0,0,0,0.9), 0 0 80px -20px rgba(247,185,85,0.15)"
+                      : "0 20px 50px -15px rgba(0,0,0,0.7)",
                   }}
                 >
                   {slide.image ? (
-                    <>
-                      <img
-                        src={slide.image}
-                        alt={slide.title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        draggable={false}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/50 to-transparent pointer-events-none" />
-                      <div className="absolute bottom-0 left-0 right-0 p-6">
-                        <h3 className="font-display text-lg md:text-xl font-bold text-fg mb-2">
-                          {slide.title}
-                        </h3>
-                        {isActive && (
-                          <motion.p
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="text-fg/70 text-sm leading-relaxed line-clamp-2 mb-3"
-                          >
-                            {slide.description}
-                          </motion.p>
-                        )}
-                        {(slide.url || slide.repository) && isActive && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.1 }}
-                            className="flex items-center gap-3"
-                          >
-                            {slide.url && (
-                              <a
-                                href={slide.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className={actionButtonClassName}
-                              >
-                                <Globe className="w-3.5 h-3.5" />
-                                Website
-                              </a>
-                            )}
-                            {slide.repository && (
-                              <a
-                                href={`https://github.com/${slide.repository}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className={actionButtonClassName}
-                              >
-                                <Github className="w-3.5 h-3.5" />
-                                GitHub
-                              </a>
-                            )}
-                          </motion.div>
-                        )}
-                      </div>
-                    </>
+                    <img
+                      src={slide.image}
+                      alt={slide.title}
+                      className={`w-full h-full object-cover transition-all duration-[1200ms] ${
+                        isActive
+                          ? "grayscale-0 scale-100"
+                          : "grayscale contrast-125 scale-105"
+                      }`}
+                      draggable={false}
+                    />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-fg/10 to-fg/5 flex flex-col justify-between p-6 md:p-8 border border-fg/20 rounded-xl">
-                      <div>
-                        <h3 className="font-display text-xl md:text-2xl font-bold text-fg mb-3">
-                          {slide.title}
-                        </h3>
-                        <p className="text-fg/60 text-sm md:text-base leading-relaxed line-clamp-4">
-                          {slide.description}
-                        </p>
-                      </div>
+                    <div className="w-full h-full bg-gradient-to-br from-fg/10 to-fg/0 flex items-center justify-center">
+                      <span className="display text-9xl text-fg/10 tabular-nums">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                    </div>
+                  )}
 
-                      {(slide.url || slide.repository) && isActive && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.2 }}
-                          className="flex items-center gap-3"
-                        >
+                  {/* Editorial scrim */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/10 to-transparent pointer-events-none" />
+
+                  {/* Corner marks */}
+                  <div className="absolute top-0 left-0 w-5 h-5 border-t border-l border-fg/50" />
+                  <div className="absolute top-0 right-0 w-5 h-5 border-t border-r border-fg/50" />
+                  <div className="absolute bottom-0 left-0 w-5 h-5 border-b border-l border-fg/50" />
+                  <div className="absolute bottom-0 right-0 w-5 h-5 border-b border-r border-fg/50" />
+
+                  {/* Number overlay */}
+                  <div className="absolute top-4 left-4 font-mono text-[10px] tracking-[0.18em] text-fg/60 uppercase">
+                    {String(index + 1).padStart(2, "0")} / {total}
+                  </div>
+
+                  {/* Title + actions only on active */}
+                  <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7">
+                    <h3 className="display text-xl md:text-3xl text-fg leading-[1] mb-2 text-balance">
+                      {slide.title}
+                    </h3>
+                    {isActive && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.15 }}
+                      >
+                        {meta[slide.title]?.highlight && (
+                          <div className="mb-3 flex items-center gap-2 font-mono text-[10px] text-accent/90 uppercase tracking-wide">
+                            <span className="w-5 h-px bg-accent/60" />
+                            {meta[slide.title]?.highlight}
+                          </div>
+                        )}
+                        <div className="flex items-center gap-2">
                           {slide.url && (
                             <a
                               href={slide.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className={actionButtonClassName}
+                              className="group/btn inline-flex items-center gap-1.5 px-3 py-1.5 bg-fg text-bg font-mono text-[10px] uppercase tracking-[0.14em] hover:bg-accent transition-colors"
                             >
-                              <Globe className="w-3.5 h-3.5" />
-                              Website
+                              Live
+                              <ArrowUpRight className="w-3 h-3" />
                             </a>
                           )}
                           {slide.repository && (
@@ -223,54 +270,101 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                               href={`https://github.com/${slide.repository}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className={actionButtonClassName}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-fg/25 text-fg/80 hover:text-fg hover:border-fg/60 font-mono text-[10px] uppercase tracking-[0.14em] transition-colors"
                             >
-                              <Github className="w-3.5 h-3.5" />
-                              GitHub
+                              <Github className="w-3 h-3" />
+                              Source
                             </a>
                           )}
-                        </motion.div>
-                      )}
-                    </div>
-                  )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </div>
 
-                  <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-fg/10 pointer-events-none" />
+                  {/* Active accent line */}
+                  {isActive && (
+                    <div className="absolute top-0 left-0 right-0 h-px bg-accent/70" />
+                  )}
                 </div>
               </motion.div>
             );
           })}
-        </AnimatePresence>
+        </div>
+
+        {/* Nav buttons */}
+        <button
+          onClick={slidePrev}
+          className="absolute left-2 md:left-8 z-30 p-2.5 border border-fg/20 bg-bg/60 backdrop-blur-sm hover:bg-fg/10 hover:border-fg/50 transition-all"
+          aria-label="Previous"
+        >
+          <ChevronLeft className="w-4 h-4 text-fg/70 group-hover:text-fg" />
+        </button>
+        <button
+          onClick={slideNext}
+          className="absolute right-2 md:right-8 z-30 p-2.5 border border-fg/20 bg-bg/60 backdrop-blur-sm hover:bg-fg/10 hover:border-fg/50 transition-all"
+          aria-label="Next"
+        >
+          <ChevronRight className="w-4 h-4 text-fg/70" />
+        </button>
       </div>
 
-      <button
-        onClick={slidePrev}
-        className="absolute left-4 md:left-8 z-30 p-3 rounded-full bg-fg/10 backdrop-blur-sm border border-fg/20 hover:bg-fg/20 transition-all duration-200 hover:scale-110 group"
-        aria-label="Previous slide"
-      >
-        <ChevronLeft className="w-5 h-5 text-fg/70 group-hover:text-fg transition-colors" />
-      </button>
-
-      <button
-        onClick={slideNext}
-        className="absolute right-4 md:right-8 z-30 p-3 rounded-full bg-fg/10 backdrop-blur-sm border border-fg/20 hover:bg-fg/20 transition-all duration-200 hover:scale-110 group"
-        aria-label="Next slide"
-      >
-        <ChevronRight className="w-5 h-5 text-fg/70 group-hover:text-fg transition-colors" />
-      </button>
-
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex gap-2">
-        {slides.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setCurrentIndex(index)}
-            className={`w-2 h-2 rounded-full transition-all duration-300 ${
-              index === currentIndex
-                ? "bg-fg w-6"
-                : "bg-fg/30 hover:bg-fg/50"
-            }`}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
+      {/* Footer: description + indicator rail */}
+      <div className="editorial mt-8 md:mt-12">
+        <div className="grid grid-cols-12 gap-6 md:gap-10 items-start">
+          <div className="col-span-12 md:col-span-7">
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={active.title + "desc"}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.35 }}
+                className="font-serif text-lg md:text-xl leading-[1.55] text-fg/80 text-pretty max-w-2xl"
+              >
+                {active.description}
+              </motion.p>
+            </AnimatePresence>
+          </div>
+          <div className="col-span-12 md:col-span-5 flex flex-col gap-4">
+            <div className="label">Index</div>
+            <div className="flex flex-col gap-2">
+              {slides.map((s, i) => {
+                const isActive = i === currentIndex;
+                return (
+                  <button
+                    key={s.id}
+                    onClick={() => setCurrentIndex(i)}
+                    className="group flex items-center gap-4 text-left"
+                  >
+                    <span
+                      className={`font-mono text-[10px] tabular-nums transition-colors ${
+                        isActive ? "text-accent" : "text-fg/35"
+                      }`}
+                    >
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <span
+                      className={`h-px transition-all duration-500 ${
+                        isActive
+                          ? "w-16 bg-accent"
+                          : "w-8 bg-fg/20 group-hover:w-12 group-hover:bg-fg/50"
+                      }`}
+                    />
+                    <span
+                      className={`font-serif text-sm md:text-base leading-tight transition-colors text-balance ${
+                        isActive
+                          ? "text-fg"
+                          : "text-fg/45 group-hover:text-fg/80"
+                      }`}
+                    >
+                      {s.title}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

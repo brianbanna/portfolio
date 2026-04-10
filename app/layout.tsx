@@ -1,20 +1,20 @@
 import "../global.css";
-import { Inter } from "@next/font/google";
-import LocalFont from "@next/font/local";
+import { Inter, Fraunces, JetBrains_Mono } from "@next/font/google";
 import { Metadata } from "next";
 import { Analytics } from "./components/analytics";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://brianbanna.com"),
   title: {
-    default: "Brian Banna - Portfolio",
+    default: "Brian Banna — Quantitative Research",
     template: "%s | Brian Banna",
   },
-  description: "Data Science master's student at EPFL focused on quantitative finance, systematic trading, and commodities.",
+  description:
+    "Brian Banna — Data Science at EPFL. Quantitative modelling, systematic trading strategies, and commodity markets research.",
   openGraph: {
-    title: "Brian Banna Portfolio",
+    title: "Brian Banna — Quantitative Research",
     description:
-      "Data Science master's student at EPFL focused on quantitative finance, systematic trading, and commodities.",
+      "Data Science master's student at EPFL focused on quantitative finance, systematic trading, and commodity markets.",
     url: "https://brianbanna.com",
     siteName: "Brian Banna",
     images: [
@@ -47,14 +47,24 @@ export const metadata: Metadata = {
     icon: "/favicon.svg",
   },
 };
+
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+  display: "swap",
 });
 
-const calSans = LocalFont({
-  src: "../public/fonts/CalSans-SemiBold.ttf",
-  variable: "--font-calsans",
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-fraunces",
+  display: "swap",
+  axes: ["opsz", "SOFT"],
+});
+
+const jetbrains = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
 });
 
 export default function RootLayout({
@@ -63,14 +73,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={["dark", inter.variable, calSans.variable].join(" ")}>
+    <html
+      lang="en"
+      className={[
+        "dark",
+        inter.variable,
+        fraunces.variable,
+        jetbrains.variable,
+      ].join(" ")}
+    >
       <head>
         <Analytics />
       </head>
-      <body
-        className={`bg-bg transition-colors duration-300 ${process.env.NODE_ENV === "development" ? "debug-screens" : undefined
-          }`}
-      >
+      <body className="bg-bg text-fg font-sans antialiased selection:bg-accent/30 selection:text-fg">
         {children}
       </body>
     </html>

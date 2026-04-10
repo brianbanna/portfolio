@@ -6,6 +6,7 @@ import { AboutSection } from "./components/sections/about";
 import { ProjectsSection } from "./components/sections/projects";
 import { ContactSection } from "./components/sections/contact";
 import { Footer } from "./components/footer";
+import { Cursor } from "./components/cursor";
 
 export default function Home() {
   const projects = allProjects
@@ -25,6 +26,7 @@ export default function Home() {
 
   return (
     <div className="bg-bg transition-colors duration-300">
+      <Cursor />
       <Navigation />
       <HeroSection />
       <AboutSection />
