@@ -4,12 +4,12 @@
 
 @layer base {
   :root {
-    /* Refined palette — cooler ink, warmer paper, dusty-gold accent */
-    --color-bg: 9 10 12;
-    --color-fg: 232 228 220;
-    --color-paper: 17 17 19;
-    --color-ink: 11 11 13;
-    --color-accent: 214 189 145;
+    /* Refined palette: graphite ground, bone foreground, warm stone accent */
+    --color-bg: 10 11 13;
+    --color-fg: 234 230 222;
+    --color-paper: 18 18 20;
+    --color-ink: 12 12 14;
+    --color-accent: 212 206 192;
 
     --edge: 1px solid rgb(var(--color-fg) / 0.08);
   }

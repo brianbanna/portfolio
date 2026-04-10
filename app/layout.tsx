@@ -6,13 +6,13 @@ import { Analytics } from "./components/analytics";
 export const metadata: Metadata = {
   metadataBase: new URL("https://brianbanna.com"),
   title: {
-    default: "Brian Banna — Quantitative Research",
+    default: "Brian Banna · Quantitative Research",
     template: "%s | Brian Banna",
   },
   description:
-    "Brian Banna — Data Science at EPFL. Quantitative modelling, systematic trading strategies, and commodity markets research.",
+    "Brian Banna. Data Science at EPFL. Quantitative modelling, systematic trading strategies, and commodity markets research.",
   openGraph: {
-    title: "Brian Banna — Quantitative Research",
+    title: "Brian Banna · Quantitative Research",
     description:
       "Data Science master's student at EPFL focused on quantitative finance, systematic trading, and commodity markets.",
     url: "https://brianbanna.com",

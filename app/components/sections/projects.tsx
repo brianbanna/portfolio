@@ -27,7 +27,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
       <div className="editorial pt-28 md:pt-40 pb-8 md:pb-12">
         <div className="grid grid-cols-12 gap-6">
           <div className="col-span-12 md:col-span-3">
-            <div className="section-marker">§ 02 — Selected Work</div>
+            <div className="section-marker">§ 02 · Selected Work</div>
           </div>
           <div className="col-span-12 md:col-span-9">
             <h2 className="display text-[clamp(2.5rem,6vw,5rem)] text-fg leading-[0.95] text-balance">

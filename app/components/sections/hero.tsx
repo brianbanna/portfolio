@@ -70,7 +70,7 @@ export const HeroSection: React.FC = () => {
 
       {/* Warm top glow */}
       <div
-        className="absolute -top-1/3 left-1/2 -translate-x-1/2 w-[120vw] h-[80vh] bg-[radial-gradient(ellipse_at_center,rgb(214_189_145/0.07),transparent_60%)] pointer-events-none"
+        className="absolute -top-1/3 left-1/2 -translate-x-1/2 w-[120vw] h-[80vh] bg-[radial-gradient(ellipse_at_center,rgb(212_206_192/0.06),transparent_60%)] pointer-events-none"
         aria-hidden
       />
       <div className="noise" aria-hidden />
@@ -83,7 +83,7 @@ export const HeroSection: React.FC = () => {
         <div className="editorial w-full py-16 md:py-24">
           {/* Section marker */}
           <div className="mb-10 md:mb-14 opacity-0 animate-[fade-in_1.2s_ease-out_0.2s_forwards]">
-            <span className="section-marker">§ 00 — Index</span>
+            <span className="section-marker">§ 00 · Index</span>
           </div>
 
           {/* Display — name (no colored letters) */}

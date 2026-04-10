@@ -29,7 +29,7 @@ export const AboutSection: React.FC = () => {
       <div className="editorial relative py-28 md:py-40">
         {/* Section header */}
         <div className="mb-16 md:mb-20">
-          <div className="section-marker">§ 01 — About</div>
+          <div className="section-marker">§ 01 · About</div>
         </div>
 
         {/* Portrait + prose */}
@@ -105,7 +105,7 @@ export const AboutSection: React.FC = () => {
           <div className="hairline mb-10" />
           <div className="grid grid-cols-12 gap-6 md:gap-10">
             <div className="col-span-12 md:col-span-3">
-              <div className="label mb-4">§ 01.1 — Stack</div>
+              <div className="label mb-4">§ 01.1 · Stack</div>
               <div className="font-serif text-2xl text-fg/90 leading-tight">
                 Tools I work with.
               </div>

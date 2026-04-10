@@ -155,7 +155,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
       </div>
 
       {/* 3D carousel stage */}
-      <div className="relative w-full h-[460px] md:h-[540px] flex items-center justify-center overflow-hidden">
+      <div className="relative w-full h-[380px] sm:h-[440px] md:h-[540px] flex items-center justify-center overflow-hidden">
         {/* Side fade masks */}
         <div className="absolute inset-0 bg-gradient-to-r from-bg via-transparent to-bg z-20 pointer-events-none" />
 
@@ -190,10 +190,10 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                 }}
               >
                 <div
-                  className="relative w-[320px] md:w-[520px] aspect-[4/3] overflow-hidden group bg-paper border border-fg/15"
+                  className="relative w-[280px] sm:w-[340px] md:w-[520px] aspect-[4/3] overflow-hidden group bg-paper border border-fg/15"
                   style={{
                     boxShadow: isActive
-                      ? "0 40px 80px -20px rgba(0,0,0,0.9), 0 0 80px -20px rgba(247,185,85,0.15)"
+                      ? "0 40px 80px -20px rgba(0,0,0,0.9), 0 0 80px -20px rgba(212,206,192,0.10)"
                       : "0 20px 50px -15px rgba(0,0,0,0.7)",
                   }}
                 >

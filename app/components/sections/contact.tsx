@@ -62,7 +62,7 @@ export const ContactSection: React.FC = () => {
         aria-hidden
       />
       <div
-        className="absolute -bottom-1/3 left-1/2 -translate-x-1/2 w-[120vw] h-[70vh] bg-[radial-gradient(ellipse_at_center,rgb(214_189_145/0.06),transparent_60%)] pointer-events-none"
+        className="absolute -bottom-1/3 left-1/2 -translate-x-1/2 w-[120vw] h-[70vh] bg-[radial-gradient(ellipse_at_center,rgb(212_206_192/0.05),transparent_60%)] pointer-events-none"
         aria-hidden
       />
       <div className="noise" aria-hidden />
@@ -70,7 +70,7 @@ export const ContactSection: React.FC = () => {
       <div className="editorial relative py-28 md:py-44">
         {/* Section header */}
         <div className="mb-14 md:mb-20">
-          <div className="section-marker mb-10">§ 03 — Contact</div>
+          <div className="section-marker mb-10">§ 03 · Contact</div>
           <h2 className="display text-[clamp(3rem,9vw,9rem)] text-fg leading-[0.88]">
             Let&apos;s talk.
           </h2>
@@ -85,16 +85,16 @@ export const ContactSection: React.FC = () => {
           <div className="border-t border-fg/15">
             {channels.map((c) => {
               const content = (
-                <div className="group grid grid-cols-12 gap-4 md:gap-6 items-center py-7 md:py-8 border-b border-fg/15 transition-colors hover:bg-fg/[0.02]">
+                <div className="group grid grid-cols-12 gap-3 sm:gap-4 md:gap-6 items-center py-6 sm:py-7 md:py-8 border-b border-fg/15 transition-colors hover:bg-fg/[0.02]">
                   <div className="col-span-2 md:col-span-1 flex justify-start">
                     <span className="text-fg/40 group-hover:text-accent transition-colors">
                       {c.icon}
                     </span>
                   </div>
-                  <div className="col-span-10 md:col-span-3 font-mono text-[11px] uppercase tracking-[0.18em] text-fg/55 group-hover:text-fg transition-colors">
+                  <div className="col-span-8 sm:col-span-10 md:col-span-3 font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.16em] sm:tracking-[0.18em] text-fg/55 group-hover:text-fg transition-colors">
                     {c.label}
                   </div>
-                  <div className="col-span-10 col-start-3 md:col-start-auto md:col-span-7 display text-2xl md:text-[32px] text-fg/90 group-hover:text-fg tracking-tight leading-none">
+                  <div className="col-span-12 sm:col-span-10 sm:col-start-3 md:col-start-auto md:col-span-7 display text-[18px] sm:text-2xl md:text-[32px] text-fg/90 group-hover:text-fg tracking-tight leading-tight break-words">
                     <span className="link-draw">{c.value}</span>
                   </div>
                   <div className="col-span-2 md:col-span-1 flex justify-end">
