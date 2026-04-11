@@ -17,16 +17,30 @@ export const Navigation: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
+    let rafId = 0;
+    let pending = false;
+    const update = () => {
+      pending = false;
       const scrollTop = window.scrollY;
       const docHeight =
         document.documentElement.scrollHeight - window.innerHeight;
       setScrolled(scrollTop > 40);
-      setProgress(docHeight > 0 ? Math.min(1, scrollTop / docHeight) : 0);
+      const p = docHeight > 0 ? scrollTop / docHeight : 0;
+      setProgress(Math.max(0, Math.min(1, p)));
     };
-    handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    const onScroll = () => {
+      if (pending) return;
+      pending = true;
+      rafId = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      cancelAnimationFrame(rafId);
+    };
   }, []);
 
   useEffect(() => {
@@ -125,7 +139,7 @@ export const Navigation: React.FC = () => {
         {/* Scroll progress hairline */}
         <div className="absolute bottom-0 left-0 right-0 h-px bg-fg/5">
           <div
-            className="h-full bg-accent/80 origin-left transition-transform duration-150"
+            className="h-full bg-accent/80 origin-left will-change-transform"
             style={{ transform: `scaleX(${progress})` }}
           />
         </div>

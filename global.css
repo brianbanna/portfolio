@@ -53,18 +53,12 @@
     color: rgb(var(--color-fg) / 0.55);
   }
 
-  /* Editorial display headline — uses Fraunces optical-size axis */
+  /* Editorial display headline - Source Serif 4, research-paper voice */
   .display {
-    font-family: var(--font-fraunces), serif;
-    font-feature-settings: "ss01", "ss02";
+    font-family: var(--font-serif), Georgia, "Times New Roman", serif;
     font-weight: 300;
-    letter-spacing: -0.035em;
-    line-height: 0.92;
-  }
-  @supports (font-variation-settings: normal) {
-    .display {
-      font-variation-settings: "opsz" 144, "SOFT" 0;
-    }
+    letter-spacing: -0.022em;
+    line-height: 0.94;
   }
 
   .editorial {
@@ -134,9 +128,9 @@
   }
 
   .italic-accent {
-    font-family: var(--font-fraunces), serif;
+    font-family: var(--font-serif), Georgia, "Times New Roman", serif;
     font-style: italic;
-    font-variation-settings: "opsz" 144, "SOFT" 50;
+    font-weight: 400;
   }
 }
 

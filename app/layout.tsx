@@ -1,5 +1,5 @@
 import "../global.css";
-import { Inter, Fraunces, JetBrains_Mono } from "@next/font/google";
+import { Inter, Source_Serif_4, JetBrains_Mono } from "@next/font/google";
 import { Metadata } from "next";
 import { Analytics } from "./components/analytics";
 
@@ -54,11 +54,12 @@ const inter = Inter({
   display: "swap",
 });
 
-const fraunces = Fraunces({
+const sourceSerif = Source_Serif_4({
   subsets: ["latin"],
-  variable: "--font-fraunces",
+  variable: "--font-serif",
   display: "swap",
-  axes: ["opsz", "SOFT"],
+  style: ["normal", "italic"],
+  weight: ["300", "400", "600"],
 });
 
 const jetbrains = JetBrains_Mono({
@@ -78,7 +79,7 @@ export default function RootLayout({
       className={[
         "dark",
         inter.variable,
-        fraunces.variable,
+        sourceSerif.variable,
         jetbrains.variable,
       ].join(" ")}
     >

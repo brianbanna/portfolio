@@ -23,7 +23,7 @@ export const Footer: React.FC = () => {
           <div className="col-span-12 md:col-span-8">
             <Link
               href="#home"
-              className="display text-[clamp(3.5rem,12vw,11rem)] leading-[0.85] text-fg tracking-tightest block hover:text-accent transition-colors"
+              className="display text-[clamp(2.6rem,11vw,10rem)] leading-[0.88] text-fg tracking-tightest block hover:text-accent transition-colors"
             >
               Brian Banna.
             </Link>
