@@ -1,0 +1,3556 @@
+/*
+ * The Price of Wind and Sun — stylesheet
+ *
+ * Design reference: see project design system documentation
+ * Typography: Fraunces (variable display serif) + JetBrains Mono
+ * Aesthetic direction: "Dispatch from the grid" — editorial gravity meets trading-terminal precision
+ */
+
+/* ---------- Synchronized 1Hz heartbeat ----------
+ * European AC grids run at 50Hz; humans can't see that, but they CAN
+ * feel a 1Hz pulse as a heartbeat. The --beat property is animated as
+ * a single source of truth and several elements (the eyebrow dot, the
+ * accent mark, the graticule rings) read from it for in-phase glow.
+ * Requires @property registration so a number can be transitioned. */
+
+@property --beat {
+    syntax: "<number>";
+    inherits: true;
+    initial-value: 0;
+}
+
+:root {
+    --beat: 0;
+    animation: beat 1400ms cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes beat {
+    0%, 100% { --beat: 0; }
+    40%      { --beat: 1; }
+}
+
+:root.is-beat-paused {
+    animation-play-state: paused;
+}
+
+/* ---------- Tokens ---------- */
+
+:root {
+    /* Backgrounds — warm graphite, layered */
+    --bg-base: #0a0b0d;
+    --bg-surface: #121214;
+    --bg-elevated: #1c1c1e;
+    --bg-glass: rgba(18, 18, 20, 0.72);
+    --border: #2a2a2e;
+    --border-strong: #3f3f44;
+    --border-glass: rgba(234, 230, 222, 0.06);
+
+    /* Text — warm bone, muted stone */
+    --text-primary: #eae6de;
+    --text-secondary: #8b8880;
+    --text-muted: #5a5752;
+    --text-ghost: #2f2e2b;
+
+    /* Accent — warm stone for interactive affordances (links, play,
+     * timeline, focus country). */
+    --accent: #d4cec0;
+    --accent-bright: #eae6de;
+    --accent-glow: #f5f2ed;
+    --accent-dim: #8b8880;
+
+    /* Chrome — warm stone for decorative/structural elements
+     * (eyebrow dots, leader lines, compass, kickers, chart titles).
+     * Separated from accent so ornament doesn't compete with data. */
+    --chrome: #a09a8e;
+
+    /* Price diverging scale — inverted luminance at the extreme */
+    --price-neg-extreme: #e0f7ff;
+    --price-neg-deep: #67e8f9;
+    --price-neg: #22d3ee;
+    --price-zero: #475569;
+    --price-pos: #fb923c;
+    --price-pos-high: #ef4444;
+    --price-pos-extreme: #991b1b;
+
+    /* Generation sources */
+    --gen-solar: #fbbf24;
+    --gen-wind: #10b981;
+    --gen-nuclear: #a855f7;
+    --gen-hydro: #6366f1;
+    --gen-biomass: #84cc16;
+    --gen-gas: #fb7185;
+    --gen-coal: #64748b;
+
+    /* Motion */
+    --ease-default: cubic-bezier(0.22, 0.61, 0.36, 1);
+    --ease-overshoot: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-cinematic: cubic-bezier(0.65, 0, 0.35, 1);
+    --dur-fast: 150ms;
+    --dur-medium: 300ms;
+    --dur-default: 800ms;
+    --dur-slow: 1400ms;
+
+    /* Type */
+    --font-display: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+    /* Layout */
+    --content-max: 1440px;
+    --narrative-col: 460px;
+    --gutter: clamp(24px, 4vw, 80px);
+
+    /* Vignette + film grain — modulated during iris wipe animation */
+    --vignette-size: 80%;
+    --grain-intensity: 0.035;
+}
+
+/* ---------- Reset ---------- */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+/* ---------- Skip link (accessibility) ---------- */
+
+.skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 16px;
+    z-index: 999;
+    padding: 8px 16px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--bg-base);
+    background: var(--accent);
+    border-radius: 3px;
+    text-decoration: none;
+    border: none;
+}
+
+.skip-link:focus {
+    left: 16px;
+}
+
+html {
+    scroll-behavior: auto;
+    -webkit-text-size-adjust: 100%;
+    background: var(--bg-base);
+    -webkit-tap-highlight-color: transparent;
+    overflow-x: clip;
+}
+
+html, body {
+    overscroll-behavior-y: contain;
+}
+
+body {
+    margin: 0;
+    background: var(--bg-base);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.55;
+    font-feature-settings: "cv11", "calt";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
+}
+
+h1, h2, h3, p {
+    margin: 0;
+}
+
+svg text {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.country, .map-clock, .hero__title em, svg text {
+    -webkit-touch-callout: none;
+    user-select: none;
+}
+
+button, .country, .timeline__track {
+    -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+    background: var(--accent);
+    color: var(--bg-base);
+}
+
+.app-loading {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-base);
+}
+.app-loading__text {
+    font-size: 14px;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+}
+.app-loading__dots::after {
+    content: "";
+    animation: loadingDots 1.2s steps(4, end) infinite;
+}
+@keyframes loadingDots {
+    0%, 25% { content: "\00B7"; }
+    50% { content: "\00B7\00B7"; }
+    75% { content: "\00B7\00B7\00B7"; }
+}
+
+a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    padding-bottom: 1px;
+    transition: border-color var(--dur-fast) var(--ease-default),
+                color var(--dur-fast) var(--ease-default);
+}
+
+a:hover,
+a:focus-visible {
+    color: var(--accent-bright);
+    border-bottom-color: var(--accent-bright);
+}
+
+*:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+}
+
+.mono {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "zero", "ss02";
+    /* Reset Fraunces variation settings for the mono face */
+    font-variation-settings: normal;
+}
+
+/* Negative-price signal — the true Unicode minus (U+2212), rendered
+ * in the ice-white glow color so negative numbers visually carry the
+ * meaning of the extreme end of the price scale. Use as:
+ *   <span class="mono neg">145.12</span>
+ *   or with currency: <span class="mono neg">€145.12</span>
+ */
+.neg::before {
+    content: "−";  /* U+2212 */
+    color: var(--accent-glow);
+    margin-right: 0.06em;
+    font-weight: 400;
+}
+
+/* Currency unit rendered as a mono subscript — makes "€145.12/MWh"
+ * read as a quantity rather than a string of characters. */
+.unit {
+    font-size: 0.62em;
+    vertical-align: 0.32em;
+    letter-spacing: 0.04em;
+    color: color-mix(in srgb, currentColor 65%, transparent);
+    margin-left: 0.08em;
+}
+
+em {
+    font-style: italic;
+    /* Fraunces italic at body optical size — display-size contexts
+     * (hero title, cold-open, footer closing) override to opsz 144. */
+    font-variation-settings: "opsz" 24, "SOFT" 30;
+}
+
+strong {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* ---------- Scroll progress bar ---------- */
+
+.scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: color-mix(in srgb, var(--border) 60%, transparent);
+    z-index: 100;
+    pointer-events: none;
+}
+
+.scroll-progress__bar {
+    height: 100%;
+    width: 0;
+    background: linear-gradient(
+        90deg,
+        var(--accent-dim) 0%,
+        var(--accent) 40%,
+        var(--accent-bright) 80%,
+        var(--accent-glow) 100%
+    );
+    box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 60%, transparent),
+                0 0 2px var(--accent);
+    transition: width 100ms linear;
+}
+
+/* Chapter ticks. Data-chapter-ticks attribute on the bar container
+ * lets narrative.js set `--tick-count` so the notches auto-space. */
+.scroll-progress__ticks {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.scroll-progress__tick {
+    position: absolute;
+    top: 0;
+    width: 1px;
+    height: 6px;
+    background: color-mix(in srgb, var(--text-primary) 25%, transparent);
+    transform: translateY(0);
+}
+
+/* ---------- Big on-map clock ----------
+ * Display-sized clock showing the hour of the currently active
+ * narrative step, pinned to the lower-right of the viewport. The
+ * hour digits are Fraunces italic at display opsz — treated like a
+ * typographic moment rather than a utility readout. */
+
+.map-clock {
+    position: fixed;
+    right: calc(clamp(20px, 3vw, 48px) + env(safe-area-inset-right, 0px));
+    bottom: calc(clamp(24px, 4vh, 56px) + env(safe-area-inset-bottom, 0px));
+    z-index: 85;
+    text-align: right;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+        opacity var(--dur-default) var(--ease-default),
+        transform var(--dur-default) var(--ease-default);
+}
+
+.map-clock.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.map-clock.is-hidden-by-footer,
+.map-clock.is-hidden-by-explorer,
+.map-clock.is-hidden-by-sidebar {
+    opacity: 0;
+    transform: translateY(16px);
+    pointer-events: none;
+}
+
+.map-clock__label {
+    font-size: 9px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--chrome);
+    margin: 0 0 10px 0;
+}
+
+.map-clock__time {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 2px;
+    color: var(--text-primary);
+    line-height: 0.82;
+    text-shadow: 0 0 40px rgba(10, 11, 13, 0.9),
+                 0 0 20px color-mix(in srgb, var(--bg-base) 85%, transparent);
+}
+
+.map-clock__hour {
+    font-family: var(--font-display);
+    font-size: clamp(72px, 10vw, 140px);
+    font-style: italic;
+    font-weight: 300;
+    font-variation-settings: "opsz" 144, "SOFT" 50, "wght" 300;
+    letter-spacing: -0.04em;
+    color: var(--text-primary);
+    transition: color var(--dur-default) var(--ease-default);
+    /* Subtle digit morph when the hour changes — a quick blur out + in */
+    animation: clockDigitReveal var(--dur-default) var(--ease-cinematic);
+}
+
+.map-clock.is-peak .map-clock__hour {
+    color: var(--accent-glow);
+    text-shadow:
+        0 0 40px rgba(10, 11, 13, 0.9),
+        0 0 28px color-mix(in srgb, var(--accent) 60%, transparent),
+        0 0 2px var(--accent-glow);
+}
+
+.map-clock__colon {
+    font-family: var(--font-display);
+    font-size: clamp(56px, 7.5vw, 96px);
+    font-style: italic;
+    font-weight: 300;
+    font-variation-settings: "opsz" 144, "wght" 300;
+    color: color-mix(in srgb, var(--accent) 55%, var(--text-muted));
+    padding: 0 4px;
+    transform: translateY(-0.04em);
+    /* Colon blinks softly at the heartbeat rate */
+    opacity: calc(0.55 + var(--beat) * 0.45);
+}
+
+.map-clock__minute {
+    font-size: clamp(18px, 1.8vw, 26px);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--text-muted);
+    align-self: flex-start;
+    margin-top: 0.25em;
+}
+
+.map-clock__date {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--text-muted);
+    margin: 8px 0 0 0;
+}
+
+@keyframes clockDigitReveal {
+    from { opacity: 0; filter: blur(6px); transform: translateY(6px); }
+    to   { opacity: 1; filter: blur(0);   transform: translateY(0); }
+}
+
+@media (max-width: 900px) {
+    .map-clock {
+        right: 16px;
+        bottom: 16px;
+    }
+    .map-clock__hour { font-size: 64px; }
+    .map-clock__colon { font-size: 48px; }
+    .map-clock__label,
+    .map-clock__date { font-size: 8px; }
+}
+
+/* ---------- Hero ---------- */
+
+.hero {
+    position: relative;
+    z-index: 2;
+    min-height: 100svh;
+    padding: clamp(72px, 10svh, 140px) var(--gutter) 64px;
+    background: var(--bg-base);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* Subtle ambient gradient behind the hero — a light source
+ * from lower-left, barely visible, suggests a sunrise without
+ * a literal sun. A cursor-following glow layers on top when
+ * the .has-cursor-light class is set by JS. */
+.hero {
+    --cursor-x: 50%;
+    --cursor-y: 50%;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(
+            ellipse 60% 40% at 15% 100%,
+            color-mix(in srgb, var(--accent) 8%, transparent) 0%,
+            transparent 60%
+        ),
+        radial-gradient(
+            ellipse 40% 30% at 90% 0%,
+            color-mix(in srgb, var(--gen-solar) 5%, transparent) 0%,
+            transparent 70%
+        );
+    pointer-events: none;
+    z-index: 0;
+}
+
+.hero.has-cursor-light::before {
+    background:
+        radial-gradient(
+            circle 480px at var(--cursor-x) var(--cursor-y),
+            color-mix(in srgb, var(--accent) 6%, transparent) 0%,
+            transparent 70%
+        ),
+        radial-gradient(
+            ellipse 60% 40% at 15% 100%,
+            color-mix(in srgb, var(--accent) 8%, transparent) 0%,
+            transparent 60%
+        ),
+        radial-gradient(
+            ellipse 40% 30% at 90% 0%,
+            color-mix(in srgb, var(--gen-solar) 5%, transparent) 0%,
+            transparent 70%
+        );
+    transition: background 200ms linear;
+}
+
+/* Grain overlay on the hero for atmospheric texture. */
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.5 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+}
+
+.hero__inner {
+    position: relative;
+    max-width: var(--content-max);
+    margin: 0 auto;
+    width: 100%;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+/* Thin warm-gold vertical rule down the left edge of the hero interior.
+ * The muted --gen-solar color visually ties to "sun" without being
+ * literal. Rises on page load like a curtain pull. */
+.hero__rail {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: clamp(24px, 4vw, 80px);
+    width: 1px;
+    background: linear-gradient(
+        180deg,
+        transparent 0%,
+        color-mix(in srgb, var(--gen-solar) 32%, transparent) 18%,
+        color-mix(in srgb, var(--gen-solar) 18%, transparent) 80%,
+        transparent 100%
+    );
+    transform-origin: top;
+    transform: scaleY(0);
+    animation: heroRailReveal 1600ms var(--ease-cinematic) 300ms forwards;
+    z-index: 1;
+    pointer-events: none;
+}
+
+@keyframes heroRailReveal {
+    to { transform: scaleY(1); }
+}
+
+/* Masthead — reads like a newspaper dispatch header. Hairlines between
+ * fields, tracked small-caps mono, low-contrast on the warm side. */
+.hero__masthead {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid color-mix(in srgb, var(--gen-solar) 18%, transparent);
+    opacity: 0;
+    animation: fadeUp 1000ms var(--ease-cinematic) 100ms forwards;
+}
+
+.hero__masthead-item {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: color-mix(in srgb, var(--gen-solar) 60%, var(--text-secondary));
+}
+
+.hero__masthead-rule {
+    width: 6px;
+    height: 1px;
+    background: color-mix(in srgb, var(--gen-solar) 40%, transparent);
+}
+
+.hero__eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--chrome);
+    margin-bottom: 48px;
+    opacity: 0;
+    animation: fadeUp 1000ms var(--ease-cinematic) 250ms forwards;
+}
+
+.hero__eyebrow-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--chrome);
+    /* Glow modulates with the global heartbeat. The --beat var is
+     * read from :root and used to compute box-shadow softness. */
+    box-shadow:
+        0 0 calc(8px + var(--beat) * 12px) color-mix(in srgb, var(--accent) calc(50% + var(--beat) * 50%), transparent),
+        0 0 2px var(--accent-glow);
+    transform: scale(calc(0.92 + var(--beat) * 0.16));
+}
+
+.hero__title {
+    font-family: var(--font-display);
+    font-size: clamp(56px, 9vw, 136px);
+    font-weight: 400;
+    /* Fraunces's display-optimised opsz at the largest end */
+    font-variation-settings: "opsz" 144, "SOFT" 0;
+    letter-spacing: -0.035em;
+    line-height: 0.92;
+    color: var(--text-primary);
+    max-width: 14ch;
+    margin-bottom: 56px;
+    text-wrap: balance;
+}
+
+.hero__title-line {
+    display: block;
+}
+
+/* Per-character reveal — each letter starts invisible, displaced
+ * downward, and softly blurred, then lands in sequence. The per-char
+ * `animation-delay` is written inline by splitHeroTitleIntoLetters()
+ * in main.js so staggering tracks the actual character count.
+ *
+ * When main.js has NOT yet split the line (reduced-motion, or a race
+ * with DOMContentLoaded), the line-level fallback reveal runs on the
+ * whole line instead so no content is ever invisible. */
+.hero__title-line:not(.is-split) {
+    opacity: 0;
+    transform: translateY(24px);
+    animation: heroLineReveal 1200ms var(--ease-cinematic) forwards;
+}
+
+.hero__title-line:not(.is-split):nth-child(1) { animation-delay: 400ms; }
+.hero__title-line:not(.is-split):nth-child(2) { animation-delay: 600ms; }
+.hero__title-line:not(.is-split):nth-child(3) { animation-delay: 800ms; }
+
+.hero__title-char {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(22px);
+    filter: blur(6px);
+    animation: heroCharReveal 900ms var(--ease-cinematic) forwards;
+    animation-delay: var(--char-delay, 0ms);
+    will-change: opacity, transform, filter;
+}
+
+@keyframes heroCharReveal {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+}
+
+.hero__title em {
+    font-style: italic;
+    color: var(--accent-bright);
+    font-variation-settings: "opsz" 144, "SOFT" 50;
+    /* Nudge the italic down a hair to optically center it against the
+     * surrounding roman — Fraunces italic rises slightly on the baseline. */
+    display: inline-block;
+    transform: translateY(0.015em);
+    letter-spacing: -0.01em;
+    padding-right: 0.02em;
+}
+
+/* The wonk-italic ampersand. Fraunces has a WONK axis which switches
+ * selected glyphs (like &) to swash/calligraphic variants — one of the
+ * most beautiful glyphs in any free variable font, almost nobody uses
+ * it. Sits slightly below the baseline and is colored accent cyan. */
+.hero__amp {
+    display: inline-block;
+    font-style: italic;
+    font-variation-settings: "opsz" 144, "wght" 500, "SOFT" 100, "WONK" 1;
+    color: var(--accent);
+    font-size: 0.85em;
+    transform: translateY(0.08em) rotate(-3deg);
+    transform-origin: center;
+    padding: 0 0.04em;
+    text-shadow: 0 0 20px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.hero__lede {
+    font-size: clamp(18px, 1.5vw, 22px);
+    line-height: 1.5;
+    color: color-mix(in srgb, var(--text-primary) 88%, var(--text-secondary));
+    max-width: 56ch;
+    margin-bottom: 72px;
+    font-variation-settings: "opsz" 24, "SOFT" 20;
+    opacity: 0;
+    animation: fadeUp 1200ms var(--ease-cinematic) 1100ms forwards;
+}
+
+.hero__lede em {
+    font-style: italic;
+    color: var(--accent-bright);
+    font-variation-settings: "opsz" 24, "SOFT" 40;
+}
+
+.hero__signature {
+    display: flex;
+    align-items: baseline;
+    gap: 32px;
+    margin-bottom: 48px;
+    opacity: 0;
+    animation: fadeUp 1200ms var(--ease-cinematic) 1400ms forwards;
+    flex-wrap: wrap;
+}
+
+/* Spot-price tape — the trading-floor ticker. A hairline-bounded row
+ * of mono country quotes under the byline, reads like a Bloomberg
+ * terminal dispatch. Populated from showcase_day.json by main.js. */
+.hero__tape {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    padding: 14px 0;
+    margin-bottom: 72px;
+    border-top: 1px solid color-mix(in srgb, var(--border-strong) 70%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--border-strong) 70%, transparent);
+    max-width: 680px;
+    opacity: 0;
+    animation: fadeUp 1200ms var(--ease-cinematic) 1650ms forwards;
+    flex-wrap: wrap;
+}
+
+.hero__tape-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.hero__tape-sep {
+    color: var(--text-ghost);
+    margin: 0 4px;
+}
+
+.hero__tape-row {
+    display: flex;
+    gap: 22px;
+    flex-wrap: wrap;
+}
+
+.hero__tape-quote {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--text-secondary);
+    display: inline-flex;
+    gap: 6px;
+    align-items: baseline;
+}
+
+.hero__tape-quote em {
+    font-style: normal;
+    color: var(--text-muted);
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.hero__tape-quote [data-tape-price] {
+    color: var(--accent);
+    font-weight: 500;
+    transition: color 400ms ease;
+    min-width: 4ch;
+    display: inline-block;
+    text-align: right;
+}
+
+.hero__tape-quote [data-tape-price].is-negative {
+    color: var(--accent-glow);
+}
+
+.hero__tape-quote [data-tape-price].is-flash {
+    color: var(--accent-bright);
+}
+
+.hero__byline,
+.hero__date {
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.hero__scroll-hint {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--text-muted);
+    margin-top: auto;
+    opacity: 0;
+    animation: scrollHintAppear 1200ms var(--ease-cinematic) 1800ms forwards;
+}
+
+.hero__scroll-rule {
+    flex: 0 0 48px;
+    height: 1px;
+    background: var(--text-muted);
+    animation: scrollRulePulse 2.4s ease-in-out infinite;
+    transform-origin: left;
+}
+
+/* ---------- Hero animations ---------- */
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes heroLineReveal {
+    from {
+        opacity: 0;
+        transform: translateY(32px);
+        filter: blur(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+}
+
+@keyframes scrollHintAppear {
+    from { opacity: 0; transform: translateY(0); }
+    to   { opacity: 0.7; transform: translateY(0); }
+}
+
+@keyframes scrollRulePulse {
+    0%, 100% { transform: scaleX(0.6); opacity: 0.5; }
+    50%      { transform: scaleX(1);   opacity: 1; }
+}
+
+/* ---------- Hero cold-open teaser ----------
+ *
+ * A single large price briefly flashes after the title has landed,
+ * counting the reader from the midnight baseline (~€45) down to the
+ * Sunday trough (−€145.12). Overlays the hero without pushing layout.
+ * Class toggles (is-showing → is-holding → is-fading) are driven from
+ * setupHeroColdOpen() in main.js. */
+
+.hero__coldopen {
+    position: absolute;
+    /* Land in the empty right-hand half of the hero, vertically
+     * aligned with the middle of the title block. The title is
+     * max-width: 14ch on the left, so this zone is clear. */
+    right: clamp(40px, 5vw, 120px);
+    top: clamp(180px, 24%, 300px);
+    transform: translate(12px, -8px) scale(0.96);
+    opacity: 0;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+    gap: 12px;
+    transition: opacity 480ms var(--ease-cinematic),
+                transform 600ms var(--ease-cinematic);
+    z-index: 5;
+}
+
+.hero__coldopen.is-showing {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+}
+
+
+
+/* On narrow viewports the title wraps wide and there's no room in
+ * the right gutter for the counter without crashing into the title.
+ * Hide it — the letter-by-letter reveal alone carries the moment. */
+@media (max-width: 1180px) {
+    .hero__coldopen { display: none; }
+}
+
+.hero__coldopen-eyebrow {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--accent) 70%, var(--text-secondary));
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 400ms var(--ease-cinematic) 120ms,
+                transform 400ms var(--ease-cinematic) 120ms;
+}
+
+.hero__coldopen.is-showing .hero__coldopen-eyebrow {
+    opacity: 1;
+    transform: none;
+}
+
+.hero__coldopen-number {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 10px;
+    font-style: italic;
+    font-variation-settings: "opsz" 144, "SOFT" 40;
+    color: var(--accent-glow);
+    text-shadow:
+        0 0 24px color-mix(in srgb, var(--accent) 45%, transparent),
+        0 0 2px var(--accent-glow);
+}
+
+.hero__coldopen-value {
+    font-size: clamp(42px, 5.5vw, 84px);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 0.9;
+    font-style: normal;
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    /* The value tween rewrites the text every frame — min-width keeps
+     * the surrounding geometry from jittering as digits switch. */
+    min-width: 8ch;
+    text-align: right;
+    display: inline-block;
+}
+
+.hero__coldopen.is-crashing .hero__coldopen-value {
+    color: var(--accent-glow);
+    filter: drop-shadow(0 0 22px color-mix(in srgb, var(--accent) 60%, transparent));
+}
+
+.hero__coldopen-unit {
+    font-size: clamp(14px, 1.4vw, 22px);
+    font-style: normal;
+    font-family: var(--font-mono);
+    color: color-mix(in srgb, var(--accent) 60%, var(--text-secondary));
+    letter-spacing: 0.08em;
+    transform: translateY(-0.1em);
+}
+
+.hero__coldopen-rule {
+    display: block;
+    width: clamp(120px, 16vw, 220px);
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        color-mix(in srgb, var(--accent) 50%, transparent) 50%,
+        transparent 100%
+    );
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 640ms var(--ease-cinematic) 160ms;
+}
+
+.hero__coldopen.is-showing .hero__coldopen-rule {
+    transform: scaleX(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero__coldopen { display: none; }
+}
+
+
+
+/* ---------- Scene (shared parent of narrative + explorer) ----------
+ *
+ * The map is `position: sticky` within this container. It stays
+ * pinned as the reader scrolls the narrative cards and the explorer
+ * intro, and naturally releases when the scene ends and the footer
+ * begins. No JS tricks, no opacity hacks, no fixed-vs-flow conflicts.
+ */
+
+.scene {
+    position: relative;
+    width: 100%;
+}
+
+.scene__map {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100dvh;
+    /* Zero effective height in flow — the narrative and explorer
+     * stack normally on top of the sticky map rather than below it.
+     * This is the canonical "sticky background" trick. */
+    margin-bottom: -100vh;
+    margin-bottom: -100dvh;
+    z-index: 0;
+    background: var(--bg-base);
+    overflow: hidden;
+    /* Perspective on the sticky container — children tilt with
+     * --map-tilt driven from scroll position. Only the <svg> itself
+     * picks up the rotation; the circadian tint + vignette stay flat
+     * as atmospheric layers, which reads as "ground under sky". */
+    perspective: 2400px;
+    perspective-origin: 50% 38%;
+}
+
+/* Circadian tint layer — sits above the map SVG. Uses `screen`
+ * blend mode so the warm-solar midpoint actually registers against
+ * the dark navy base (soft-light at low alpha was imperceptible). */
+.scene__map .circadian {
+    position: absolute;
+    inset: 0;
+    background: var(--atmos-tint, transparent);
+    mix-blend-mode: screen;
+    pointer-events: none;
+    z-index: 3;
+    transition: background var(--dur-default) var(--ease-default);
+}
+
+.scene__map svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    /* Desaturate + dim the map when a narrative step is active, so
+     * overlaid prose always out-ranks the background. Reverts to full
+     * saturation for map-focused beats (hero reveal, explorer). */
+    filter: saturate(1) brightness(1);
+    transition: filter var(--dur-default) var(--ease-default);
+    /* 3D tilt driven by scroll. --map-tilt is written by
+     * setupMapTilt() in main.js; ranges 0 (flat, hero) → 1 (peak
+     * moment, 8°) → holds lower through the explorer. Origin near
+     * center so the top edge doesn't visually jump down as the
+     * tilt increases (at 62% the top-edge displacement was ~24px
+     * at max tilt; at 48% it's ~11px). */
+    transform: rotateX(calc(var(--map-tilt, 0) * 8deg));
+    transform-origin: 50% 48%;
+    will-change: transform;
+}
+
+/* When a narrative card lights up its target country, the country
+ * physically lifts off the plane — a translateY + scale + double
+ * drop-shadow halo reads as "rising" because of the surrounding
+ * rotateX tilt. Stroke thickens to an ice-white halo so even small
+ * countries (Switzerland, Austria) carry the effect unambiguously.
+ *
+ * Transition is declared on `.country` above — it runs symmetrically
+ * on class add *and* class remove.
+ */
+.country.is-focus-country {
+    transform: translateY(-7px) scale(1.03);
+    filter:
+        drop-shadow(0 14px 22px color-mix(in srgb, var(--accent-glow) 48%, transparent))
+        drop-shadow(0 0 22px color-mix(in srgb, var(--accent) 55%, transparent));
+    stroke: var(--accent-glow);
+    stroke-width: 1.6;
+}
+
+/* Secondary highlight — used for comparison countries that share
+ * the beat but aren't the card's primary subject. Dimmer contour,
+ * no lift, so the primary focus still dominates the hierarchy. */
+.country.is-secondary-focus {
+    stroke: color-mix(in srgb, var(--accent) 65%, transparent);
+    stroke-width: 1.3;
+    filter: drop-shadow(0 0 14px color-mix(in srgb, var(--accent) 35%, transparent));
+}
+
+body.is-narrative-active .scene__map svg {
+    filter: saturate(0.55) brightness(0.82);
+}
+
+/* Vignette — subtle radial darken at the edges. Draws the eye
+ * to the center where the action happens. The --vignette-size
+ * and --grain-intensity variables are modulated during the iris
+ * wipe animation that fires once on hero exit. */
+
+.scene__map::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(
+            ellipse var(--vignette-size) calc(var(--vignette-size) - 10%) at 50% 50%,
+            transparent 40%,
+            color-mix(in srgb, var(--bg-base) 75%, transparent) 100%
+        );
+    pointer-events: none;
+    z-index: 1;
+    transition: background 1400ms var(--ease-cinematic);
+}
+
+/* Iris wipe — when body.is-iris-firing, vignette contracts sharply
+ * and the grain intensifies, mimicking a CRT news-broadcast on-air cue. */
+body.is-iris-firing {
+    --vignette-size: 55%;
+    --grain-intensity: 0.09;
+}
+
+body.is-iris-firing .scene__map::before {
+    transition: background 700ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* Top-of-viewport scrim — a soft fade from the bg color so the HUD
+ * never collides with map fill colors. 96px tall, fully transparent
+ * at the bottom. Lives above the map but below the HUD. */
+.map-topscrim {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 96px;
+    background: linear-gradient(
+        180deg,
+        var(--bg-base) 0%,
+        color-mix(in srgb, var(--bg-base) 40%, transparent) 60%,
+        transparent 100%
+    );
+    pointer-events: none;
+    z-index: 80;
+}
+
+/* Grain overlay on the map for atmosphere */
+.scene__map::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.4 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity: var(--grain-intensity, 0.035);
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    z-index: 2;
+    transition: opacity 700ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* ---------- Map price legend ----------
+ * Horizontal gradient bar anchored to the bottom-left of the map.
+ * Hidden by default; shown when the map has active price colors. */
+
+.map-legend {
+    position: absolute;
+    bottom: 28px;
+    left: var(--gutter);
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity var(--dur-default) var(--ease-default);
+    pointer-events: none;
+}
+
+.map-legend.is-visible {
+    opacity: 1;
+}
+
+.map-legend__bar {
+    width: 200px;
+    height: 12px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+}
+
+.map-legend__ticks {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    padding: 0 1px;
+}
+
+.map-legend__caption {
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-ghost);
+    margin: 0;
+}
+
+/* ---------- Arrow legend ---------- */
+
+.arrow-legend {
+    position: absolute;
+    bottom: 80px;
+    left: var(--gutter);
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    opacity: 0;
+    transition: opacity var(--dur-default) var(--ease-default);
+    pointer-events: none;
+}
+
+.arrow-legend.is-visible {
+    opacity: 1;
+}
+
+.arrow-legend svg {
+    flex-shrink: 0;
+}
+
+/* ---------- Leader-line overlay (card → country) ----------
+ * SVG overlay that sits above the map but below the narrative cards.
+ * Renders the active card's leader line + target dot. */
+
+.leader-overlay {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    pointer-events: none;
+    /* Above the map (z=0) but below the narrative cards and explorer
+     * so the leader line never paints over the explorer intro. */
+    z-index: 2;
+    overflow: visible;
+}
+
+.leader-line {
+    fill: none;
+    stroke: var(--chrome);
+    stroke-width: 1;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--accent) 40%, transparent));
+    opacity: 0;
+    transition: opacity var(--dur-medium) var(--ease-default);
+}
+
+.leader-line.is-visible {
+    opacity: 0.9;
+}
+
+.leader-target {
+    fill: var(--chrome);
+    stroke: var(--accent-glow);
+    stroke-width: 1;
+    filter: drop-shadow(0 0 8px var(--accent));
+    opacity: 0;
+    transition: opacity var(--dur-medium) var(--ease-default),
+                r var(--dur-default) var(--ease-overshoot);
+}
+
+.leader-target.is-visible {
+    opacity: 1;
+}
+
+.leader-target-pulse {
+    fill: none;
+    stroke: var(--chrome);
+    stroke-width: 1.5;
+    opacity: 0;
+    transform-origin: center;
+}
+
+.leader-target-pulse.is-pulsing {
+    animation: leaderPulse 1800ms var(--ease-default) infinite;
+}
+
+/* When the card the leader is tracking scrolls off-viewport,
+ * fade everything out so the line doesn't stretch to chase it.
+ * !important beats .is-visible so we don't have to remove that
+ * class (which would break the show/hide lifecycle). */
+.leader-line.is-offscreen,
+.leader-target.is-offscreen,
+.leader-target-pulse.is-offscreen {
+    opacity: 0 !important;
+    transition: opacity var(--dur-fast) var(--ease-default) !important;
+}
+
+@keyframes leaderPulse {
+    0%   { opacity: 0.8; r: 4; }
+    100% { opacity: 0; r: 22; }
+}
+
+/* ---------- Map — graticule (cartographic atlas touch) ---------- */
+
+/*
+ * Thin meridian/parallel lines + concentric distance rings from the
+ * map's anchor point (Munich). Half-opacity grey so they sit behind
+ * the countries without ever competing for attention. Reads as both
+ * "serious atlas" and "radar sweep / grid schematic".
+ */
+
+.graticule__line {
+    fill: none;
+    stroke: color-mix(in srgb, var(--border-strong) 55%, transparent);
+    stroke-width: 0.5;
+    stroke-dasharray: 2 4;
+    stroke-linecap: round;
+}
+
+.graticule__ring {
+    stroke: color-mix(in srgb, var(--accent) 10%, transparent);
+    stroke-width: 0.5;
+    stroke-dasharray: 1 6;
+}
+
+.graticule__ring:last-of-type {
+    stroke: color-mix(in srgb, var(--accent) 4%, transparent);
+}
+
+.graticule__crosshair-line {
+    stroke: color-mix(in srgb, var(--accent) 40%, transparent);
+    stroke-width: 1;
+    stroke-linecap: round;
+}
+
+/* ---------- Map — cartouche (compass rose, scale bar, edge labels) ----------
+ *
+ * Classic atlas furniture rendered inside the map SVG so it tilts with
+ * the 3D perspective and reads as part of the geography, not as chrome.
+ * Thin warm-gold strokes (via --gen-solar) tie the cartouche to the
+ * hero's warm-gold vertical rule — one subtle through-line across the
+ * piece. The north needle is the only piece in accent cyan so it carries
+ * the only color in the corner.
+ */
+
+.cartouche {
+    pointer-events: none;
+}
+
+.cartouche__compass-ring {
+    fill: none;
+    stroke: color-mix(in srgb, var(--gen-solar) 32%, transparent);
+    stroke-width: 0.8;
+}
+
+.cartouche__compass-ring--inner {
+    stroke: color-mix(in srgb, var(--gen-solar) 18%, transparent);
+    stroke-dasharray: 1 3;
+}
+
+.cartouche__compass-tick {
+    stroke: color-mix(in srgb, var(--gen-solar) 30%, transparent);
+    stroke-width: 0.6;
+    stroke-linecap: round;
+}
+
+.cartouche__compass-tick--cardinal {
+    stroke: color-mix(in srgb, var(--gen-solar) 60%, transparent);
+    stroke-width: 1;
+}
+
+.cartouche__compass-needle {
+    fill: color-mix(in srgb, var(--accent) 85%, transparent);
+    stroke: var(--accent-glow);
+    stroke-width: 0.4;
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--accent) 50%, transparent));
+}
+
+.cartouche__compass-letter {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    fill: color-mix(in srgb, var(--accent) 80%, transparent);
+    text-anchor: middle;
+    dominant-baseline: alphabetic;
+    text-transform: uppercase;
+}
+
+.cartouche__scale-bar {
+    stroke: color-mix(in srgb, var(--gen-solar) 55%, transparent);
+    stroke-width: 1.2;
+    stroke-linecap: square;
+}
+
+.cartouche__scale-tick {
+    stroke: color-mix(in srgb, var(--gen-solar) 55%, transparent);
+    stroke-width: 1;
+}
+
+.cartouche__scale-tick--mid {
+    stroke: color-mix(in srgb, var(--gen-solar) 35%, transparent);
+}
+
+.cartouche__scale-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    fill: color-mix(in srgb, var(--gen-solar) 72%, transparent);
+    text-anchor: middle;
+    text-transform: uppercase;
+}
+
+.cartouche__scale-origin,
+.cartouche__scale-end {
+    font-family: var(--font-mono);
+    font-size: 8px;
+    fill: color-mix(in srgb, var(--text-secondary) 60%, transparent);
+    text-anchor: middle;
+    font-variant-numeric: tabular-nums;
+}
+
+.cartouche__edge-label {
+    font-family: var(--font-mono);
+    font-size: 8px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    fill: color-mix(in srgb, var(--text-secondary) 45%, transparent);
+    font-variant-numeric: tabular-nums;
+}
+
+.cartouche__edge-lon {
+    text-anchor: middle;
+}
+
+.cartouche__edge-lat {
+    text-anchor: end;
+    dominant-baseline: middle;
+}
+
+@media (max-width: 900px) {
+    /* Cartouche clutter hurts the smaller viewport — hide it on mobile. */
+    .cartouche { display: none; }
+}
+
+/* ---------- Map — countries (base state) ----------
+ *
+ * Every animated property lives here on the base rule (not on the
+ * focus modifier below), so that when the `is-focus-country` class
+ * is *removed* the same transition plays in reverse. Otherwise the
+ * country snaps back to its resting state the instant focus leaves.
+ *
+ * transform-box / transform-origin let the focus scale + translate
+ * pivot around each path's own bounding-box centre, rather than the
+ * SVG coordinate origin at (0, 0). Without these, scaling a country
+ * would also translate it by most of its distance from origin.
+ */
+.country {
+    fill: var(--bg-surface);
+    stroke: var(--border-strong);
+    stroke-width: 0.8;
+    stroke-linejoin: round;
+    transform-box: fill-box;
+    transform-origin: center;
+    /* All animated properties share the same curve so fill, stroke,
+     * and glow arrive together as one beat. */
+    transition:
+        fill var(--dur-default) var(--ease-default),
+        transform var(--dur-default) var(--ease-default),
+        filter var(--dur-default) var(--ease-default),
+        stroke var(--dur-default) var(--ease-default),
+        stroke-width var(--dur-default) var(--ease-default);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .country:hover {
+        stroke: var(--accent);
+        stroke-width: 1.2;
+        filter: drop-shadow(0 0 8px color-mix(in srgb, var(--accent) 30%, transparent));
+        cursor: pointer;
+    }
+}
+.country:focus-visible {
+    stroke: var(--accent);
+    stroke-width: 1.2;
+    filter: drop-shadow(0 0 8px color-mix(in srgb, var(--accent) 30%, transparent));
+    cursor: pointer;
+}
+
+/* Keyboard focus uses the same halo as hover instead of the global
+ * outline rule — outline rendering on SVG paths is inconsistent across
+ * browsers, and the stroke/filter pair matches the hover affordance. */
+.country:focus-visible {
+    outline: none;
+}
+
+/* ---------- Map — country hover tooltip ---------- */
+
+.map-tip {
+    position: absolute;
+    padding: 5px 10px;
+    font-size: 13px;
+    color: var(--text-primary);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* ---------- Map — flow guides + particle stream ----------
+ *
+ * Quadratic bezier paths connecting country centroids, rendered when
+ * the price spread between two connected markets exceeds a threshold.
+ * Direction follows the price gradient (low → high).
+ *
+ * The path itself is now a dim CHANNEL — a low-opacity cyan hairline
+ * that shows the route of the interconnector even when no particle is
+ * currently on it. The motion layer is a generative stream of small
+ * dots (`.particle`) that ride the same path, spawned and advanced by
+ * map.js. Focus-country flows glow brighter and flow faster.
+ */
+
+.flow {
+    stroke: color-mix(in srgb, var(--accent) 70%, transparent);
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 3px color-mix(in srgb, var(--accent) 32%, transparent));
+}
+
+.flow--focus {
+    stroke: color-mix(in srgb, var(--accent-glow) 80%, transparent);
+    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--accent) 50%, transparent))
+            drop-shadow(0 0 2px var(--accent-glow));
+}
+
+/* Particles — small cyan dots streaming along the flow guide. JS owns
+ * their transform (via translate) + opacity on every rAF tick; the
+ * group-level `#particle-glow` SVG filter in map.js handles the glow
+ * for all particles at once so individual nodes stay cheap. */
+.particle {
+    fill: var(--accent);
+    pointer-events: none;
+}
+
+.particle--focus {
+    fill: var(--accent-glow);
+}
+
+/* ---------- Map — labels (ISO code + live price per country) ----------
+ *
+ * Two text elements per country, grouped:
+ *   .label__code   — two-letter ISO code, small tracked mono uppercase
+ *   .label__price  — current price at the active hour, mono tabular
+ *
+ * Default state: invisible (countries don't have labels until a
+ * narrative step activates the map).
+ * is-visible: labels fade in with the step.
+ * is-focus: labels of the card's target country get the hero treatment —
+ *   larger, ice-white, with a glow filter.
+ */
+
+.label {
+    pointer-events: none;
+    text-anchor: middle;
+    opacity: 0;
+    transition: opacity var(--dur-default) var(--ease-default);
+}
+
+.label.is-visible {
+    opacity: 1;
+}
+
+.label__code {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    fill: color-mix(in srgb, var(--text-primary) 60%, transparent);
+    /* Tight dark stroke for legibility against any country fill color */
+    paint-order: stroke;
+    stroke: var(--bg-base);
+    stroke-width: 3.5;
+    stroke-linejoin: round;
+}
+
+.label__price {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "zero", "ss02";
+    font-size: 14px;
+    font-weight: 500;
+    fill: var(--text-primary);
+    paint-order: stroke;
+    stroke: var(--bg-base);
+    stroke-width: 4;
+    stroke-linejoin: round;
+    transition:
+        font-size var(--dur-default) var(--ease-overshoot),
+        fill var(--dur-default) var(--ease-default);
+}
+
+/* Focus country — the card's target. Label grows and glows. */
+.label.is-focus .label__code {
+    fill: var(--accent-glow);
+}
+
+.label.is-focus .label__price {
+    fill: var(--accent-glow);
+    font-size: 20px;
+    font-weight: 700;
+    filter: drop-shadow(0 0 8px color-mix(in srgb, var(--accent) 60%, transparent))
+            drop-shadow(0 0 2px var(--accent-glow));
+}
+
+/* ---------- Narrative column ----------
+ *
+ * The bottom padding is intentionally short (40vh instead of 100vh)
+ * so the emotional peak of Step 3 — the −145.12 hero number — flows
+ * into the explorer intro quickly. Agent E's insight: the reader's
+ * emotional momentum from the reveal shouldn't be spent on empty
+ * scroll. The scrubber is the reveal's proof; don't make them wait.
+ */
+
+.scene__narrative {
+    position: relative;
+    z-index: 3;
+    pointer-events: none;
+    max-width: var(--narrative-col);
+    margin-left: var(--gutter);
+    padding-block: 45vh 40vh;
+    display: flex;
+    flex-direction: column;
+    gap: 70vh;
+}
+
+/* Glass narrative card. A floating dispatch.
+ *
+ * Asymmetric top border: a brighter 1px line on top fakes a light
+ * source from above. This is the single rule that separates "glass
+ * card" from "PowerPoint box". */
+.step {
+    pointer-events: auto;
+    position: relative;
+    background: var(--bg-glass);
+    backdrop-filter: blur(28px) saturate(1.6);
+    -webkit-backdrop-filter: blur(28px) saturate(1.6);
+    border: 1px solid var(--border-glass);
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 3px;
+    padding: 36px 40px 40px;
+    max-width: var(--narrative-col);
+    box-shadow:
+        0 32px 64px -24px rgba(0, 0, 0, 0.7),
+        0 4px 12px -2px rgba(0, 0, 0, 0.3),
+        0 1px 0 0 rgba(255, 255, 255, 0.05) inset;
+
+    /* Inactive state — dimmed but still readable so the reader can
+     * glance back at a previous card. Active card jumps to 1. */
+    opacity: 0.65;
+    transform: translateY(16px) scale(0.985);
+    transition:
+        opacity var(--dur-default) var(--ease-default) 600ms,
+        transform var(--dur-default) var(--ease-default),
+        border-color var(--dur-default) var(--ease-default),
+        box-shadow var(--dur-default) var(--ease-default);
+}
+
+.step:not(.is-active) {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+/* Radial scrim under the active card only — guarantees legibility
+ * without dimming the whole map. */
+.step::after {
+    content: "";
+    position: absolute;
+    inset: -80px -200px -80px -120px;
+    background: radial-gradient(
+        ellipse 70% 60% at 30% 50%,
+        color-mix(in srgb, var(--bg-base) 70%, transparent) 0%,
+        transparent 65%
+    );
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--dur-default) var(--ease-default);
+}
+
+.step.is-active::after {
+    opacity: 1;
+}
+
+.step.is-active {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    /* Override the 600ms delay on the inactive rule — the entering
+     * card should brighten immediately, only the LEAVING card dwells. */
+    transition-delay: 0ms;
+    border-color: color-mix(in srgb, var(--step-accent, var(--accent)) 18%, var(--border-glass));
+    border-top-color: color-mix(in srgb, var(--step-accent, var(--accent)) 24%, rgba(255, 255, 255, 0.12));
+    box-shadow:
+        0 40px 80px -20px rgba(0, 0, 0, 0.8),
+        0 4px 16px -2px rgba(0, 0, 0, 0.4),
+        0 0 0 1px color-mix(in srgb, var(--step-accent, var(--accent)) 10%, transparent),
+        0 1px 0 0 rgba(255, 255, 255, 0.1) inset;
+}
+
+/* Per-step semantic accent. Each step's active state uses a slightly
+ * different hue tied to the temperature of the moment. The whole bar,
+ * border, eyebrow, and step number react together. */
+.step[data-step="1"] { --step-accent: var(--accent-dim); }
+.step[data-step="2"] { --step-accent: var(--accent); }
+.step[data-step="3"] { --step-accent: var(--accent-glow); }
+
+.step[data-step="3"].is-active {
+    /* Step 3 — the shock. Adds an interior cyan wash because this is
+     * the moment the data breaks the rule. */
+    box-shadow:
+        0 40px 80px -20px rgba(0, 0, 0, 0.85),
+        0 4px 16px -2px rgba(0, 0, 0, 0.4),
+        0 0 0 1px color-mix(in srgb, var(--accent-glow) 18%, transparent),
+        0 1px 0 0 rgba(255, 255, 255, 0.18) inset,
+        inset 0 0 80px color-mix(in srgb, var(--accent) 6%, transparent);
+}
+
+/* ---------- Step 3 — break the grid (number-as-hero) ---------- */
+
+/*
+ * After two cards in a steady rhythm, Step 3 ruptures the layout: the
+ * card widens, and the price value becomes the centerpiece in display
+ * Fraunces italic. The body prose flows under the number like a cutline.
+ *
+ * This is intentional craft — the data breaks the rule (prices going
+ * negative is nonsense), so the layout breaks the rule too.
+ */
+
+.step--shock {
+    max-width: 540px;
+}
+
+/* Steps 4–5 match the shock card width so the progression
+ * from 460→540→540 reads as intentional widening, not a regression. */
+.step--wide {
+    max-width: 540px;
+}
+
+.step__chart--heatmap {
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+}
+
+.step__hero-number {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 300;
+    font-variation-settings: "opsz" 144, "SOFT" 50, "wght" 300;
+    color: var(--accent-glow);
+    line-height: 0.85;
+    letter-spacing: -0.04em;
+    margin: 8px 0 22px;
+    text-shadow:
+        0 0 60px color-mix(in srgb, var(--accent) 40%, transparent),
+        0 0 24px color-mix(in srgb, var(--accent-bright) 30%, transparent);
+
+    /* Hidden by default; revealed when the card activates */
+    opacity: 0;
+    transform: translateY(20px) scale(0.96);
+    filter: blur(8px);
+    transition:
+        opacity 1400ms var(--ease-cinematic) 200ms,
+        transform 1400ms var(--ease-cinematic) 200ms,
+        filter 1400ms var(--ease-cinematic) 200ms;
+}
+
+.step--shock.is-active .step__hero-number {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+}
+
+.step__hero-currency {
+    font-size: 0.36em;
+    font-style: normal;
+    font-variation-settings: "opsz" 24, "wght" 400;
+    color: color-mix(in srgb, var(--accent-glow) 60%, transparent);
+    margin-right: 0.06em;
+    align-self: flex-start;
+    margin-top: 0.5em;
+}
+
+.step__hero-sign {
+    font-size: 0.92em;
+    font-style: normal;
+    font-weight: 300;
+    color: var(--accent-glow);
+    margin-right: -0.04em;
+}
+
+.step__hero-value {
+    font-family: var(--font-display);
+    font-size: clamp(80px, 8.5vw, 132px);
+    font-style: italic;
+    font-weight: 300;
+    font-variation-settings: "opsz" 144, "SOFT" 50, "wght" 300;
+    letter-spacing: -0.04em;
+    color: var(--accent-glow);
+    /* Reset mono utility settings — we want the display serif here */
+    font-variant-numeric: normal;
+    font-feature-settings: normal;
+}
+
+.step__hero-decimal {
+    font-size: 0.42em;
+    vertical-align: 0.6em;
+    margin-left: 0.04em;
+    color: color-mix(in srgb, var(--accent-glow) 60%, var(--text-secondary));
+    letter-spacing: -0.02em;
+}
+
+.step__hero-unit {
+    font-size: 0.16em;
+    font-style: normal;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: color-mix(in srgb, var(--accent-glow) 50%, var(--text-secondary));
+    align-self: flex-end;
+    margin-bottom: 1.2em;
+    margin-left: 0.4em;
+    border-top: 1px solid color-mix(in srgb, var(--accent-glow) 40%, transparent);
+    padding-top: 4px;
+}
+
+/* Left accent bar that grows when the step activates. Uses the
+ * step-specific accent hue. */
+.step::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 24px;
+    bottom: 24px;
+    width: 2px;
+    background: var(--step-accent, var(--accent));
+    box-shadow: 0 0 12px var(--step-accent, var(--accent)),
+                0 0 2px var(--accent-bright);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform var(--dur-default) var(--ease-cinematic),
+                background var(--dur-default) var(--ease-default),
+                box-shadow var(--dur-default) var(--ease-default);
+}
+
+.step.is-active::before {
+    transform: scaleY(1);
+}
+
+.step__eyebrow {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--text-muted);
+    margin-bottom: 18px;
+    transition: color var(--dur-default) var(--ease-default);
+}
+
+.step.is-active .step__eyebrow {
+    color: var(--step-accent, var(--accent));
+}
+
+.step__number {
+    font-size: 10px;
+    color: var(--text-ghost);
+    transition: color var(--dur-default) var(--ease-default);
+}
+
+.step.is-active .step__number {
+    color: var(--step-accent, var(--accent-bright));
+}
+
+.step__headline {
+    font-family: var(--font-display);
+    font-size: 34px;
+    font-weight: 400;
+    font-variation-settings: "opsz" 48, "SOFT" 10;
+    letter-spacing: -0.02em;
+    line-height: 1.08;
+    margin-bottom: 18px;
+    color: var(--text-primary);
+    text-wrap: balance;
+}
+
+.step__headline em {
+    color: var(--accent-bright);
+    font-style: italic;
+    font-variation-settings: "opsz" 144, "SOFT" 40;
+}
+
+.step__body {
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--text-secondary);
+    font-variation-settings: "opsz" 18, "SOFT" 25;
+    text-wrap: pretty;
+}
+
+.step__body strong {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.step__body strong.mono {
+    /* Mono strongs are the data highlights — pulled out further. */
+    color: var(--accent-bright);
+    font-weight: 500;
+}
+
+/* ---------- Step sparkline (in-card 24h price trace) ---------- */
+
+.step__chart {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+    opacity: 0.5;
+    transition: opacity var(--dur-default) var(--ease-default);
+}
+
+.step.is-active .step__chart {
+    opacity: 1;
+}
+
+.spark {
+    display: block;
+    width: 100%;
+    height: 48px;
+    overflow: visible;
+}
+
+.spark__zero {
+    stroke: color-mix(in srgb, var(--text-muted) 50%, transparent);
+    stroke-width: 0.5;
+    stroke-dasharray: 2 3;
+}
+
+.spark__area {
+    fill: color-mix(in srgb, var(--accent) 12%, transparent);
+    stroke: none;
+}
+
+.spark__line {
+    fill: none;
+    stroke: color-mix(in srgb, var(--text-primary) 55%, transparent);
+    stroke-width: 1.4;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    transition: stroke var(--dur-default) var(--ease-default);
+}
+
+.step.is-active .spark__line {
+    stroke: var(--accent-bright);
+    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--accent) 50%, transparent));
+}
+
+.spark__indicator {
+    stroke: color-mix(in srgb, var(--accent) 35%, transparent);
+    stroke-width: 1;
+    stroke-dasharray: 1 2;
+}
+
+.step.is-active .spark__indicator {
+    stroke: color-mix(in srgb, var(--accent-glow) 65%, transparent);
+}
+
+.spark__dot {
+    fill: var(--accent);
+    stroke: var(--bg-glass);
+    stroke-width: 1.5;
+    filter: drop-shadow(0 0 6px var(--accent));
+    transition: fill var(--dur-default) var(--ease-default),
+                r var(--dur-default) var(--ease-overshoot);
+}
+
+.step.is-active .spark__dot {
+    fill: var(--accent-glow);
+    r: 4.5;
+    filter: drop-shadow(0 0 10px var(--accent-glow))
+            drop-shadow(0 0 2px var(--accent-bright));
+}
+
+.spark__anchor,
+.spark__country {
+    font-family: var(--font-mono);
+    font-size: 8px;
+    font-weight: 500;
+    fill: var(--text-muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-variation-settings: normal;
+}
+
+.spark__country {
+    fill: color-mix(in srgb, var(--accent) 65%, var(--text-secondary));
+    font-weight: 600;
+}
+
+/* Generation donut — small pie chart showing source mix at a
+ * specific hour. Sits inside the step chart container. */
+.gen-donut__label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    fill: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+    font-variation-settings: normal;
+}
+
+/* ---------- Calendar heatmap ----------
+ *
+ * A dense hour × day grid rendered to <canvas> and wrapped in a thin
+ * DOM structure for axis labels and tooltip. Sits inside a narrative
+ * step card's .step__chart container. Two instances stack vertically
+ * (DE above, CH below) when Step 4 is active.
+ */
+
+.cal-heatmap {
+    display: inline-block;
+    margin-bottom: 16px;
+}
+
+.chart-empty {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 24px 0;
+    text-align: center;
+}
+
+/* DE / CH toggle tabs above the heatmap grid. */
+.cal-heatmap__tabs {
+    display: inline-flex;
+    gap: 2px;
+    margin-bottom: 10px;
+    background: var(--bg-base);
+    border-radius: 4px;
+    padding: 2px;
+    border: 1px solid var(--border);
+}
+
+.cal-heatmap__tab {
+    padding: 4px 14px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: color var(--dur-fast) var(--ease-default),
+                background var(--dur-fast) var(--ease-default);
+}
+
+.cal-heatmap__tab:hover {
+    color: var(--text-secondary);
+}
+
+.cal-heatmap__tab.is-active {
+    color: var(--accent);
+    background: var(--bg-elevated);
+}
+
+.cal-heatmap__holder {
+    position: relative;
+}
+
+.cal-heatmap__title {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--chrome);
+    margin: 0 0 6px;
+}
+
+.cal-heatmap__canvas {
+    display: block;
+    border-radius: 2px;
+}
+
+.cal-heatmap__hours {
+    position: absolute;
+    top: 6px;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+}
+
+.cal-heatmap__hour-label {
+    position: absolute;
+    transform: translateX(-50%);
+    font-size: 8px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+}
+
+.cal-heatmap__months {
+    position: absolute;
+    left: 0;
+    width: 40px;
+    pointer-events: none;
+}
+
+.cal-heatmap__month-label {
+    position: absolute;
+    right: 4px;
+    font-size: 8px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    line-height: 1;
+}
+
+.cal-heatmap__tip {
+    position: absolute;
+    padding: 4px 8px;
+    font-size: 13px;
+    color: var(--text-primary);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.cal-heatmap__legend {
+    margin-top: 8px;
+    width: 100%;
+    max-width: 240px;
+}
+
+.cal-heatmap__legend-bar {
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(
+        90deg,
+        #e0f7ff 0%,
+        #67e8f9 20%,
+        #0e7490 40%,
+        #e8a460 65%,
+        #ef4444 85%,
+        #991b1b 100%
+    );
+}
+
+.cal-heatmap__legend-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 3px;
+    font-size: 8px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+}
+
+/* ---------- Generation stack chart ----------
+ *
+ * Stacked area of hourly generation by source for Germany on the
+ * showcase day, with a price line on a secondary right-hand axis
+ * and a dashed total-load reference line.
+ */
+
+.gen-stack {
+    display: inline-block;
+    margin-bottom: 16px;
+}
+
+.gen-stack__title {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--chrome);
+    margin: 0 0 6px;
+}
+
+.gen-stack__svg {
+    display: block;
+    width: 100%;
+    max-width: 420px;
+    height: auto;
+    overflow: visible;
+}
+
+.gen-stack__zero {
+    stroke: color-mix(in srgb, var(--text-muted) 50%, transparent);
+    stroke-width: 0.8;
+    stroke-dasharray: 3 3;
+}
+
+.gen-stack__load {
+    fill: none;
+    stroke: color-mix(in srgb, var(--text-primary) 55%, transparent);
+    stroke-width: 1.2;
+    stroke-dasharray: 4 4;
+    stroke-linecap: round;
+}
+
+.gen-stack__price {
+    fill: none;
+    stroke: var(--accent-glow);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--accent) 50%, transparent));
+}
+
+.gen-stack__axis text {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    fill: var(--text-muted);
+    letter-spacing: 0.05em;
+    font-variation-settings: normal;
+}
+
+.gen-stack__axis--y-price text {
+    fill: color-mix(in srgb, var(--accent-glow) 80%, var(--text-secondary));
+}
+
+.gen-stack__axis-label {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    fill: var(--text-muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-variation-settings: normal;
+}
+
+.gen-stack__axis-label--right {
+    fill: color-mix(in srgb, var(--accent-glow) 70%, var(--text-secondary));
+}
+
+.gen-stack__legend-text {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    fill: var(--text-muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    dominant-baseline: middle;
+    font-variation-settings: normal;
+}
+
+.gen-stack__crosshair {
+    stroke: var(--text-muted);
+    stroke-width: 1;
+    stroke-dasharray: 2 2;
+    pointer-events: none;
+}
+
+.gen-stack__crosshair-dot {
+    fill: var(--accent-glow);
+    stroke: var(--bg-base);
+    stroke-width: 2;
+    pointer-events: none;
+}
+
+.gen-stack__tip {
+    position: absolute;
+    padding: 6px 10px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    line-height: 1.5;
+}
+
+/* ---------- Daily profile chart ---------- */
+
+.daily-profile {
+    display: inline-block;
+    margin-bottom: 16px;
+}
+
+.daily-profile__title {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--chrome);
+    margin: 0 0 6px;
+}
+
+.daily-profile__svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+}
+
+.daily-profile__zero {
+    stroke: color-mix(in srgb, var(--text-muted) 50%, transparent);
+    stroke-width: 0.8;
+    stroke-dasharray: 3 3;
+}
+
+.daily-profile__ghost {
+    fill: none;
+    stroke: color-mix(in srgb, var(--text-muted) 40%, transparent);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+}
+
+.daily-profile__area {
+    fill: color-mix(in srgb, var(--accent) 12%, transparent);
+    stroke: none;
+}
+
+.daily-profile__line {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--accent) 40%, transparent));
+}
+
+/* Duck chart (Step 6) gets heavier lines so the monthly morph is
+ * clearly visible against the glass card background. */
+.step__chart--duck .daily-profile__line {
+    stroke-width: 2.6;
+    filter: drop-shadow(0 0 8px color-mix(in srgb, var(--accent) 55%, transparent));
+}
+
+.step__chart--duck .daily-profile__ghost {
+    stroke: color-mix(in srgb, var(--text-muted) 60%, transparent);
+    stroke-width: 1.4;
+}
+
+.step__chart--duck .daily-profile__area {
+    fill: color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+.daily-profile__month-label {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    fill: var(--accent);
+    letter-spacing: 0.08em;
+    font-variation-settings: normal;
+}
+
+.daily-profile__axis text {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    fill: var(--text-muted);
+    letter-spacing: 0.05em;
+    font-variation-settings: normal;
+}
+
+.daily-profile__axis-label {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    fill: var(--text-muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-variation-settings: normal;
+}
+
+/* Compact mode — small multiples for Step 7 */
+.daily-profile--compact {
+    margin-bottom: 8px;
+}
+
+.daily-profile--compact .daily-profile__line {
+    stroke-width: 1.4;
+    filter: none;
+}
+
+.daily-profile--compact .daily-profile__area {
+    fill: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+/* Small multiples grid for Step 7 */
+.small-multiples {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px 12px;
+    max-width: 500px;
+}
+
+@media (max-width: 900px) {
+    .small-multiples {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.daily-profile__country-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 700;
+    fill: var(--chrome);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-variation-settings: normal;
+}
+
+.daily-profile__crosshair {
+    stroke: var(--text-muted);
+    stroke-width: 1;
+    stroke-dasharray: 2 2;
+    pointer-events: none;
+}
+
+.daily-profile__crosshair-dot {
+    fill: var(--accent-glow);
+    stroke: var(--bg-base);
+    stroke-width: 2;
+    pointer-events: none;
+}
+
+.daily-profile__tip {
+    position: absolute;
+    padding: 5px 10px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* ---------- Explorer ----------
+ *
+ * A "steer the grid" mode. The map stays FULLY visible in the fixed
+ * background — the explorer section is completely transparent so the
+ * reader can see the countries and flow arrows they're about to
+ * drive. Intro copy and the timeline card float over the map as
+ * semantic glass panels with their own backdrop blur; the section
+ * itself adds nothing between them and the map.
+ */
+
+/* ---------- Explorer (inside the scene) ----------
+ *
+ * The explorer is a 100vh section that sits below the narrative
+ * inside the same `.scene` container as the sticky map. Structure:
+ *
+ *   .scene__explorer    — 100vh relative-positioned section
+ *   .explorer__intro    — normal flow, rides the top of the section
+ *   .explorer__timeline-wrap — position:sticky bottom, docks to
+ *                              viewport bottom while the section is
+ *                              scrolling through the viewport
+ *
+ * When the reader enters the explorer, the intro enters naturally
+ * and the sticky timeline docks. They both ride together with the
+ * rest of the document. When the section ends, the timeline un-docks
+ * and the scene ends — the sticky map slides away and the footer
+ * takes over. No fade JS, no position:fixed fights.
+ */
+
+.scene__explorer,
+.explorer {
+    position: relative;
+    z-index: 4;
+    min-height: 100dvh;
+    padding: 0;
+    background: transparent;
+    border-top: 1px solid color-mix(in srgb, var(--accent) 20%, var(--border));
+    display: flex;
+    flex-direction: column;
+}
+
+.explorer__intro {
+    padding: 10vh var(--gutter) 0;
+    max-width: calc(520px + var(--gutter) * 2);
+    /* Legibility on bare map — tight dark halo under the text. */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7),
+                 0 0 12px rgba(10, 11, 13, 0.9);
+}
+
+/* Timeline wrap — sticky to the explorer section's bottom edge.
+ * When the reader scrolls the explorer into view, this docks to the
+ * viewport bottom. When the explorer ends, it naturally un-docks
+ * and the footer rises. No JS fade, no fixed-position fight — the
+ * browser does the work via native sticky positioning.
+ *
+ * `margin-top: auto` pushes the wrap to the bottom of the explorer's
+ * flex column, so the bottom of the wrap is at the bottom of the
+ * section. `bottom: clamp(...)` applies the sticky offset. */
+.explorer__timeline-wrap {
+    position: sticky;
+    bottom: calc(clamp(24px, 4vh, 56px) + env(safe-area-inset-bottom, 0px));
+    margin-top: auto;
+    padding: 0 max(var(--gutter), env(safe-area-inset-right, 0px)) 0 max(var(--gutter), env(safe-area-inset-left, 0px));
+    z-index: 6;
+    /* Fades in synced with the explorer headline becoming visible.
+     * Default state is invisible; the .is-visible class is toggled
+     * by an IntersectionObserver in explorer.js watching the
+     * .explorer__headline element. */
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity var(--dur-default) var(--ease-cinematic),
+                transform var(--dur-default) var(--ease-cinematic);
+    pointer-events: none;
+}
+
+.explorer__timeline-wrap.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.explorer__timeline-wrap .timeline {
+    max-width: var(--content-max);
+    margin: 0 auto;
+}
+
+.explorer__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--chrome);
+    margin: 0 0 28px 0;
+}
+
+.explorer__eyebrow-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--chrome);
+    box-shadow:
+        0 0 calc(8px + var(--beat) * 12px) color-mix(in srgb, var(--accent) calc(50% + var(--beat) * 50%), transparent),
+        0 0 2px var(--accent-glow);
+    transform: scale(calc(0.92 + var(--beat) * 0.16));
+}
+
+.explorer__headline {
+    font-family: var(--font-display);
+    font-size: clamp(36px, 5vw, 64px);
+    font-weight: 400;
+    font-variation-settings: "opsz" 144, "SOFT" 10;
+    letter-spacing: -0.025em;
+    line-height: 1.04;
+    margin: 0 0 24px 0;
+    color: var(--text-primary);
+    text-wrap: balance;
+}
+
+.explorer__headline em {
+    font-style: italic;
+    color: var(--accent-bright);
+    font-variation-settings: "opsz" 144, "SOFT" 50;
+}
+
+.explorer__lede {
+    font-size: clamp(16px, 1.2vw, 19px);
+    line-height: 1.6;
+    color: var(--text-secondary);
+    font-variation-settings: "opsz" 18, "SOFT" 20;
+    max-width: 60ch;
+    margin: 0;
+}
+
+/* Inline "try this" cue — an editorial callout in the intro that
+ * gives the reader a specific destination worth scrubbing to, so
+ * the timeline becomes an invitation rather than just an affordance. */
+.explorer__cue {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin: 28px 0 0;
+    padding: 16px 20px 16px 18px;
+    font-size: clamp(14px, 1vw, 16px);
+    line-height: 1.55;
+    color: var(--text-secondary);
+    background: color-mix(in srgb, var(--accent) 6%, transparent);
+    border-left: 2px solid var(--accent);
+    border-radius: 0 2px 2px 0;
+    max-width: 52ch;
+    font-variation-settings: "opsz" 16, "SOFT" 15;
+}
+
+.explorer__cue strong {
+    color: var(--accent-bright);
+    font-weight: 500;
+}
+
+.explorer__cue em {
+    font-style: italic;
+    color: var(--accent-glow);
+    font-variation-settings: "opsz" 144, "SOFT" 45;
+}
+
+.explorer__cue-marker {
+    flex-shrink: 0;
+    color: var(--accent);
+    font-size: 15px;
+    font-weight: 700;
+    opacity: 0.85;
+    /* Subtle breathing pulse to draw the eye, tied to the global
+     * 1Hz heartbeat so it feels of-a-piece rather than arbitrary. */
+    transform: translateX(calc(var(--beat) * 3px));
+    transition: transform 200ms var(--ease-default);
+}
+
+/* Scroll-pause prompt — visible during the brief scroll freeze
+ * when the explorer first enters. Encourages the reader to interact
+ * with the timeline. Fades out when the pause releases (auto-timer
+ * or first interaction). */
+.explorer__scroll-prompt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--chrome);
+    margin-top: 24px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 500ms var(--ease-cinematic),
+                transform 500ms var(--ease-cinematic);
+    pointer-events: none;
+}
+
+.explorer__scroll-prompt-arrow {
+    font-size: 16px;
+    animation: scrollPromptBounce 1400ms var(--ease-default) infinite;
+}
+
+@keyframes scrollPromptBounce {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(4px); }
+}
+
+/* Show prompt during the scroll pause */
+.scene__explorer.is-scroll-locked .explorer__scroll-prompt {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Fade prompt out on release */
+.scene__explorer.is-scroll-released .explorer__scroll-prompt {
+    opacity: 0;
+}
+
+/* ---------- Explorer sidebar ----------
+ *
+ * Slides in from the right when the reader clicks a country on the
+ * map during the explorer phase. Shows generation stack + daily
+ * profile + stats for the selected country at the current hour.
+ */
+
+.explorer__sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: clamp(300px, 26vw, 400px);
+    height: 100vh;
+    height: 100dvh;
+    background: var(--bg-surface);
+    border-left: 1px solid var(--border);
+    z-index: 20;
+    overflow-y: auto;
+    padding: 24px 24px 100px;
+    transform: translateX(100%);
+    transition: transform 400ms var(--ease-default);
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.4);
+}
+
+.explorer__sidebar.is-open {
+    transform: translateX(0);
+}
+
+.sidebar__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.sidebar__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--bg-elevated);
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+    transition: color var(--dur-fast), border-color var(--dur-fast);
+}
+
+.sidebar__close:hover {
+    color: var(--text-primary);
+    border-color: var(--text-muted);
+}
+
+.sidebar__country {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0;
+}
+
+.sidebar__stats {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.sidebar__stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sidebar__stat-label {
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.sidebar__stat-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.sidebar__charts {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.sidebar__chart {
+    width: 100%;
+}
+
+@media (max-width: 900px) {
+    .explorer__sidebar {
+        width: 100vw;
+        z-index: 110;
+        height: 100dvh;
+        min-height: -webkit-fill-available;
+    }
+    .sidebar__close {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+    }
+}
+
+/* ---------- Timeline scrubber ---------- */
+
+.timeline {
+    background: var(--bg-glass);
+    backdrop-filter: blur(28px) saturate(1.6);
+    -webkit-backdrop-filter: blur(28px) saturate(1.6);
+    border: 1px solid var(--border-glass);
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 3px;
+    padding: 28px 32px 32px;
+    box-shadow:
+        0 32px 64px -24px rgba(0, 0, 0, 0.7),
+        0 4px 12px -2px rgba(0, 0, 0, 0.3),
+        0 1px 0 0 rgba(255, 255, 255, 0.05) inset;
+}
+
+.timeline__chrome {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    row-gap: 12px;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.timeline__play {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--bg-elevated);
+    border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border));
+    color: var(--accent);
+    cursor: pointer;
+    transition:
+        background var(--dur-fast) var(--ease-default),
+        border-color var(--dur-fast) var(--ease-default),
+        transform var(--dur-fast) var(--ease-default),
+        box-shadow var(--dur-fast) var(--ease-default);
+    flex-shrink: 0;
+    padding: 0;
+}
+
+.timeline__play:hover,
+.timeline__play:focus-visible {
+    background: color-mix(in srgb, var(--accent) 12%, var(--bg-elevated));
+    border-color: var(--accent);
+    box-shadow: 0 0 24px color-mix(in srgb, var(--accent) 30%, transparent);
+    outline: none;
+    transform: scale(1.04);
+}
+
+.timeline__play:active {
+    transform: scale(0.96);
+}
+
+/* Waiting for the first click — the play button radiates a slow
+ * accent pulse so the reader can't miss it. Class is applied by
+ * explorer.js on entry and removed the moment they interact. */
+.timeline.is-waiting .timeline__play {
+    animation: playWait 1900ms var(--ease-cinematic) infinite;
+    background: color-mix(in srgb, var(--accent) 18%, var(--bg-elevated));
+    border-color: var(--accent);
+}
+
+.timeline.is-waiting .timeline__play-shape {
+    fill: var(--accent-glow);
+}
+
+@keyframes playWait {
+    0%, 100% {
+        box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 42%, transparent),
+                    0 0 18px color-mix(in srgb, var(--accent) 28%, transparent);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 0 14px color-mix(in srgb, var(--accent) 0%, transparent),
+                    0 0 26px color-mix(in srgb, var(--accent) 40%, transparent);
+        transform: scale(1.05);
+    }
+}
+
+.timeline.is-waiting .timeline__play:active {
+    animation: none;
+    transform: scale(0.96);
+}
+
+.timeline__play-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.timeline__play-shape {
+    fill: var(--accent);
+    transition: d var(--dur-medium) var(--ease-default);
+}
+
+.timeline.is-playing .timeline__play-shape--left {
+    d: path("M6 4 L6 20 L10 20 L10 4 Z");
+}
+
+.timeline.is-playing .timeline__play-shape--right {
+    d: path("M14 4 L14 20 L18 20 L18 4 Z");
+}
+
+.timeline__readout {
+    flex-shrink: 0;
+}
+
+.timeline__readout-label {
+    font-size: 9px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--text-muted);
+    margin: 0 0 4px 0;
+}
+
+.timeline__readout-value {
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0;
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "zero", "ss02";
+}
+
+.timeline__mode-group {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.timeline__mode-label {
+    font-size: 9px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+}
+
+.timeline__mode {
+    display: inline-flex;
+    gap: 2px;
+    background: var(--bg-base);
+    border-radius: 4px;
+    padding: 2px;
+    border: 1px solid var(--border);
+}
+
+.timeline__mode-btn {
+    padding: 3px 10px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: color var(--dur-fast) var(--ease-default),
+                background var(--dur-fast) var(--ease-default);
+}
+
+.timeline__mode-btn:hover {
+    color: var(--text-secondary);
+}
+
+.timeline__mode-btn.is-active {
+    color: var(--accent);
+    background: var(--bg-elevated);
+}
+
+.timeline__speed-group {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.timeline__speed {
+    display: inline-flex;
+    gap: 2px;
+    background: var(--bg-base);
+    border-radius: 4px;
+    padding: 2px;
+    border: 1px solid var(--border);
+}
+
+.timeline__speed-btn {
+    padding: 3px 10px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: color var(--dur-fast) var(--ease-default),
+                background var(--dur-fast) var(--ease-default);
+}
+
+.timeline__speed-btn:hover {
+    color: var(--text-secondary);
+}
+
+.timeline__speed-btn.is-active {
+    color: var(--accent);
+    background: var(--bg-elevated);
+}
+
+.timeline__legend {
+    margin-left: auto;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--text-muted);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.timeline__legend-sep {
+    color: var(--text-ghost);
+}
+
+.timeline__track {
+    position: relative;
+    height: 36px;
+    cursor: grab;
+    user-select: none;
+    /* `pan-y` lets the browser handle vertical scroll natively while
+     * we take horizontal pan events for drag-scrubbing. Using `none`
+     * would swallow all touch gestures and block page scroll whenever
+     * a finger touched the track. */
+    touch-action: pan-y;
+    outline: none;
+}
+
+/* Suppress the global 2px focus ring on the track — it would draw
+ * a giant cyan box around the full-width track container. The handle
+ * ring scaling up on focus is the correct affordance: it shows the
+ * keyboard user where their arrow keys will act. */
+.timeline__track:focus-visible {
+    outline: none;
+}
+
+.timeline__track:focus-visible .timeline__handle-ring {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.4);
+    box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 55%, transparent),
+                0 0 0 2px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.timeline__track:active {
+    cursor: grabbing;
+}
+
+.timeline__rail {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 2px;
+    background: color-mix(in srgb, var(--border-strong) 80%, transparent);
+    transform: translateY(-50%);
+    border-radius: 1px;
+}
+
+.timeline__ticks {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 8px;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.timeline__tick {
+    position: absolute;
+    top: 0;
+    width: 1px;
+    height: 100%;
+    background: color-mix(in srgb, var(--text-muted) 50%, transparent);
+}
+
+.timeline__tick--major {
+    height: 14px;
+    top: -3px;
+    background: var(--text-muted);
+}
+
+.timeline__fill {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 0;
+    height: 2px;
+    transform: translateY(-50%);
+    background: linear-gradient(
+        90deg,
+        var(--accent-dim) 0%,
+        var(--accent) 60%,
+        var(--accent-bright) 100%
+    );
+    box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 50%, transparent);
+    border-radius: 1px;
+    pointer-events: none;
+}
+
+.timeline__handle {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+.timeline__handle-dot {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent-glow);
+    box-shadow:
+        0 0 12px var(--accent),
+        0 0 24px color-mix(in srgb, var(--accent) 40%, transparent),
+        0 0 0 2px var(--bg-base);
+    transform: translate(-50%, -50%);
+}
+
+.timeline__handle-ring {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid var(--accent);
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0;
+    transition: opacity var(--dur-fast) var(--ease-default),
+                transform var(--dur-fast) var(--ease-default);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+/* First-encounter pulse — a subtle "you can drag me" hint that
+ * fires when the explorer first comes into view. Pulses the handle
+ * ring outward three times then stops. The timeline's
+ * is-touched class (set on first user interaction) kills the
+ * animation permanently so it never fires again. */
+.timeline.is-hinting .timeline__handle-ring {
+    opacity: 1;
+    animation: timelineHint 1800ms cubic-bezier(0.22, 0.61, 0.36, 1) 3;
+}
+
+.timeline.is-touched .timeline__handle-ring {
+    animation: none;
+}
+
+@keyframes timelineHint {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.9;
+        box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 30%, transparent);
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.85);
+        opacity: 0;
+        box-shadow: 0 0 32px color-mix(in srgb, var(--accent) 55%, transparent);
+    }
+}
+
+.timeline__track:hover .timeline__handle-ring,
+.timeline.is-playing .timeline__handle-ring {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.timeline__hours {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12px;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.timeline__hour-label {
+    flex: 0 0 auto;
+    min-width: 0;
+    text-align: center;
+}
+
+@media (max-width: 900px) {
+    /* Tighten explorer intro padding + rework the cue to be more
+     * compact on narrow screens. The sticky timeline stays at the
+     * viewport bottom and the intro rides above it. */
+    .scene__explorer,
+    .explorer {
+        padding: 0;
+    }
+    .explorer__intro {
+        padding: 10dvh 16px 0;
+    }
+    .explorer__headline {
+        font-size: clamp(28px, 8vw, 40px);
+    }
+    .explorer__lede {
+        font-size: 15px;
+    }
+    .explorer__cue {
+        padding: 12px 14px;
+        font-size: 13px;
+        margin-top: 20px;
+    }
+    .explorer__timeline-wrap {
+        padding: 0 16px;
+    }
+    .timeline {
+        padding: 16px 16px 20px;
+    }
+    .timeline__chrome {
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+    .timeline__legend {
+        display: none;
+    }
+    .timeline__readout-value {
+        font-size: 18px;
+    }
+}
+
+/* ---------- Footer ---------- */
+
+.site-footer {
+    position: relative;
+    z-index: 4;
+    padding: 120px var(--gutter) calc(64px + env(safe-area-inset-bottom, 0px));
+    background: var(--bg-base);
+    border-top: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    font-variation-settings: "opsz" 16;
+    min-height: 64vh;
+}
+
+/* No footer top-mask — under the sticky-scene architecture the map
+ * naturally scrolls out of the viewport as the scene ends, so the
+ * footer arrives cleanly through empty space. A soft mask here would
+ * add visual noise to a transition that no longer needs softening. */
+
+.site-footer__inner {
+    max-width: var(--content-max);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+}
+
+.site-footer__kicker {
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--chrome);
+    margin: 0;
+}
+
+.site-footer__closing {
+    font-family: var(--font-display);
+    font-size: clamp(32px, 4vw, 56px);
+    font-weight: 400;
+    font-variation-settings: "opsz" 144, "SOFT" 10;
+    letter-spacing: -0.02em;
+    line-height: 1.06;
+    color: var(--text-primary);
+    max-width: 24ch;
+    margin: 0;
+    text-wrap: balance;
+}
+
+.site-footer__closing em {
+    font-style: italic;
+    color: var(--accent-bright);
+    font-variation-settings: "opsz" 144, "SOFT" 50;
+}
+
+.site-footer__columns {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 48px;
+    margin-top: 16px;
+}
+
+.site-footer__col {
+    max-width: 38ch;
+}
+
+.site-footer__col-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--text-muted);
+    margin: 0 0 16px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+}
+
+.site-footer__col p {
+    margin: 0 0 12px 0;
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+.site-footer__col p:last-child {
+    margin-bottom: 0;
+}
+
+.site-footer__col strong {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.site-footer__rule {
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--border) 15%,
+        var(--border) 85%,
+        transparent 100%
+    );
+    margin-top: 24px;
+}
+
+.site-footer__coda {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* Footer scroll-triggered reveal — staggered entrance */
+.site-footer__kicker,
+.site-footer__closing,
+.site-footer__columns,
+.site-footer__rule,
+.site-footer__coda {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity var(--dur-default) var(--ease-cinematic),
+                transform var(--dur-default) var(--ease-cinematic);
+}
+
+.site-footer.is-revealed .site-footer__kicker {
+    opacity: 1; transform: translateY(0); transition-delay: 0ms;
+}
+.site-footer.is-revealed .site-footer__closing {
+    opacity: 1; transform: translateY(0); transition-delay: 150ms;
+}
+.site-footer.is-revealed .site-footer__columns {
+    opacity: 1; transform: translateY(0); transition-delay: 350ms;
+}
+.site-footer.is-revealed .site-footer__rule {
+    opacity: 1; transform: translateY(0); transition-delay: 550ms;
+}
+.site-footer.is-revealed .site-footer__coda {
+    opacity: 1; transform: translateY(0); transition-delay: 700ms;
+}
+
+.site-footer__coda-dot {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--chrome) 55%, transparent);
+    flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+    .site-footer {
+        padding: 80px 16px 56px;
+        min-height: 0;
+    }
+    .site-footer__columns {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+    .site-footer__closing {
+        font-size: clamp(26px, 7vw, 42px);
+    }
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 900px) {
+    :root {
+        --narrative-col: min(380px, calc(100vw - 32px));
+    }
+
+    .hero__title {
+        font-size: clamp(48px, 12vw, 88px);
+    }
+
+    .scene__narrative {
+        margin-inline: 16px;
+        padding-block: 30dvh 60dvh;
+        gap: 55dvh;
+    }
+
+    .step {
+        padding: 28px 28px 32px;
+    }
+
+    .step__headline {
+        font-size: 26px;
+    }
+
+    /* Tap targets ≥ 44px for touch devices */
+    .timeline__track { height: 56px; }
+    .sidebar__close { width: 44px; height: 44px; padding: 10px; }
+    .timeline__mode-btn, .timeline__speed-btn {
+        padding: 10px 14px;
+        font-size: 12px;
+        min-height: 44px;
+    }
+    .timeline__mode-group, .timeline__speed-group { gap: 6px; }
+    .cal-heatmap__tab {
+        padding: 10px 16px;
+        min-height: 44px;
+        font-size: 11px;
+    }
+
+    /* T28: Drop backdrop-filter on mobile for scroll performance */
+    .step.is-active {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        background: color-mix(in srgb, var(--bg-surface) 94%, transparent);
+    }
+
+    /* T23: Timeline mobile chrome */
+    .timeline__chrome { gap: 10px; row-gap: 10px; }
+    .timeline__mode-group, .timeline__speed-group {
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+    }
+    .timeline__mode-label, .timeline__speed-label { display: none; }
+    .timeline__readout-label { font-size: 10px; }
+    .timeline__hours { font-size: 10px; }
+
+    /* T22: Narrative card density + hero number reflow */
+    .step { padding: 20px 18px 22px; }
+    .step::after { inset: -40px -40px; }
+    .step--shock, .step--wide { max-width: 100%; }
+    .step__hero-number { flex-wrap: wrap; }
+    .step__hero-value { font-size: clamp(56px, 16vw, 80px); }
+    .step__headline { font-size: clamp(22px, 6.2vw, 28px); line-height: 1.14; }
+    .step__eyebrow, .step__number { font-size: 11px; }
+}
+
+@media (hover: none) {
+    .timeline__handle-dot { width: 20px; height: 20px; }
+}
+
+@media (max-width: 600px) {
+    .label__code { font-size: 8px; }
+    .label__price { font-size: 11px; }
+    .label.is-focus .label__price { font-size: 14px; }
+}
+
+@media (max-width: 480px) {
+    .small-multiples { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+    .map-clock { display: none; }
+}
+
+@media (hover: none) {
+    button:focus-visible { outline: none; }
+}
+
+/* ---------- Wide viewport / zoomed-out scaling ----------
+ *
+ * At browser zoom < 100% or on ultrawide monitors (>1800px effective
+ * viewport), fixed-px text becomes microscopic and the layout floats
+ * in too much empty space. Scale up the base font, layout tokens, and
+ * small UI text proportionally. */
+
+@media (min-width: 1800px) {
+    :root {
+        --content-max: 1600px;
+        --narrative-col: 540px;
+        --gutter: clamp(40px, 5vw, 120px);
+    }
+
+    body { font-size: 19px; }
+
+    /* Small mono UI text — floor at 11px so nothing is microscopic */
+    .map-clock__label, .map-clock__date,
+    .hero__masthead-item, .hero__tape-label, .hero__tape-quote,
+    .hero__byline, .hero__date, .hero__scroll-hint,
+    .step__eyebrow, .step__number,
+    .timeline__legend, .timeline__mode-label,
+    .timeline__mode-btn, .timeline__speed-btn,
+    .explorer__eyebrow, .explorer__scroll-prompt,
+    .site-footer__kicker, .site-footer__coda,
+    .sidebar__stat-label,
+    .cal-heatmap__title, .cal-heatmap__tab,
+    .cal-heatmap__hour-label, .cal-heatmap__month-label,
+    .gen-stack__title, .gen-stack__legend-text,
+    .gen-stack__axis-label,
+    .daily-profile__title, .daily-profile__axis-label,
+    .daily-profile__country-label, .daily-profile__month-label,
+    .cartouche__compass-letter, .cartouche__scale-label,
+    .cartouche__scale-origin, .cartouche__scale-end,
+    .cartouche__edge-label,
+    .label__code {
+        font-size: 11px;
+    }
+
+    .label__price { font-size: 16px; }
+    .label.is-focus .label__price { font-size: 22px; }
+
+    .step { max-width: 540px; }
+    .step--shock, .step--wide { max-width: 620px; }
+    .step__headline { font-size: 38px; }
+
+    .explorer__headline { font-size: clamp(42px, 5.5vw, 72px); }
+    .explorer__sidebar { width: clamp(360px, 28vw, 480px); }
+
+    .map-clock__hour { font-size: clamp(80px, 11vw, 160px); }
+    .timeline__readout-value { font-size: 24px; }
+
+    .map-tip { font-size: 12px; padding: 6px 12px; }
+    .cal-heatmap__tip { font-size: 11px; }
+}
+
+@media (min-width: 2200px) {
+    :root {
+        --content-max: 1800px;
+        --narrative-col: 600px;
+    }
+
+    body { font-size: 21px; }
+
+    .step { max-width: 600px; }
+    .step--shock, .step--wide { max-width: 680px; }
+
+    .label__price { font-size: 18px; }
+    .label.is-focus .label__price { font-size: 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+        animation-duration: 0ms !important;
+        transition-duration: 0ms !important;
+    }
+    .hero__title-line,
+    .hero__eyebrow,
+    .hero__lede,
+    .hero__signature,
+    .hero__scroll-hint {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}

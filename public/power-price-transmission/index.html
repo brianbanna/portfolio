@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="An interactive data story about how renewable supply shocks in Germany propagate through the Central European power market, crashing day-ahead prices in neighbouring bidding zones and pulling Switzerland into negative territory.">
+    <title>Cross-Border Price Transmission — The Price of Wind and Sun</title>
+
+    <meta name="theme-color" content="#0a0b0d">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%230a0b0d%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%226%22%20fill%3D%22%23eae6de%22%2F%3E%3C%2Fsvg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <link rel="preload" href="data/processed/map.topojson" as="fetch" crossorigin>
+    <link rel="preload" href="data/processed/showcase_day.json" as="fetch" crossorigin>
+    <link rel="preload" href="data/processed/daily_profiles.json" as="fetch" crossorigin>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "d3": "https://cdn.jsdelivr.net/npm/d3@7/+esm",
+            "topojson-client": "https://cdn.jsdelivr.net/npm/topojson-client@3/+esm",
+            "scrollama": "https://cdn.jsdelivr.net/npm/scrollama@3/+esm"
+        }
+    }
+    </script>
+</head>
+<body>
+    <a class="skip-link" href="#narrative">Skip to content</a>
+    <div class="scroll-progress" aria-hidden="true">
+        <div class="scroll-progress__bar"></div>
+        <div class="scroll-progress__ticks" data-progress-ticks></div>
+    </div>
+    <div class="map-topscrim" aria-hidden="true"></div>
+
+    <!--
+        Big on-map clock. Sits in the lower-right of the viewport and
+        shows the hour of the active narrative step at display size.
+        Fades in on first step enter, fades out when no step is active.
+    -->
+    <div class="map-clock" aria-hidden="true" data-map-clock>
+        <p class="map-clock__label mono">Central European Time</p>
+        <div class="map-clock__time">
+            <span class="map-clock__hour" data-clock-hour>00</span><span class="map-clock__colon">:</span><span class="map-clock__minute mono">00</span>
+        </div>
+        <p class="map-clock__date mono" data-clock-date>2024 · 05 · 12</p>
+    </div>
+
+    <div class="app-loading" aria-live="polite">
+        <p class="app-loading__text mono">Loading data<span class="app-loading__dots" aria-hidden="true"></span></p>
+    </div>
+
+    <header class="hero">
+        <div class="hero__rail" aria-hidden="true"></div>
+        <div class="hero__inner">
+            <div class="hero__masthead" aria-hidden="true">
+                <span class="hero__masthead-item mono">Edition 01</span>
+                <span class="hero__masthead-rule"></span>
+                <span class="hero__masthead-item mono">2024 – 2025</span>
+                <span class="hero__masthead-rule"></span>
+                <span class="hero__masthead-item mono">Central Europe</span>
+            </div>
+            <p class="hero__eyebrow mono">
+                <span class="hero__eyebrow-dot" aria-hidden="true"></span>
+                A dispatch from the European grid
+            </p>
+            <h1 class="hero__title">
+                <span class="hero__title-line" data-reveal="1">The Price</span>
+                <span class="hero__title-line" data-reveal="2">of <em>Wind</em></span>
+                <span class="hero__title-line" data-reveal="3"><span class="hero__amp" aria-label="and">&amp;</span> <em>Sun</em></span>
+            </h1>
+            <p class="hero__lede" data-reveal="4">
+                Switzerland has far less solar than Germany. Yet on a spring Sunday in 2024,
+                its electricity price dropped <em>lower</em> than Germany's. One country's
+                renewable revolution is rewiring the economics of its neighbours.
+            </p>
+            <div class="hero__signature" data-reveal="5">
+                <div class="hero__byline mono">Brian Banna</div>
+                <div class="hero__date mono">2026</div>
+            </div>
+            <!--
+                Spot-price tape — a live-looking trading-floor ticker under
+                the byline. Values are populated from showcase_day.json and
+                cycled through four hours of the day to sell "these prices
+                move" before the first chart loads.
+            -->
+            <div class="hero__tape" aria-hidden="true" data-hero-tape>
+                <span class="hero__tape-label mono">Spot <span class="hero__tape-sep">·</span> <span data-tape-timestamp>2024-05-12 · 00:00 CET</span></span>
+                <span class="hero__tape-row">
+                    <span class="hero__tape-quote mono"><em>CH</em> <span data-tape-price="CH">—</span></span>
+                    <span class="hero__tape-quote mono"><em>DE</em> <span data-tape-price="DE">—</span></span>
+                    <span class="hero__tape-quote mono"><em>FR</em> <span data-tape-price="FR">—</span></span>
+                    <span class="hero__tape-quote mono"><em>IT</em> <span data-tape-price="IT">—</span></span>
+                    <span class="hero__tape-quote mono"><em>AT</em> <span data-tape-price="AT">—</span></span>
+                </span>
+            </div>
+            <p class="hero__scroll-hint mono" aria-hidden="true">
+                <span>Scroll to begin</span>
+                <span class="hero__scroll-rule"></span>
+            </p>
+
+            <!--
+                Cold-open teaser — a single large price briefly flashes
+                after the title has landed, counting down from the
+                midnight baseline to the Sunday trough. Populated and
+                animated by setupHeroColdOpen() in main.js.
+            -->
+            <div class="hero__coldopen" data-hero-coldopen aria-hidden="true">
+                <span class="hero__coldopen-eyebrow mono">13:00 CET · 12 May 2024 · Switzerland</span>
+                <div class="hero__coldopen-number">
+                    <span class="hero__coldopen-value" data-coldopen-value>€57.93</span>
+                    <span class="hero__coldopen-unit mono">/MWh</span>
+                </div>
+                <span class="hero__coldopen-rule" aria-hidden="true"></span>
+            </div>
+        </div>
+    </header>
+
+    <!--
+        Scene — the shared parent container of the narrative + explorer.
+        The map is `position: sticky` within the scene, so it stays
+        pinned as the reader scrolls through the narrative AND the
+        explorer, then naturally releases when the scene ends and the
+        footer begins. This is the single architectural insight that
+        replaces all the old fade-based workarounds.
+    -->
+    <div class="scene">
+        <aside class="scene__map" id="map-container" aria-label="Map of central European electricity prices">
+            <!-- Map canvas. Populated by js/map.js. -->
+            <div class="circadian" aria-hidden="true"></div>
+
+            <!-- Price color legend — gradient bar + tick labels. Hidden
+                 until the map has active price colors (hour != null). -->
+            <div class="map-legend" aria-label="Price colour scale">
+                <canvas class="map-legend__bar" width="200" height="12"></canvas>
+                <div class="map-legend__ticks mono"></div>
+                <p class="map-legend__caption mono">EUR / MWh</p>
+            </div>
+
+            <!-- Arrow legend — explains flow direction. -->
+            <div class="arrow-legend mono" aria-label="Flow arrow legend">
+                <svg width="32" height="10" viewBox="0 0 32 10" aria-hidden="true">
+                    <defs><marker id="arrow-legend-head" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="var(--accent)"/></marker></defs>
+                    <line x1="2" y1="5" x2="26" y2="5" stroke="var(--accent)" stroke-width="1.5" marker-end="url(#arrow-legend-head)"/>
+                </svg>
+                <span>Electricity flows from cheap to expensive</span>
+            </div>
+        </aside>
+
+        <!-- Leader-line overlay — sits above the map, below the cards.
+             Populated by js/narrative.js when a step activates. -->
+        <svg class="leader-overlay" id="leader-overlay" aria-hidden="true"></svg>
+
+        <main class="scene__narrative" id="narrative">
+            <article class="step" data-step="1" data-hour="0" data-country="CH" data-timestamp="2024-05-12 00:00 CET" data-meta="Midnight baseline">
+                <p class="step__eyebrow mono"><span class="step__number">01</span> A Sunday in spring</p>
+                <h2 class="step__headline">At midnight, the grid <em>breathes</em> in rhythm.</h2>
+                <p class="step__body">
+                    Across central Europe, electricity costs roughly the same at the stroke of midnight.
+                    Around <strong class="mono">€55<span class="unit">/MWh</span></strong>,
+                    roughly what a household uses in six weeks. Switzerland, Germany, France,
+                    Italy, Austria — five countries wired together into one quiet grid.
+                </p>
+                <div class="step__chart" data-step-chart aria-hidden="true"></div>
+            </article>
+
+            <article class="step" data-step="2" data-hour="10" data-country="DE" data-timestamp="2024-05-12 10:00 CET" data-meta="Solar ascending">
+                <p class="step__eyebrow mono"><span class="step__number">02</span> Then the sun rises</p>
+                <h2 class="step__headline">Germany's solar panels are producing <em>thirty-seven gigawatts</em>.</h2>
+                <p class="step__body">
+                    On a clear spring Sunday, there is more electricity than anyone needs.
+                    Germany's solar alone approaches the country's entire domestic demand.
+                    Prices begin their descent.
+                </p>
+                <div class="step__chart" data-step-chart aria-hidden="true"></div>
+            </article>
+
+            <article class="step step--shock" data-step="3" data-hour="13" data-country="CH" data-highlight="DE" data-timestamp="2024-05-12 13:00 CET" data-meta="The shock">
+                <p class="step__eyebrow mono"><span class="step__number">03</span> 1 PM. The floor falls out</p>
+                <div class="step__hero-number" aria-hidden="true">
+                    <span class="step__hero-currency">€</span>
+                    <span class="step__hero-sign">−</span>
+                    <span class="step__hero-value">145<span class="step__hero-decimal">.12</span></span>
+                    <span class="step__hero-unit mono">MWh</span>
+                </div>
+                <h2 class="step__headline">Switzerland dropped <em>lower</em> than Germany.</h2>
+                <p class="step__body">
+                    Switzerland has far less solar capacity than Germany.
+                    Yet on this Sunday, Swiss electricity reached an unprecedented low,
+                    ten euros deeper than Germany's own trough at
+                    <strong class="mono neg">€135.45</strong>.
+                    The grid doesn't respect borders. When Germany's solar floods the
+                    interconnectors (the high-voltage cables linking neighbouring grids),
+                    Swiss prices crash too.
+                </p>
+                <div class="step__chart" data-step-chart aria-hidden="true"></div>
+            </article>
+
+            <article class="step step--wide" data-step="4" data-hour="13" data-country="CH" data-timestamp="2024-05-12 13:00 CET" data-meta="The pattern">
+                <p class="step__eyebrow mono"><span class="step__number">04</span> This isn't an accident</p>
+                <h2 class="step__headline">Germany went negative for <em>846 hours</em>.</h2>
+                <p class="step__body">
+                    In 2024 and 2025, German electricity prices went negative for 846 hours.
+                    That is 35 full days of producers paying consumers to take their power.
+                    Switzerland had 529 negative-price hours. 89% of them coincided
+                    with German negative prices.
+                </p>
+                <div class="step__chart step__chart--heatmap" data-step-chart="heatmap" aria-hidden="true"></div>
+            </article>
+
+            <article class="step step--wide" data-step="5" data-hour="13" data-country="DE" data-highlight="CH" data-timestamp="2024-05-12 13:00 CET" data-meta="The mechanism">
+                <p class="step__eyebrow mono"><span class="step__number">05</span> Why this happens</p>
+                <h2 class="step__headline">The cheapest watt <em>wins</em>.</h2>
+                <p class="step__body">
+                    Electricity is priced at the cost of the last plant needed to meet demand.
+                    Solar and wind bid at zero because they have no fuel cost. When they produce
+                    enough to meet all demand, the price collapses. When they produce
+                    <em>more</em> than demand, it goes negative.
+                </p>
+                <div class="step__chart step__chart--genstack" data-step-chart="genstack" aria-hidden="true"></div>
+            </article>
+
+            <article class="step step--wide" data-step="6" data-hour="13" data-country="DE" data-timestamp="2024-05-12 13:00 CET" data-meta="The duck deepens">
+                <p class="step__eyebrow mono"><span class="step__number">06</span> The duck is getting deeper</p>
+                <h2 class="step__headline">The midday dip <em>deepens</em> every year.</h2>
+                <p class="step__body">
+                    Power traders call this the duck curve. The midday price collapse deepens
+                    every year as more solar comes online. The evening spike sharpens as
+                    the sun sets and forty gigawatts of solar generation drain away by nightfall.
+                    One year later, the same kind of Sunday pushed Swiss prices to
+                    <strong class="mono neg">€262</strong>.
+                </p>
+                <div class="step__chart step__chart--duck" data-step-chart="duck" aria-hidden="true"></div>
+            </article>
+
+            <article class="step step--wide" data-step="7" data-hour="13" data-country="CH" data-highlight="DE,FR,IT,AT" data-timestamp="2024-05-12 13:00 CET" data-meta="Five identities">
+                <p class="step__eyebrow mono"><span class="step__number">07</span> Five countries, five shapes</p>
+                <h2 class="step__headline">Five countries bet on five different <em>futures</em>.</h2>
+                <p class="step__body">
+                    Germany bets on solar. France bets on nuclear.
+                    Switzerland uses hydro as a battery, absorbing its neighbours'
+                    surplus at noon and releasing it at sunset. Italy, still dependent
+                    on gas, remains insulated. For now.
+                </p>
+                <div class="step__chart step__chart--multiples" data-step-chart="multiples" aria-hidden="true"></div>
+            </article>
+        </main>
+
+        <!--
+            Explorer — lives INSIDE the same scene as the narrative so
+            the sticky map stays in place as the reader enters it. The
+            timeline is itself `position: sticky; bottom: 32px` so it
+            docks to the viewport while the reader is in the explorer,
+            and naturally un-docks when the explorer ends.
+        -->
+        <section class="scene__explorer" id="explorer" aria-label="Interactive explorer">
+            <div class="explorer__intro">
+                <p class="explorer__eyebrow mono"><span class="explorer__eyebrow-dot" aria-hidden="true"></span>Now you steer the grid</p>
+                <h2 class="explorer__headline">See the moment for <em>yourself</em>.</h2>
+                <p class="explorer__lede">
+                    Drag the playhead below, or press play. The map tracks your
+                    position hour by hour across <strong class="mono">May 12, 2024</strong>.
+                    Every fill colour, every flow arrow, every price label is real data.
+                </p>
+                <p class="explorer__cue">
+                    <span class="explorer__cue-marker mono" aria-hidden="true">→</span>
+                    Scrub to <strong class="mono">13:00</strong>, the hour
+                    Switzerland hit <strong class="mono neg">€145.12</strong>.
+                </p>
+                <p class="explorer__scroll-prompt mono" aria-hidden="true">
+                    <span class="explorer__scroll-prompt-arrow">▶</span>
+                    Press play or drag the timeline
+                </p>
+            </div>
+
+            <aside class="explorer__sidebar" data-sidebar aria-label="Country detail panel">
+                <div class="sidebar__header">
+                    <button type="button" class="sidebar__close" data-sidebar-close aria-label="Close panel">
+                        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                            <path d="M18 6 L6 18 M6 6 L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                    <h3 class="sidebar__country mono" data-sidebar-country>Switzerland</h3>
+                </div>
+                <div class="sidebar__stats" data-sidebar-stats>
+                    <div class="sidebar__stat">
+                        <span class="sidebar__stat-label mono">Price</span>
+                        <span class="sidebar__stat-value mono" data-sidebar-price>—</span>
+                    </div>
+                    <div class="sidebar__stat">
+                        <span class="sidebar__stat-label mono">Renewable</span>
+                        <span class="sidebar__stat-value mono" data-sidebar-renewable>—</span>
+                    </div>
+                    <div class="sidebar__stat">
+                        <span class="sidebar__stat-label mono">Gap to Italy</span>
+                        <span class="sidebar__stat-value mono" data-sidebar-spread>—</span>
+                    </div>
+                </div>
+                <div class="sidebar__charts">
+                    <div class="sidebar__chart" data-sidebar-genstack></div>
+                    <div class="sidebar__chart" data-sidebar-profile></div>
+                </div>
+            </aside>
+
+            <div class="explorer__timeline-wrap">
+                <div class="timeline" data-timeline>
+                    <div class="timeline__chrome">
+                        <button
+                            type="button"
+                            class="timeline__play"
+                            data-timeline-play
+                            aria-label="Play timeline"
+                        >
+                            <svg class="timeline__play-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                <path class="timeline__play-shape timeline__play-shape--left" d="M7 4 L7 20 L13 16 L13 8 Z"></path>
+                                <path class="timeline__play-shape timeline__play-shape--right" d="M13 8 L13 16 L20 12 L20 12 Z"></path>
+                            </svg>
+                        </button>
+
+                        <div class="timeline__readout">
+                            <p class="timeline__readout-label mono">Hour</p>
+                            <p class="timeline__readout-value mono" data-timeline-hour>00:00</p>
+                        </div>
+
+                        <div class="timeline__mode-group">
+                            <span class="timeline__mode-label mono">Map shows</span>
+                            <div class="timeline__mode mono" data-color-mode aria-label="Map color mode">
+                                <button type="button" class="timeline__mode-btn is-active" data-mode="price">Price</button>
+                                <button type="button" class="timeline__mode-btn" data-mode="renewable">Renewable</button>
+                            </div>
+                        </div>
+
+                        <div class="timeline__speed-group">
+                            <span class="timeline__mode-label mono">Speed</span>
+                            <div class="timeline__speed mono" data-timeline-speed aria-label="Playback speed">
+                                <button type="button" class="timeline__speed-btn is-active" data-speed="1">1x</button>
+                                <button type="button" class="timeline__speed-btn" data-speed="2">2x</button>
+                                <button type="button" class="timeline__speed-btn" data-speed="4">4x</button>
+                            </div>
+                        </div>
+
+                        <div class="timeline__legend mono" aria-hidden="true">
+                            <span>Drag</span>
+                            <span class="timeline__legend-sep">·</span>
+                            <span>←&nbsp;→</span>
+                            <span class="timeline__legend-sep">·</span>
+                            <span>Space to play</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline__track" data-timeline-track tabindex="0" role="slider" aria-label="Hour of day" aria-valuemin="0" aria-valuemax="23" aria-valuenow="0" aria-valuetext="00:00 hours">
+                        <div class="timeline__rail"></div>
+                        <div class="timeline__ticks" data-timeline-ticks></div>
+                        <div class="timeline__fill" data-timeline-fill></div>
+                        <div class="timeline__handle" data-timeline-handle>
+                            <div class="timeline__handle-dot"></div>
+                            <div class="timeline__handle-ring"></div>
+                        </div>
+                    </div>
+
+                    <div class="timeline__hours mono" aria-hidden="true" data-timeline-hours></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="site-footer">
+        <div class="site-footer__inner">
+            <p class="site-footer__kicker mono">End of dispatch</p>
+            <h2 class="site-footer__closing">
+                One country's renewable revolution
+                <em>rewires</em> the economics of its neighbours.
+            </h2>
+            <div class="site-footer__columns">
+                <div class="site-footer__col">
+                    <p class="site-footer__col-label mono">Data</p>
+                    <p>
+                        <a href="https://transparency.entsoe.eu/">ENTSO-E Transparency Platform</a>,
+                        day-ahead prices and generation by source,
+                        January 2024 to June 2025.
+                    </p>
+                    <p>
+                        Map geometry: Natural Earth 1:50m via
+                        <a href="https://github.com/topojson/world-atlas">world-atlas</a>.
+                    </p>
+                </div>
+                <div class="site-footer__col">
+                    <p class="site-footer__col-label mono">Method</p>
+                    <p>
+                        Flow directions inferred from day-ahead price
+                        differentials; magnitude proportional to
+                        |spread| between connected bidding zones.
+                    </p>
+                    <p>
+                        Showcase day validated against the raw dataset
+                        to 1 decimal place across nine headline facts.
+                    </p>
+                </div>
+                <div class="site-footer__col">
+                    <p class="site-footer__col-label mono">Credits</p>
+                    <p>
+                        A data story by <strong>Brian Banna</strong>,
+                        based on day-ahead market data from the
+                        <a href="https://transparency.entsoe.eu/">ENTSO-E Transparency Platform</a>.
+                    </p>
+                    <p>
+                        Built with D3, TopoJSON and Scrollama.
+                        Source at
+                        <a href="https://github.com/brianbanna/power-price-transmission">github.com/brianbanna/power-price-transmission</a>.
+                    </p>
+                </div>
+            </div>
+            <div class="site-footer__rule" aria-hidden="true"></div>
+            <p class="site-footer__coda mono">
+                <span>brianbanna.com</span>
+                <span class="site-footer__coda-dot" aria-hidden="true"></span>
+                <span>The Price of Wind and Sun</span>
+                <span class="site-footer__coda-dot" aria-hidden="true"></span>
+                <span>2026</span>
+            </p>
+        </div>
+    </footer>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
