@@ -32,9 +32,9 @@ jobs:
           sudo apt-get install -y lftp
           lftp -u "${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }}" sftp://vs0hny.ftp.infomaniak.com -e "
             set sftp:auto-confirm yes
-            set net:timeout 30
-            set net:max-retries 3
+            set net:timeout 60
+            set net:max-retries 5
             set net:reconnect-interval-base 5
-            mirror -R --delete --only-newer --parallel=4 --verbose ./out/ sites/brianbanna.com/
+            mirror -R --delete --only-newer --parallel=2 --verbose ./out/ sites/brianbanna.com/
             quit
           "
