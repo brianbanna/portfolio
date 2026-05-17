@@ -21,14 +21,19 @@ const meta: Record<
   { tag: string; domain: string; highlight?: string }
 > = {
   "Market Regime Modeling for Systematic Trading": {
-    tag: "Systematic / Regime",
-    domain: "Equity Indices",
-    highlight: "0.70 Sharpe · 6-day lead · 15y out-of-sample",
+    tag: "Regime Detection",
+    domain: "US Equities",
+    highlight: "20y data · 0.70 Sharpe · lower drawdown vs SPY",
+  },
+  "Cross Border Price Transmission in European Power Markets": {
+    tag: "Power Markets / Transmission",
+    domain: "European Electricity",
+    highlight: "ENTSO E · 301k observations · 5 bidding zones",
   },
   "Commodity Futures Curve Modeling and Factor Trading": {
-    tag: "Factors / Term Structure",
+    tag: "Futures Curves / Factors",
     domain: "Commodity Futures",
-    highlight: "Cross-sectional, roll-cost adjusted",
+    highlight: "19 markets · 2.4M observations · cost aware backtests",
   },
   "Adaptive Statistical Arbitrage in Commodity Spreads": {
     tag: "Stat Arb / Cointegration",

@@ -57,7 +57,9 @@ export const AboutSection: React.FC = () => {
             <div className="space-y-6 font-serif text-[18px] md:text-[19px] leading-[1.7] text-fg/85 max-w-[62ch]">
               <p className="text-[22px] md:text-[24px] leading-[1.5] text-fg">
                 I'm a Master's student in Data Science with a minor in
-                Financial Engineering at EPFL.
+                Financial Engineering at EPFL, focused on quantitative
+                modelling, financial data analysis and commodities trading
+                research.
               </p>
 
               <p>
@@ -68,18 +70,17 @@ export const AboutSection: React.FC = () => {
               </p>
 
               <p>
-                I previously worked in quantitative research on commodity
-                markets, where I built market signals using production data,
-                refining capacity, and global trade flows to analyse
-                supply-demand dynamics and asset dependencies.
+                I previously worked in quantitative research related to
+                commodity markets, building market signals from production data,
+                refining capacity and global trade flows to analyse supply
+                demand dynamics, market exposures and asset dependencies.
               </p>
 
               <p>
-                In parallel, I have developed several research projects around
-                systematic trading strategies, including market regime
-                modelling using HMM, GARCH and regime-switching models,
-                futures curve factor strategies, and statistical arbitrage
-                models based on cointegration and Kalman filtering.
+                In parallel, I have developed research projects around cross
+                border European power prices, commodity spread stat arb, futures
+                curve factor research and market regime modelling using HMM,
+                GARCH and regime switching models.
               </p>
 
               <p>

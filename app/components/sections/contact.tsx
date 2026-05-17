@@ -75,8 +75,8 @@ export const ContactSection: React.FC = () => {
             Let&apos;s talk.
           </h2>
           <p className="mt-8 max-w-xl font-serif text-xl md:text-2xl text-fg/65 leading-[1.5]">
-            Always happy to chat about markets, research, or anything in
-            between. Reach out through any of the channels below.
+            Happy to talk about commodity markets, quantitative research,
+            trading roles or project work.
           </p>
         </div>
 

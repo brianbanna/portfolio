@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Commodity Factor Trading · Brian Banna</title>
-    <meta name="description" content="Production-grade commodity factor system. 10 factors, 19 markets, 20 years of WRDS institutional data. Identifies signal contamination in curve factors and isolates the commodity risk premium as the dominant return driver.">
+    <title>Commodity Futures Curve Modeling and Factor Trading · Brian Banna</title>
+    <meta name="description" content="End to end commodity factor system. 10 factors, 19 markets, 20 years of WRDS institutional data. Identifies signal contamination in curve factors and shows the commodity risk premium as the strongest return source.">
     <meta property="og:title" content="Commodity Factor Trading">
     <meta property="og:description" content="End-to-end commodity quant stack: curve construction, 10-factor engine, 8 strategy variants, realistic execution. 19 markets, 20 years, 438 tests.">
     <meta property="og:image" content="assets/figures/01_cumulative_returns.png">
@@ -73,7 +73,7 @@
         <div class="hero-lower">
             <div>
                 <p class="tagline">
-                    Full commodity quant stack. 10 factors, 19 markets, <em>20 years</em> of WRDS institutional data. I found a signal contamination problem in daily curve factors that the standard literature misses, and proved that the commodity risk premium is the only return source that survives out-of-sample.
+                    Full commodity quant stack. 10 factors, 19 markets, <em>20 years</em> of WRDS institutional data. I found a signal contamination problem in daily curve factors where daily implementation can distort IC results, and showed that the commodity risk premium was the strongest return source out-of-sample.
                 </p>
                 <a href="#hook" class="scroll-hint">
                     <span>Begin reading</span>
@@ -146,7 +146,7 @@
         </div>
         <div class="side-note">
             <strong>The setup</strong>
-            Every commodity desk runs a carry signal. But after $400B of CTA capital piled into systematic commodity strategies, the real question is whether any of these factors still produce alpha net of costs. I built the system to answer that definitively.
+            Every commodity desk runs a carry signal. But after $400B of CTA capital piled into systematic commodity strategies, the real question is whether any of these factors still produce alpha net of costs. I built the system to answer that directly.
         </div>
     </div>
 
@@ -222,12 +222,12 @@
         <div>
             <h2>I found a contamination mechanism <em>in daily curve factors.</em></h2>
             <p class="lead">
-                All 4 curve factors (carry, slope, curvature, curve momentum) show lag-0 IC 3-4x higher than lag-1. The interpolated curve is computed from the same prices you're trying to predict, so the signal is mechanically correlated with contemporaneous returns. Once you lag signals to t+1 (which any real execution would require), the predictive power collapses to noise. This affects every daily-frequency carry backtest in the literature that doesn't explicitly test for it.
+                All 4 curve factors (carry, slope, curvature, curve momentum) show lag-0 IC 3-4x higher than lag-1. The interpolated curve is computed from the same prices you're trying to predict, so the signal is mechanically correlated with contemporaneous returns. Once you lag signals to t+1 (which any real execution would require), the predictive power collapses to noise. This can affect daily-frequency carry backtests that do not explicitly test for it.
             </p>
         </div>
         <div class="side-note">
             <strong>Original finding</strong>
-            This contamination is not documented in the standard commodity factor papers (Gorton-Rouwenhorst, Erb-Harvey, Szymanowska). They rebalance monthly which masks the effect. I built an IC decay diagnostic across lags [0, 1, 5, 10, 20] that catches it systematically.
+            This effect is easy to miss in monthly commodity factor studies (Gorton-Rouwenhorst, Erb-Harvey, Szymanowska), where monthly rebalancing masks the daily lag issue. I built an IC decay diagnostic across lags [0, 1, 5, 10, 20] to test it systematically.
         </div>
     </div>
 
@@ -340,7 +340,7 @@
     </div>
 
     <p>
-        IS/OOS gap of -0.69 Sharpe. This tells you something important: even when you build the signals the way a physical commodity trader thinks about the market (convenience yield for positioning, regime transitions for timing, structural spreads for relative value), you still can't generate persistent alpha in post-2010 commodity markets. The system is production-grade. The alpha just isn't there anymore.
+        IS/OOS gap of -0.69 Sharpe. This tells you something important: even when you build the signals the way a physical commodity trader thinks about the market (convenience yield for positioning, regime transitions for timing, structural spreads for relative value), the signal did not survive stricter lag tests in post-2010 commodity markets. The system is end to end, but the evidence weakens out-of-sample.
     </p>
 </section>
 
@@ -358,7 +358,7 @@
         </div>
         <div class="side-note">
             <strong>Zero parameters</strong>
-            No lookback windows. No thresholds. No regime classification. No estimation error. No overfitting surface. The EW long portfolio is the correct null hypothesis for commodity factor research. After testing 10 factors and 8 strategies, nothing beats it OOS.
+            No lookback windows. No thresholds. No regime classification. No estimation error. No overfitting surface. The EW long portfolio is the correct null hypothesis for commodity factor research. After testing 10 factors and 8 strategies, none of the tested active variants beat it OOS.
         </div>
     </div>
 
@@ -438,7 +438,7 @@
      ════════════════════════════════════════════════════════ -->
 <section id="architecture" class="reveal" data-theme="steel">
     <div class="section-marker">§ 09 · Architecture</div>
-    <h2>Production-grade, <em>end to end.</em></h2>
+    <h2>End to end, <em>from data to evaluation.</em></h2>
 
     <div class="pipeline">
         <span class="pipeline-step">WRDS Ingest</span>

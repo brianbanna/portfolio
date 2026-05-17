@@ -1,7 +1,7 @@
 <div align="center">
     <h1 align="center">Brian Banna Portfolio</h1>
 
-Personal portfolio website showcasing quantitative finance and systematic trading projects. Built with [Next.js](https://nextjs.org/), [Tailwind CSS](https://tailwindcss.com/), and [Contentlayer](https://www.contentlayer.dev/).
+Personal website focused on commodity markets, quantitative research, systematic trading projects and market data analysis.
 
 </div>
 

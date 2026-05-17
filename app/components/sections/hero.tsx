@@ -102,9 +102,9 @@ export const HeroSection: React.FC = () => {
           <div className="mt-14 md:mt-20 grid grid-cols-12 gap-6 md:gap-8">
             <div className="col-span-12 md:col-span-8 opacity-0 animate-[fade-up_1.2s_cubic-bezier(0.2,0.8,0.2,1)_0.8s_forwards]">
               <p className="font-serif text-xl md:text-2xl lg:text-[26px] leading-[1.45] text-fg/85 text-pretty max-w-3xl">
-                Quantitative research, systematic trading, and commodity
-                markets. I build models and frameworks to study how markets
-                move.
+                Commodity focused quantitative research. I build models and
+                frameworks to study futures curves, spread relationships,
+                physical market signals and regime shifts.
               </p>
             </div>
             <div className="col-span-12 md:col-span-4 flex md:justify-end items-end opacity-0 animate-[fade-up_1.2s_cubic-bezier(0.2,0.8,0.2,1)_1s_forwards]">
