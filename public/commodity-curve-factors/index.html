@@ -5,11 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Commodity Futures Curve Modeling and Factor Trading · Brian Banna</title>
     <meta name="description" content="End to end commodity factor system. 10 factors, 19 markets, 20 years of WRDS institutional data. Identifies signal contamination in curve factors and shows the commodity risk premium as the strongest return source.">
-    <meta property="og:title" content="Commodity Factor Trading">
-    <meta property="og:description" content="End-to-end commodity quant stack: curve construction, 10-factor engine, 8 strategy variants, realistic execution. 19 markets, 20 years, 438 tests.">
-    <meta property="og:image" content="assets/figures/01_cumulative_returns.png">
+    <link rel="canonical" href="https://brianbanna.com/commodity-curve-factors/">
+    <meta property="og:title" content="Commodity Futures Curve Modeling and Factor Trading · Brian Banna">
+    <meta property="og:description" content="End to end commodity factor system. 10 factors, 19 markets, 20 years of WRDS institutional data. Identifies signal contamination in curve factors and shows the commodity risk premium as the strongest return source.">
+    <meta property="og:url" content="https://brianbanna.com/commodity-curve-factors/">
+    <meta property="og:image" content="https://brianbanna.com/commodity-preview.png">
+    <meta property="og:image:width" content="2808">
+    <meta property="og:image:height" content="1307">
     <meta property="og:type" content="article">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Commodity Futures Curve Modeling and Factor Trading · Brian Banna">
+    <meta name="twitter:description" content="End to end commodity factor system across 19 markets and 20 years of WRDS institutional data.">
+    <meta name="twitter:image" content="https://brianbanna.com/commodity-preview.png">
 
+    <link rel="preconnect" href="https://cdn.plot.ly" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&display=swap" rel="stylesheet">
@@ -191,7 +200,7 @@
     <p class="chart-caption-inline">Hover for daily values. Click legend to toggle. Drag to zoom.</p>
 
     <div class="chart-container">
-        <img src="assets/figures/02_drawdown.png" alt="Drawdown comparison" loading="lazy">
+        <img src="assets/figures/02_drawdown.png" alt="Drawdown comparison" loading="lazy" decoding="async">
         <div class="chart-caption">Drawdown from peak, full sample. More complexity and more turnover, worse drawdowns. The passive EW long portfolio recovers faster than every active strategy.</div>
     </div>
 
@@ -232,7 +241,7 @@
     </div>
 
     <div class="chart-container">
-        <img src="assets/figures/05_factor_ic_decay.png" alt="Factor IC decay" loading="lazy">
+        <img src="assets/figures/05_factor_ic_decay.png" alt="Factor IC decay" loading="lazy" decoding="async">
         <div class="chart-caption">IC at lag 0 vs lag 1 across all 10 factors. The 4 curve factors (left) show 3-4x decay. Momentum factors (center) retain some signal at lag 1. Fundamental factors (right) are flat. This is the key diagnostic.</div>
     </div>
 
@@ -282,7 +291,7 @@
     <p class="chart-caption-inline">Click legend to toggle commodities. CL, NG, GC shown by default.</p>
 
     <div class="chart-container">
-        <img src="assets/figures/08_curve_regime_heatmap.png" alt="Curve regime heatmap" loading="lazy">
+        <img src="assets/figures/08_curve_regime_heatmap.png" alt="Curve regime heatmap" loading="lazy" decoding="async">
         <div class="chart-caption">Regime classification across all 19 commodities over time. Deep backwardation clusters during supply crises: 2008 energy, 2022 grains.</div>
     </div>
 </section>
@@ -312,7 +321,7 @@
     </div>
 
     <div class="chart-container">
-        <img src="assets/figures/09_tsi_layer_decomposition.png" alt="TSI layer decomposition" loading="lazy">
+        <img src="assets/figures/09_tsi_layer_decomposition.png" alt="TSI layer decomposition" loading="lazy" decoding="async">
         <div class="chart-caption">Per-layer cumulative returns. The directional layer drives in-sample gains. Transition and spread layers diversify but add no persistent OOS alpha.</div>
     </div>
 
@@ -363,12 +372,12 @@
     </div>
 
     <div class="chart-container">
-        <img src="assets/figures/04_rolling_sharpe.png" alt="Rolling Sharpe ratio" loading="lazy">
+        <img src="assets/figures/04_rolling_sharpe.png" alt="Rolling Sharpe ratio" loading="lazy" decoding="async">
         <div class="chart-caption">252-day rolling Sharpe across the IS/OOS boundary. EW long stays consistently positive through multiple regimes. Active factor strategies oscillate around zero with no persistent edge.</div>
     </div>
 
     <div class="chart-container">
-        <img src="assets/figures/14_bootstrap_ci.png" alt="Bootstrap confidence intervals" loading="lazy">
+        <img src="assets/figures/14_bootstrap_ci.png" alt="Bootstrap confidence intervals" loading="lazy" decoding="async">
         <div class="chart-caption">10,000-sample block bootstrap, 95% CI. Only EW long excludes zero. No active strategy is statistically significant.</div>
     </div>
 </section>
@@ -423,12 +432,12 @@
     <p class="lead">GFC 2008 (commodities crashed 60%). Oil glut 2014-2016 (WTI from $105 to $26). COVID March 2020 (WTI went negative for the first time in history). Russia-Ukraine energy spike 2022 (nat gas +300%, grain +80%). The EW long portfolio survived all 4.</p>
 
     <div class="chart-container">
-        <img src="assets/figures/10_stress_test.png" alt="Stress test results" loading="lazy">
+        <img src="assets/figures/10_stress_test.png" alt="Stress test results" loading="lazy" decoding="async">
         <div class="chart-caption">Strategy performance during each crisis window. The diversified long portfolio recovers faster than any single-factor strategy because sector diversification absorbs idiosyncratic shocks.</div>
     </div>
 
     <div class="chart-container">
-        <img src="assets/figures/13_sector_attribution.png" alt="Sector attribution" loading="lazy">
+        <img src="assets/figures/13_sector_attribution.png" alt="Sector attribution" loading="lazy" decoding="async">
         <div class="chart-caption">Annualized return contribution by sector. Energy is the largest driver of both gains and losses. Precious metals partially hedge equity drawdowns. Agriculture and livestock provide structural diversification.</div>
     </div>
 </section>
@@ -492,17 +501,17 @@
     </p>
 
     <div class="chart-container">
-        <img src="assets/figures/12_is_oos_comparison.png" alt="IS vs OOS comparison" loading="lazy">
+        <img src="assets/figures/12_is_oos_comparison.png" alt="IS vs OOS comparison" loading="lazy" decoding="async">
         <div class="chart-caption">IS vs OOS Sharpe for every strategy. Only EW long (zero parameters) improves out-of-sample. Everything else degrades.</div>
     </div>
 
     <div class="chart-container">
-        <img src="assets/figures/06_factor_correlation.png" alt="Factor correlation matrix" loading="lazy">
+        <img src="assets/figures/06_factor_correlation.png" alt="Factor correlation matrix" loading="lazy" decoding="async">
         <div class="chart-caption">Pairwise correlations across all 10 factors. Carry and slope are 0.75 correlated (both read the same curve shape). Momentum factors are nearly orthogonal to curve factors, which gives you diversification but not alpha.</div>
     </div>
 
     <div class="chart-container">
-        <img src="assets/figures/03_monthly_heatmap.png" alt="Monthly returns heatmap" loading="lazy">
+        <img src="assets/figures/03_monthly_heatmap.png" alt="Monthly returns heatmap" loading="lazy" decoding="async">
         <div class="chart-caption">Monthly returns for EW long. No seasonal clustering. The returns come from the risk premium, not from timing anything.</div>
     </div>
 </section>

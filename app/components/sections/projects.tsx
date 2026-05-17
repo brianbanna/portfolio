@@ -31,7 +31,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
           </div>
           <div className="col-span-12 md:col-span-9">
             <h2 className="display text-[clamp(2.5rem,6vw,5rem)] text-fg leading-[0.95] text-balance">
-              Selected market research.
+              Selected quantitative work.
             </h2>
             <p className="mt-6 max-w-xl font-serif text-lg text-fg/60 leading-relaxed">
               Projects across European power markets, commodity spreads,

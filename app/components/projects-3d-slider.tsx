@@ -206,6 +206,8 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                     <img
                       src={slide.image}
                       alt={slide.title}
+                      loading={isActive ? "eager" : "lazy"}
+                      decoding="async"
                       className={`w-full h-full object-cover transition-all duration-[1200ms] ${
                         isActive
                           ? "grayscale-0 scale-100"

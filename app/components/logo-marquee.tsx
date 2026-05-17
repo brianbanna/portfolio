@@ -37,6 +37,8 @@ export const LogoMarquee: React.FC<LogoMarqueeProps> = ({
               <img
                 src={item.icon}
                 alt={item.name}
+                loading="lazy"
+                decoding="async"
                 className="w-7 h-7"
               />
             ) : (
@@ -50,4 +52,3 @@ export const LogoMarquee: React.FC<LogoMarqueeProps> = ({
     </div>
   );
 };
-

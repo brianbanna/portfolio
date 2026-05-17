@@ -104,6 +104,8 @@ const components = {
 		<img
 			className={clsx("rounded-md border border-zinc-200", className)}
 			alt={alt}
+			loading="lazy"
+			decoding="async"
 			{...props}
 		/>
 	),

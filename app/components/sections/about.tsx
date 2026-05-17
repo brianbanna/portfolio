@@ -41,6 +41,10 @@ export const AboutSection: React.FC = () => {
                 <img
                   src="/profile.jpg"
                   alt="Brian Banna"
+                  width={2048}
+                  height={2048}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover transition-transform duration-[1200ms] hover:scale-[1.02]"
                 />
                 <div className="absolute inset-0 ring-1 ring-inset ring-fg/10 pointer-events-none" />

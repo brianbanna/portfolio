@@ -5,11 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Systematic Regime Trading · Brian Banna</title>
     <meta name="description" content="A 5-model ensemble that classifies market regimes and adjusts equity allocation. Cuts max drawdown from -55% to -28% over fifteen years of out-of-sample data.">
+    <link rel="canonical" href="https://brianbanna.com/systematic-regime-trading/">
     <meta property="og:title" content="Systematic Regime Trading">
     <meta property="og:description" content="5-model ensemble regime detection. Cuts drawdowns by 50% while improving the Sharpe ratio over SPY.">
-    <meta property="og:image" content="assets/figures/01_cumulative_returns.png">
+    <meta property="og:url" content="https://brianbanna.com/systematic-regime-trading/">
+    <meta property="og:image" content="https://brianbanna.com/regime-preview.gif">
+    <meta property="og:image:width" content="1280">
+    <meta property="og:image:height" content="720">
     <meta property="og:type" content="article">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Systematic Regime Trading · Brian Banna">
+    <meta name="twitter:description" content="5-model ensemble regime detection on US equity market data, benchmarked against SPY.">
+    <meta name="twitter:image" content="https://brianbanna.com/regime-preview.gif">
 
+    <link rel="preconnect" href="https://cdn.plot.ly" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&display=swap" rel="stylesheet">
@@ -196,7 +205,7 @@
     <p class="chart-caption-inline">Hover for daily values. Click the legend to toggle strategies. Drag to zoom.</p>
 
     <div class="chart-container">
-        <img src="assets/figures/02_drawdown.png" alt="Drawdown comparison" loading="lazy">
+        <img src="assets/figures/02_drawdown.png" alt="Drawdown comparison" loading="lazy" decoding="async">
         <div class="chart-caption">Drawdown from peak. Buy-and-hold hit −55% in 2008. The regime strategy cut that in half while delivering higher returns (10.2% vs 9.6% CAGR).</div>
     </div>
 
@@ -227,7 +236,7 @@
         <div>
             <h2>Allocation <em>leads</em> drawdown.</h2>
             <div class="chart-container">
-                <img src="assets/figures/11_signal_vs_drawdown.png" alt="Signal vs drawdown" loading="lazy">
+                <img src="assets/figures/11_signal_vs_drawdown.png" alt="Signal vs drawdown" loading="lazy" decoding="async">
                 <div class="chart-caption"><b>Bone:</b> equity allocation. <b>Terracotta:</b> market drawdown. The strategy reduces exposure <b>before and during</b> every major drawdown of the sample.</div>
             </div>
         </div>
@@ -293,12 +302,12 @@
     <h2>Regime forecast <em>is real.</em></h2>
 
     <div class="chart-container">
-        <img src="assets/figures/14_prediction_accuracy.png" alt="Prediction accuracy" loading="lazy">
+        <img src="assets/figures/14_prediction_accuracy.png" alt="Prediction accuracy" loading="lazy" decoding="async">
         <div class="chart-caption">Realized volatility over the next 5, 10, and 20 days by predicted regime. Calm: 12%. Turbulent: 22%. Clear separation across all horizons.</div>
     </div>
 
     <div class="chart-container">
-        <img src="assets/figures/06_regime_timeline.png" alt="Regime timeline" loading="lazy">
+        <img src="assets/figures/06_regime_timeline.png" alt="Regime timeline" loading="lazy" decoding="async">
         <div class="chart-caption">SPY with regime shading. Bottom panel: ensemble probability decomposition. Turbulent regimes concentrate around 2008, 2011, 2015, and early 2020.</div>
     </div>
 </section>
@@ -334,7 +343,7 @@
     </div>
 
     <div class="chart-container">
-        <img src="assets/figures/09_regime_performance.png" alt="Regime performance" loading="lazy">
+        <img src="assets/figures/09_regime_performance.png" alt="Regime performance" loading="lazy" decoding="async">
         <div class="chart-caption">Calm markets: Sharpe 1.10. Eighty-one percent of total return comes from 52% of trading days.</div>
     </div>
 </section>
@@ -456,7 +465,7 @@
     </div>
 
     <div class="chart-container">
-        <img src="assets/figures/18_crude_oil_regimes.png" alt="Crude oil regimes" loading="lazy">
+        <img src="assets/figures/18_crude_oil_regimes.png" alt="Crude oil regimes" loading="lazy" decoding="async">
         <div class="chart-caption">WTI crude oil regime detection. Correctly identifies the 2008 crash, the 2014–2016 oil glut, and the 2020 negative price event. Cross-asset correlation with equity VIX: 0.25.</div>
     </div>
 </section>
@@ -469,12 +478,12 @@
     <h2>Ensemble agrees, <em>then disagrees, then agrees.</em></h2>
 
     <div class="chart-container">
-        <img src="assets/figures/12_model_agreement.png" alt="Model agreement" loading="lazy">
+        <img src="assets/figures/12_model_agreement.png" alt="Model agreement" loading="lazy" decoding="async">
         <div class="chart-caption">Pairwise agreement between the five models. Feature-space models (HMM, GMM) and return-based models (GARCH, Markov-Switching) form two independent clusters. Healthy diversification.</div>
     </div>
 
     <div class="chart-container">
-        <img src="assets/figures/16_cumulative_excess.png" alt="Cumulative excess" loading="lazy">
+        <img src="assets/figures/16_cumulative_excess.png" alt="Cumulative excess" loading="lazy" decoding="async">
         <div class="chart-caption">Cumulative excess return vs SPY. Alpha concentrates during crisis periods. Fama-French R-squared of 0.20 confirms low factor exposure.</div>
     </div>
 </section>

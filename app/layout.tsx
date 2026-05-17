@@ -11,6 +11,23 @@ export const metadata: Metadata = {
   },
   description:
     "Brian Banna, Data Science master's student at EPFL focused on quantitative research for commodity markets, futures curves, spread relationships and market regimes.",
+  alternates: {
+    canonical: "https://brianbanna.com",
+  },
+  authors: [{ name: "Brian Banna", url: "https://brianbanna.com" }],
+  creator: "Brian Banna",
+  publisher: "Brian Banna",
+  keywords: [
+    "Brian Banna",
+    "commodity quant research",
+    "commodity markets",
+    "quantitative research",
+    "futures curves",
+    "spread relationships",
+    "market regimes",
+    "systematic trading",
+    "EPFL",
+  ],
   openGraph: {
     title: "Brian Banna · Commodity Quant Research",
     description:
@@ -19,9 +36,9 @@ export const metadata: Metadata = {
     siteName: "Brian Banna",
     images: [
       {
-        url: "https://brianbanna.com/og.png",
-        width: 1920,
-        height: 1080,
+        url: "https://brianbanna.com/commodity-preview.png",
+        width: 2808,
+        height: 1307,
       },
     ],
     locale: "en-US",
@@ -39,8 +56,11 @@ export const metadata: Metadata = {
     },
   },
   twitter: {
-    title: "Brian Banna",
     card: "summary_large_image",
+    title: "Brian Banna · Commodity Quant Research",
+    description:
+      "Brian Banna, Data Science master's student at EPFL focused on quantitative research for commodity markets, futures curves, spread relationships and market regimes.",
+    images: ["https://brianbanna.com/commodity-preview.png"],
   },
   icons: {
     shortcut: "/favicon.svg",
