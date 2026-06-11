@@ -5,11 +5,11 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   metadataBase: new URL("https://brianbanna.com"),
   title: {
-    default: "Brian Banna · Commodity Quant Research",
+    default: "Brian Banna · Commodity Markets",
     template: "%s | Brian Banna",
   },
   description:
-    "Quant Analyst Intern at Cargill. MSc Data Science with a minor in Financial Engineering at EPFL. Quantitative research in commodity and power markets: futures curves, spreads and market regimes.",
+    "Quant Analyst Intern at Cargill. MSc Data Science with a minor in Financial Engineering at EPFL. Models that turn physical fundamentals into views on curves, spreads and regimes.",
   alternates: {
     canonical: "https://brianbanna.com",
   },
@@ -20,9 +20,9 @@ export const metadata: Metadata = {
     "Brian Banna",
     "Cargill",
     "Financial Engineering",
-    "commodity quant research",
+    "commodity trading",
     "commodity markets",
-    "quantitative research",
+    "commodity markets analysis",
     "futures curves",
     "spread relationships",
     "market regimes",
@@ -30,9 +30,9 @@ export const metadata: Metadata = {
     "EPFL",
   ],
   openGraph: {
-    title: "Brian Banna · Commodity Quant Research",
+    title: "Brian Banna · Commodity Markets",
     description:
-      "Quant Analyst Intern at Cargill. MSc Data Science with a minor in Financial Engineering at EPFL. Quantitative research in commodity and power markets: futures curves, spreads and market regimes.",
+      "Quant Analyst Intern at Cargill. MSc Data Science with a minor in Financial Engineering at EPFL. Models that turn physical fundamentals into views on curves, spreads and regimes.",
     url: "https://brianbanna.com",
     siteName: "Brian Banna",
     images: [
@@ -58,9 +58,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Brian Banna · Commodity Quant Research",
+    title: "Brian Banna · Commodity Markets",
     description:
-      "Quant Analyst Intern at Cargill. MSc Data Science with a minor in Financial Engineering at EPFL. Quantitative research in commodity and power markets: futures curves, spreads and market regimes.",
+      "Quant Analyst Intern at Cargill. MSc Data Science with a minor in Financial Engineering at EPFL. Models that turn physical fundamentals into views on curves, spreads and regimes.",
     images: ["https://brianbanna.com/og-home.png"],
   },
   icons: {

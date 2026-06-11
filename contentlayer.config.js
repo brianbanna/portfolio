@@ -33,6 +33,9 @@ export const Project = defineDocumentType(() => ({
 			type: "string",
 			required: true,
 		},
+		question: {
+			type: "string",
+		},
 		date: {
 			type: "date",
 		},
@@ -47,6 +50,42 @@ export const Project = defineDocumentType(() => ({
 		},
 		image: {
 			type: "string",
+		},
+	},
+	computedFields,
+}));
+
+export const Note = defineDocumentType(() => ({
+	name: "Note",
+	filePathPattern: "./notes/**/*.mdx",
+	contentType: "mdx",
+
+	fields: {
+		title: {
+			type: "string",
+			required: true,
+		},
+		date: {
+			type: "date",
+			required: true,
+		},
+		market: {
+			type: "string",
+			required: true,
+		},
+		instruments: {
+			type: "list",
+			of: { type: "string" },
+		},
+		summary: {
+			type: "string",
+			required: true,
+		},
+		published: {
+			type: "boolean",
+		},
+		order: {
+			type: "number",
 		},
 	},
 	computedFields,
@@ -70,7 +109,7 @@ export const Page = defineDocumentType(() => ({
 
 export default makeSource({
 	contentDirPath: "./content",
-	documentTypes: [Page, Project],
+	documentTypes: [Page, Project, Note],
 	mdx: {
 		remarkPlugins: [remarkGfm],
 		rehypePlugins: [

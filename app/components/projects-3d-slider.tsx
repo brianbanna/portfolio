@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, ArrowUpRight, Github } from "lucide-react";
 interface ProjectData {
   title: string;
   description: string;
+  question?: string;
   url?: string;
   repository?: string;
   image?: string;
@@ -314,16 +315,22 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
         <div className="grid grid-cols-12 gap-6 md:gap-10 items-start">
           <div className="col-span-12 md:col-span-7">
             <AnimatePresence mode="wait">
-              <motion.p
+              <motion.div
                 key={active.title + "desc"}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.35 }}
-                className="font-serif text-lg md:text-xl leading-[1.55] text-fg/80 text-pretty max-w-2xl"
               >
-                {active.description}
-              </motion.p>
+                {active.question && (
+                  <p className="font-serif italic text-xl md:text-2xl leading-[1.35] text-fg text-balance max-w-2xl mb-4">
+                    {active.question}
+                  </p>
+                )}
+                <p className="font-serif text-lg md:text-xl leading-[1.55] text-fg/80 text-pretty max-w-2xl">
+                  {active.description}
+                </p>
+              </motion.div>
             </AnimatePresence>
           </div>
           <div className="col-span-12 md:col-span-5 flex flex-col gap-4">

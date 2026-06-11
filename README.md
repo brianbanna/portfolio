@@ -1,7 +1,7 @@
 <div align="center">
     <h1 align="center">Brian Banna Portfolio</h1>
 
-Personal website focused on commodity markets, quantitative research, systematic trading projects and market data analysis.
+Personal website on commodity markets: quantitative models, market views and decision focused analysis.
 
 </div>
 

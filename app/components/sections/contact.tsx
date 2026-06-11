@@ -75,8 +75,7 @@ export const ContactSection: React.FC = () => {
             Let&apos;s talk.
           </h2>
           <p className="mt-8 max-w-xl font-serif text-xl md:text-2xl text-fg/65 leading-[1.5]">
-            Happy to talk about commodity markets, quantitative research or
-            project work.
+            Happy to talk about commodity markets, models or project work.
           </p>
         </div>
 
