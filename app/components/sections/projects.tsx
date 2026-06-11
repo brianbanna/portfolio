@@ -1,5 +1,4 @@
 import React from "react";
-import { ArrowUpRight, Github } from "lucide-react";
 
 interface ProjectsProject {
   title: string;
@@ -68,7 +67,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
     <section
       id="projects"
       data-theme="gold"
-      className="relative bg-bg section-rail"
+      className="relative bg-bg section-rail scroll-mt-24"
     >
       <div className="noise" aria-hidden />
 
@@ -199,7 +198,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                         className="relative inline-flex items-center gap-1.5 px-3 py-1.5 bg-fg text-bg font-mono text-[10px] uppercase tracking-[0.14em] hover:bg-section transition-colors before:absolute before:-inset-y-2.5 before:inset-x-0 before:content-['']"
                       >
                         Live
-                        <ArrowUpRight className="w-3 h-3" />
+                        <span aria-hidden className="arrow-glyph" />
                       </a>
                     )}
                     {project.repository && (
@@ -209,7 +208,6 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                         rel="noopener noreferrer"
                         className="relative inline-flex items-center gap-1.5 px-3 py-1.5 border border-fg/25 text-fg/80 hover:text-fg hover:border-fg/60 font-mono text-[10px] uppercase tracking-[0.14em] transition-colors before:absolute before:-inset-y-2.5 before:inset-x-0 before:content-['']"
                       >
-                        <Github className="w-3 h-3" />
                         Source
                       </a>
                     )}

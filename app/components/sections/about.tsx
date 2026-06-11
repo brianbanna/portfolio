@@ -20,7 +20,7 @@ export const AboutSection: React.FC = () => {
   return (
     <section
       id="about"
-      className="relative bg-bg overflow-hidden section-rail"
+      className="relative bg-bg overflow-hidden section-rail scroll-mt-24"
     >
       <div
         className="absolute inset-0 bg-grid-fg bg-grid-64 opacity-30 [mask-image:linear-gradient(to_bottom,black,transparent)]"
