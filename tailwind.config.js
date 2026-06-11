@@ -16,6 +16,12 @@ module.exports = {
 				accent: "rgb(var(--color-accent) / <alpha-value>)",
 				paper: "rgb(var(--color-paper) / <alpha-value>)",
 				ink: "rgb(var(--color-ink) / <alpha-value>)",
+				gold: "rgb(var(--color-gold) / <alpha-value>)",
+				jade: "rgb(var(--color-jade) / <alpha-value>)",
+				copper: "rgb(var(--color-copper) / <alpha-value>)",
+				steel: "rgb(var(--color-steel) / <alpha-value>)",
+				violet: "rgb(var(--color-violet) / <alpha-value>)",
+				section: "rgb(var(--section-accent) / <alpha-value>)",
 			},
 			fontFamily: {
 				sans: ["var(--font-inter)", ...defaultTheme.fontFamily.sans],
@@ -31,8 +37,6 @@ module.exports = {
 				"micro": ["10px", { lineHeight: "1.4", letterSpacing: "0.12em" }],
 			},
 			backgroundImage: {
-				"gradient-radial":
-					"radial-gradient(50% 50% at 50% 50%, var(--tw-gradient-stops))",
 				"grid-fg":
 					"linear-gradient(to right, rgb(var(--color-fg) / 0.045) 1px, transparent 1px), linear-gradient(to bottom, rgb(var(--color-fg) / 0.045) 1px, transparent 1px)",
 				"dot-fg":
@@ -61,10 +65,6 @@ module.exports = {
 				"fade-in": "fade-in 1.2s ease-out forwards",
 				"fade-up": "fade-up 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards",
 				"rise": "rise 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards",
-				"scan": "scan 6s ease-in-out infinite",
-				"shimmer": "shimmer 3s linear infinite",
-				"marquee": "marquee 40s linear infinite",
-				"marquee-reverse": "marquee-reverse 40s linear infinite",
 			},
 			keyframes: {
 				"fade-in": {
@@ -80,27 +80,8 @@ module.exports = {
 					"60%": { opacity: "1", filter: "blur(0)" },
 					"100%": { opacity: "1", transform: "translateY(0)", filter: "blur(0)" },
 				},
-				"scan": {
-					"0%, 100%": { transform: "translateY(-100%)", opacity: "0" },
-					"50%": { opacity: "0.5" },
-				},
-				"shimmer": {
-					"0%": { backgroundPosition: "-200% 0" },
-					"100%": { backgroundPosition: "200% 0" },
-				},
-				"marquee": {
-					"0%": { transform: "translateX(0)" },
-					"100%": { transform: "translateX(-50%)" },
-				},
-				"marquee-reverse": {
-					"0%": { transform: "translateX(-50%)" },
-					"100%": { transform: "translateX(0)" },
-				},
 			},
 		},
 	},
-	plugins: [
-		require("@tailwindcss/typography"),
-		require("tailwindcss-debug-screens"),
-	],
+	plugins: [require("@tailwindcss/typography")],
 };

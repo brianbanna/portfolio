@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import { Github, Linkedin, Mail, ArrowUpRight } from "lucide-react";
 
 const getEmail = () => {
   const user = "briannbanna";
@@ -20,7 +19,6 @@ type Channel = {
   value: string;
   href: string;
   external?: boolean;
-  icon: React.ReactNode;
   onClick?: (e: React.MouseEvent) => void;
 };
 
@@ -31,7 +29,6 @@ const channels: Channel[] = [
     value: "briannbanna [at] gmail.com",
     href: "#",
     onClick: handleEmailClick,
-    icon: <Mail className="w-5 h-5" />,
   },
   {
     num: "02",
@@ -39,7 +36,6 @@ const channels: Channel[] = [
     value: "/in/brianbanna",
     href: "https://linkedin.com/in/brianbanna",
     external: true,
-    icon: <Linkedin className="w-5 h-5" />,
   },
   {
     num: "03",
@@ -47,7 +43,6 @@ const channels: Channel[] = [
     value: "/brianbanna",
     href: "https://github.com/brianbanna",
     external: true,
-    icon: <Github className="w-5 h-5" />,
   },
 ];
 
@@ -55,7 +50,7 @@ export const ContactSection: React.FC = () => {
   return (
     <section
       id="contact"
-      className="relative bg-bg overflow-hidden border-t border-fg/5"
+      className="relative bg-bg overflow-hidden section-rail"
     >
       <div
         className="absolute inset-0 bg-grid-fg bg-grid-64 opacity-30 [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]"
@@ -71,7 +66,7 @@ export const ContactSection: React.FC = () => {
         {/* Section header */}
         <div className="mb-14 md:mb-20">
           <div className="section-marker mb-10">§ 03 · Contact</div>
-          <h2 className="display text-[clamp(3rem,9vw,9rem)] text-fg leading-[0.88]">
+          <h2 className="display text-[clamp(2.4rem,7vw,5.8rem)] text-fg leading-[0.88]">
             Let&apos;s talk.
           </h2>
           <p className="mt-8 max-w-xl font-serif text-xl md:text-2xl text-fg/65 leading-[1.5]">
@@ -79,25 +74,28 @@ export const ContactSection: React.FC = () => {
           </p>
         </div>
 
-        {/* Channels */}
+        {/* Channels — hairline ledger, mono num replaces the icon column */}
         <div className="mt-16 md:mt-20">
           <div className="border-t border-fg/15">
             {channels.map((c) => {
               const content = (
-                <div className="group grid grid-cols-12 gap-3 sm:gap-4 md:gap-6 items-center py-6 sm:py-7 md:py-8 border-b border-fg/15 transition-colors hover:bg-fg/[0.02]">
-                  <div className="col-span-2 md:col-span-1 flex justify-start">
-                    <span className="text-fg/40 group-hover:text-accent transition-colors">
-                      {c.icon}
-                    </span>
+                <div className="group grid grid-cols-[2.5rem,1fr,2rem] md:grid-cols-12 gap-3 sm:gap-4 md:gap-6 items-center py-6 sm:py-7 md:py-8 border-b border-fg/15 transition-colors hover:bg-fg/[0.02]">
+                  <div className="md:col-span-1 font-mono text-[11px] tabular-nums text-fg/40 group-hover:text-accent transition-colors">
+                    {c.num}
                   </div>
-                  <div className="col-span-8 sm:col-span-10 md:col-span-3 font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.16em] sm:tracking-[0.18em] text-fg/55 group-hover:text-fg transition-colors">
-                    {c.label}
+                  <div className="min-w-0 md:col-span-10 md:grid md:grid-cols-10 md:gap-6 md:items-center">
+                    <div className="md:col-span-3 font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.16em] sm:tracking-[0.18em] text-fg/55 group-hover:text-fg transition-colors">
+                      {c.label}
+                    </div>
+                    <div className="md:col-span-7 display text-[18px] sm:text-2xl md:text-[32px] text-fg/90 group-hover:text-fg tracking-tight leading-tight break-words">
+                      <span className="link-draw">{c.value}</span>
+                    </div>
                   </div>
-                  <div className="col-span-12 sm:col-span-10 sm:col-start-3 md:col-start-auto md:col-span-7 display text-[18px] sm:text-2xl md:text-[32px] text-fg/90 group-hover:text-fg tracking-tight leading-tight break-words">
-                    <span className="link-draw">{c.value}</span>
-                  </div>
-                  <div className="col-span-2 md:col-span-1 flex justify-end">
-                    <ArrowUpRight className="w-5 h-5 text-fg/35 group-hover:text-accent transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  <div className="md:col-span-1 flex justify-end">
+                    <span
+                      aria-hidden
+                      className="arrow-glyph font-mono text-base text-fg/35 group-hover:text-accent transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    />
                   </div>
                 </div>
               );

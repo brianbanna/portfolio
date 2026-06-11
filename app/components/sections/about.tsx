@@ -20,7 +20,7 @@ export const AboutSection: React.FC = () => {
   return (
     <section
       id="about"
-      className="relative bg-bg overflow-hidden border-t border-fg/5"
+      className="relative bg-bg overflow-hidden section-rail"
     >
       <div
         className="absolute inset-0 bg-grid-fg bg-grid-64 opacity-30 [mask-image:linear-gradient(to_bottom,black,transparent)]"
@@ -60,8 +60,8 @@ export const AboutSection: React.FC = () => {
 
           {/* Prose */}
           <div className="col-span-12 md:col-span-8 lg:col-span-8">
-            <div className="space-y-6 font-serif text-[18px] md:text-[19px] leading-[1.7] text-fg/85 max-w-[62ch]">
-              <p className="text-[22px] md:text-[24px] leading-[1.5] text-fg">
+            <div className="space-y-6 font-sans text-base leading-[1.62] text-fg/80 max-w-[64ch]">
+              <p className="font-serif text-[22px] md:text-[24px] leading-[1.5] text-fg">
                 I'm currently a Quant Analyst Intern at Cargill in Geneva for
                 the summer. In parallel, I'm pursuing my MSc in Data Science
                 with a minor in Financial Engineering at EPFL, after a BSc in
@@ -112,17 +112,23 @@ export const AboutSection: React.FC = () => {
               </div>
             </div>
             <div className="col-span-12 md:col-span-9">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
-                {Object.entries(stack).map(([group, items]) => (
-                  <div key={group}>
+              {/* Gap 0 grid with internal hairlines — SHARED container device */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border-t border-fg/10 md:border-t-0">
+                {Object.entries(stack).map(([group, items], col) => (
+                  <div
+                    key={group}
+                    className={`py-6 md:py-0 border-b border-fg/10 md:border-b-0 ${
+                      col > 0 ? "md:border-l md:border-fg/10 md:pl-8" : ""
+                    } ${col < 2 ? "md:pr-8" : ""}`}
+                  >
                     <div className="label mb-4 pb-3 border-b border-fg/10">
                       {group}
                     </div>
-                    <ul className="space-y-1">
+                    <ul>
                       {items.map((item, i) => (
                         <li
                           key={item}
-                          className="group flex items-baseline gap-3 font-mono text-[13px] text-fg/70 py-1 px-2 -mx-2 rounded hover:bg-fg/[0.035] hover:text-fg transition-colors"
+                          className="group flex items-baseline gap-3 font-mono text-[13px] text-fg/70 py-1.5 border-b border-fg/[0.06] last:border-b-0 hover:text-fg transition-colors"
                         >
                           <span className="text-fg/30 group-hover:text-accent tabular-nums text-[10px] transition-colors">
                             {String(i + 1).padStart(2, "0")}

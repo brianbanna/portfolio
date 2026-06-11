@@ -1,5 +1,5 @@
 import "../global.css";
-import { Inter, Source_Serif_4, JetBrains_Mono } from "@next/font/google";
+import { Inter, Source_Serif_4, JetBrains_Mono } from "next/font/google";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

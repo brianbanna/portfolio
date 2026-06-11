@@ -17,24 +17,23 @@ export const Footer: React.FC = () => {
   }, []);
 
   return (
-    <footer className="relative bg-bg border-t border-fg/10 overflow-hidden">
-      <div className="editorial pt-20 md:pt-28 pb-10 md:pb-14">
-        <div className="grid grid-cols-12 gap-6">
-          <div className="col-span-12 md:col-span-8">
-            <Link
-              href="/#home"
-              className="display text-[clamp(2.6rem,11vw,10rem)] leading-[0.88] text-fg tracking-tightest block hover:text-accent transition-colors"
-            >
-              Brian Banna.
-            </Link>
-          </div>
-          <div className="col-span-12 md:col-span-4 flex flex-col justify-end">
-            <div className="label mb-3">Direct</div>
-            <ul className="font-mono text-[13px] text-fg/70 space-y-1">
+    <footer className="relative bg-bg section-rail overflow-hidden">
+      {/* Colophon row: modest italic serif mark + mono meta */}
+      <div className="editorial pt-14 md:pt-16 pb-10 md:pb-12">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-10 gap-y-6">
+          <Link
+            href="/#home"
+            className="font-serif italic font-normal text-2xl md:text-3xl text-fg/85 hover:text-accent transition-colors"
+          >
+            Brian Banna.
+          </Link>
+          <div className="flex items-baseline gap-6">
+            <span className="label">Direct</span>
+            <ul className="flex items-baseline gap-5 font-mono text-[13px] text-fg/70">
               <li>
                 <button
                   onClick={handleEmailClick}
-                  className="link-draw hover:text-fg"
+                  className="relative link-draw hover:text-fg before:absolute before:-inset-y-3 before:inset-x-0 before:content-['']"
                 >
                   Email
                 </button>
@@ -44,7 +43,7 @@ export const Footer: React.FC = () => {
                   href="https://linkedin.com/in/brianbanna"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="link-draw hover:text-fg"
+                  className="relative link-draw hover:text-fg before:absolute before:-inset-y-3 before:inset-x-0 before:content-['']"
                 >
                   LinkedIn
                 </a>
@@ -54,7 +53,7 @@ export const Footer: React.FC = () => {
                   href="https://github.com/brianbanna"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="link-draw hover:text-fg"
+                  className="relative link-draw hover:text-fg before:absolute before:-inset-y-3 before:inset-x-0 before:content-['']"
                 >
                   GitHub
                 </a>

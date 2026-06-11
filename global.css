@@ -11,8 +11,25 @@
     --color-ink: 12 12 14;
     --color-accent: 212 206 192;
 
+    /* Signal palette (SHARED showcase system): stone = chrome, gold family = data */
+    --color-gold: 200 162 85;
+    --color-jade: 98 175 123;
+    --color-copper: 207 102 77;
+    --color-steel: 104 148 190;
+    --color-violet: 155 130 200;
+
+    /* Per-section accent, rewired by data-theme */
+    --section-accent: var(--color-accent);
+
     --edge: 1px solid rgb(var(--color-fg) / 0.08);
   }
+
+  [data-theme="stone"] { --section-accent: var(--color-accent); }
+  [data-theme="gold"] { --section-accent: var(--color-gold); }
+  [data-theme="jade"] { --section-accent: var(--color-jade); }
+  [data-theme="copper"] { --section-accent: var(--color-copper); }
+  [data-theme="steel"] { --section-accent: var(--color-steel); }
+  [data-theme="violet"] { --section-accent: var(--color-violet); }
 
   html {
     scroll-behavior: smooth;
@@ -80,21 +97,94 @@
     );
   }
 
+  /* Section marker: SHARED chip device — bordered, tinted, accent dot with halo */
   .section-marker {
     display: inline-flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     font-family: var(--font-mono), monospace;
     font-size: 11px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: rgb(var(--color-fg) / 0.5);
+    color: rgb(var(--color-fg) / 0.72);
+    padding: 6px 14px 6px 10px;
+    background: rgb(var(--section-accent) / 0.08);
+    border: 1px solid rgb(var(--section-accent) / 0.28);
+    border-left: 2px solid rgb(var(--section-accent));
+    border-radius: 2px;
   }
   .section-marker::before {
     content: "";
-    width: 28px;
+    width: 7px;
+    height: 7px;
+    background: rgb(var(--section-accent));
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgb(var(--section-accent) / 0.18);
+    flex-shrink: 0;
+  }
+
+  /* Tinted divider rail + dot between sections — SHARED device */
+  .section-rail {
+    position: relative;
+  }
+  .section-rail::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
     height: 1px;
-    background: rgb(var(--color-accent) / 0.85);
+    background: linear-gradient(
+      to right,
+      transparent 0%,
+      rgb(var(--section-accent) / 0.55) 18%,
+      rgb(var(--color-fg) / 0.18) 40%,
+      rgb(var(--color-fg) / 0.18) 60%,
+      rgb(var(--section-accent) / 0.55) 82%,
+      transparent 100%
+    );
+  }
+  .section-rail::after {
+    content: "";
+    position: absolute;
+    top: -4px;
+    left: 20px;
+    width: 8px;
+    height: 8px;
+    background: rgb(var(--section-accent));
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgb(var(--color-bg)), 0 0 0 4px rgb(var(--section-accent) / 0.45);
+  }
+
+  /* Framed figure with accent corner L tag — SHARED chart-container device */
+  .plate {
+    position: relative;
+    padding: 12px 12px 0;
+    background: rgb(var(--color-paper) / 0.5);
+    border: 1px solid rgb(var(--color-fg) / 0.08);
+  }
+  .plate::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 40px;
+    height: 2px;
+    background: rgb(var(--section-accent));
+  }
+  .plate::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2px;
+    height: 40px;
+    background: rgb(var(--section-accent));
+  }
+
+  /* Typographic arrow rendered as generated content (kept out of innerText) */
+  .arrow-glyph::after {
+    content: "↗";
   }
 
   .link-draw {
@@ -135,39 +225,8 @@
 }
 
 @layer utilities {
-  .cursor-none,
-  .cursor-none * {
-    cursor: none !important;
-  }
-
   .text-balance { text-wrap: balance; }
   .text-pretty { text-wrap: pretty; }
-
-  .reveal {
-    opacity: 0;
-    transform: translateY(24px);
-    transition: opacity 1s cubic-bezier(0.2, 0.8, 0.2, 1),
-      transform 1s cubic-bezier(0.2, 0.8, 0.2, 1);
-  }
-  .reveal.in {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  .stagger > * { opacity: 0; transform: translateY(18px); animation: fade-up 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
-  .stagger > *:nth-child(1) { animation-delay: 0.05s; }
-  .stagger > *:nth-child(2) { animation-delay: 0.15s; }
-  .stagger > *:nth-child(3) { animation-delay: 0.25s; }
-  .stagger > *:nth-child(4) { animation-delay: 0.35s; }
-  .stagger > *:nth-child(5) { animation-delay: 0.45s; }
-  .stagger > *:nth-child(6) { animation-delay: 0.55s; }
-  .stagger > *:nth-child(7) { animation-delay: 0.65s; }
-  .stagger > *:nth-child(8) { animation-delay: 0.75s; }
-  .stagger > *:nth-child(9) { animation-delay: 0.85s; }
-
-  @keyframes fade-up {
-    to { opacity: 1; transform: translateY(0); }
-  }
 }
 
 /* Accessibility — honour reduced motion site-wide */
