@@ -7,6 +7,5 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
     },
     sitemap: "https://brianbanna.com/sitemap.xml",
-    host: "https://brianbanna.com",
   };
 }

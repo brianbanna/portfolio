@@ -25,10 +25,10 @@ const meta: Record<
     domain: "US Equities",
     highlight: "20y data · 0.70 Sharpe · lower drawdown vs SPY",
   },
-  "Cross Border Price Transmission in European Power Markets": {
+  "Cross-Border Price Transmission in European Power Markets": {
     tag: "Power Markets / Transmission",
     domain: "European Electricity",
-    highlight: "ENTSO E · 301k observations · 5 bidding zones",
+    highlight: "ENTSO-E · 301k observations · 5 bidding zones",
   },
   "Commodity Futures Curve Modeling and Factor Trading": {
     tag: "Futures Curves / Factors",
@@ -43,7 +43,7 @@ const meta: Record<
   AirJav: {
     tag: "Signal Processing",
     domain: "ADS-B / Aviation",
-    highlight: "Real-time flight tracking",
+    highlight: "Real time flight tracking",
   },
 };
 

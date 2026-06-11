@@ -34,8 +34,8 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
               Selected quantitative work.
             </h2>
             <p className="mt-6 max-w-xl font-serif text-lg text-fg/60 leading-relaxed">
-              Projects across European power markets, commodity spreads,
-              futures curve factors and market regime detection.
+              Projects across European power markets, futures curve factors,
+              commodity spreads and market regime detection.
             </p>
           </div>
         </div>

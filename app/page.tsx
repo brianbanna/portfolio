@@ -13,8 +13,8 @@ export default function Home() {
     .filter((p) => p.published)
     .sort(
       (a, b) =>
-        new Date(b.date ?? Number.POSITIVE_INFINITY).getTime() -
-        new Date(a.date ?? Number.POSITIVE_INFINITY).getTime()
+        (a.order ?? Number.POSITIVE_INFINITY) -
+        (b.order ?? Number.POSITIVE_INFINITY)
     )
     .map((p) => ({
       title: p.title,

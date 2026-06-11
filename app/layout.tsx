@@ -1,7 +1,6 @@
 import "../global.css";
 import { Inter, Source_Serif_4, JetBrains_Mono } from "@next/font/google";
 import { Metadata } from "next";
-import { Analytics } from "./components/analytics";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://brianbanna.com"),
@@ -10,7 +9,7 @@ export const metadata: Metadata = {
     template: "%s | Brian Banna",
   },
   description:
-    "Brian Banna, Data Science master's student at EPFL focused on quantitative research for commodity markets, futures curves, spread relationships and market regimes.",
+    "Quant Analyst Intern at Cargill. MSc Data Science with a minor in Financial Engineering at EPFL. Quantitative research in commodity and power markets: futures curves, spreads and market regimes.",
   alternates: {
     canonical: "https://brianbanna.com",
   },
@@ -19,6 +18,8 @@ export const metadata: Metadata = {
   publisher: "Brian Banna",
   keywords: [
     "Brian Banna",
+    "Cargill",
+    "Financial Engineering",
     "commodity quant research",
     "commodity markets",
     "quantitative research",
@@ -31,14 +32,14 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Brian Banna · Commodity Quant Research",
     description:
-      "Brian Banna, Data Science master's student at EPFL focused on quantitative research for commodity markets, futures curves, spread relationships and market regimes.",
+      "Quant Analyst Intern at Cargill. MSc Data Science with a minor in Financial Engineering at EPFL. Quantitative research in commodity and power markets: futures curves, spreads and market regimes.",
     url: "https://brianbanna.com",
     siteName: "Brian Banna",
     images: [
       {
-        url: "https://brianbanna.com/commodity-preview.png",
-        width: 2808,
-        height: 1307,
+        url: "https://brianbanna.com/og-home.png",
+        width: 1200,
+        height: 630,
       },
     ],
     locale: "en-US",
@@ -59,8 +60,8 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Brian Banna · Commodity Quant Research",
     description:
-      "Brian Banna, Data Science master's student at EPFL focused on quantitative research for commodity markets, futures curves, spread relationships and market regimes.",
-    images: ["https://brianbanna.com/commodity-preview.png"],
+      "Quant Analyst Intern at Cargill. MSc Data Science with a minor in Financial Engineering at EPFL. Quantitative research in commodity and power markets: futures curves, spreads and market regimes.",
+    images: ["https://brianbanna.com/og-home.png"],
   },
   icons: {
     shortcut: "/favicon.svg",
@@ -103,9 +104,6 @@ export default function RootLayout({
         jetbrains.variable,
       ].join(" ")}
     >
-      <head>
-        <Analytics />
-      </head>
       <body className="bg-bg text-fg font-sans antialiased selection:bg-accent/30 selection:text-fg">
         {children}
       </body>

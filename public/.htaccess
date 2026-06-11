@@ -1,0 +1,6 @@
+# Force https and the apex domain (single 301 hop)
+RewriteEngine On
+
+RewriteCond %{HTTPS} !=on [OR]
+RewriteCond %{HTTP_HOST} ^www\. [NC]
+RewriteRule ^ https://brianbanna.com%{REQUEST_URI} [R=301,L]

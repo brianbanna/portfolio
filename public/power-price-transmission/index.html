@@ -3,26 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="description" content="An interactive data story about how renewable supply shocks in Germany propagate through the Central European power market, crashing day-ahead prices in neighbouring bidding zones and pulling Switzerland into negative territory.">
-    <title>Cross-Border Price Transmission — The Price of Wind and Sun</title>
+    <meta name="description" content="An interactive data story about renewable supply shocks in Germany and the Central European power market, with day ahead prices falling across neighbouring bidding zones and Switzerland turning negative.">
+    <title>Cross-Border Price Transmission: The Price of Wind and Sun</title>
     <link rel="canonical" href="https://brianbanna.com/power-price-transmission/">
     <meta property="og:title" content="Cross-Border Price Transmission · Brian Banna">
-    <meta property="og:description" content="Interactive analysis of cross-border price transmission in European electricity markets using ENTSO-E data across five Central European bidding zones.">
+    <meta property="og:description" content="Interactive analysis of cross border price transmission in European electricity markets using ENTSO-E data across 5 Central European bidding zones.">
     <meta property="og:url" content="https://brianbanna.com/power-price-transmission/">
-    <meta property="og:image" content="https://brianbanna.com/power-preview.png">
-    <meta property="og:image:width" content="960">
-    <meta property="og:image:height" content="750">
+    <meta property="og:image" content="https://brianbanna.com/og-power.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     <meta property="og:type" content="article">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Cross-Border Price Transmission · Brian Banna">
-    <meta name="twitter:description" content="Interactive analysis of cross-border price transmission in European electricity markets using ENTSO-E data.">
-    <meta name="twitter:image" content="https://brianbanna.com/power-preview.png">
+    <meta name="twitter:description" content="Interactive analysis of cross border price transmission in European electricity markets using ENTSO-E data.">
+    <meta name="twitter:image" content="https://brianbanna.com/og-power.png">
 
     <meta name="theme-color" content="#0a0b0d">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20fill%3D%22%230a0b0d%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%226%22%20fill%3D%22%23eae6de%22%2F%3E%3C%2Fsvg%3E">
+    <link rel="icon" href="/favicon.svg">
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -75,7 +75,7 @@
             <div class="hero__masthead" aria-hidden="true">
                 <span class="hero__masthead-item mono">Edition 01</span>
                 <span class="hero__masthead-rule"></span>
-                <span class="hero__masthead-item mono">2024 – 2025</span>
+                <span class="hero__masthead-item mono">2024–2025</span>
                 <span class="hero__masthead-rule"></span>
                 <span class="hero__masthead-item mono">Central Europe</span>
             </div>
@@ -178,7 +178,7 @@
                     Across central Europe, electricity costs roughly the same at the stroke of midnight.
                     Around <strong class="mono">€55<span class="unit">/MWh</span></strong>,
                     roughly what a household uses in six weeks. Switzerland, Germany, France,
-                    Italy, Austria — five countries wired together into one quiet grid.
+                    Italy, Austria: five countries wired together into one quiet grid.
                 </p>
                 <div class="step__chart" data-step-chart aria-hidden="true"></div>
             </article>
@@ -343,7 +343,7 @@
 
                         <div class="timeline__mode-group">
                             <span class="timeline__mode-label mono">Map shows</span>
-                            <div class="timeline__mode mono" data-color-mode aria-label="Map color mode">
+                            <div class="timeline__mode mono" data-color-mode aria-label="Map colour mode">
                                 <button type="button" class="timeline__mode-btn is-active" data-mode="price">Price</button>
                                 <button type="button" class="timeline__mode-btn" data-mode="renewable">Renewable</button>
                             </div>
@@ -395,7 +395,7 @@
                     <p class="site-footer__col-label mono">Data</p>
                     <p>
                         <a href="https://transparency.entsoe.eu/">ENTSO-E Transparency Platform</a>,
-                        day-ahead prices and generation by source,
+                        day ahead prices and generation by source,
                         January 2024 to June 2025.
                     </p>
                     <p>
@@ -406,20 +406,20 @@
                 <div class="site-footer__col">
                     <p class="site-footer__col-label mono">Method</p>
                     <p>
-                        Flow directions inferred from day-ahead price
+                        Flow directions inferred from day ahead price
                         differentials; magnitude proportional to
                         |spread| between connected bidding zones.
                     </p>
                     <p>
                         Showcase day validated against the raw dataset
-                        to 1 decimal place across nine headline facts.
+                        to 1 decimal place across 9 headline facts.
                     </p>
                 </div>
                 <div class="site-footer__col">
                     <p class="site-footer__col-label mono">Credits</p>
                     <p>
                         A data story by <strong>Brian Banna</strong>,
-                        based on day-ahead market data from the
+                        based on day ahead market data from the
                         <a href="https://transparency.entsoe.eu/">ENTSO-E Transparency Platform</a>.
                     </p>
                     <p>

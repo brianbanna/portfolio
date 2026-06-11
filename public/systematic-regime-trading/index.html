@@ -3,20 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Systematic Regime Trading · Brian Banna</title>
-    <meta name="description" content="A 5-model ensemble that classifies market regimes and adjusts equity allocation. Cuts max drawdown from -55% to -28% over fifteen years of out-of-sample data.">
+    <title>Market Regime Modeling for Systematic Trading · Brian Banna</title>
+    <meta name="description" content="A 5 model ensemble that classifies market regimes and adjusts equity allocation. Cuts max drawdown from -55% to -28% over 15 years of out of sample data.">
     <link rel="canonical" href="https://brianbanna.com/systematic-regime-trading/">
-    <meta property="og:title" content="Systematic Regime Trading">
-    <meta property="og:description" content="5-model ensemble regime detection. Cuts drawdowns by 50% while improving the Sharpe ratio over SPY.">
+    <link rel="icon" href="/favicon.svg">
+    <meta property="og:title" content="Market Regime Modeling for Systematic Trading · Brian Banna">
+    <meta property="og:description" content="5 model ensemble regime detection. Cuts drawdowns by 50% while improving the Sharpe ratio over SPY.">
     <meta property="og:url" content="https://brianbanna.com/systematic-regime-trading/">
-    <meta property="og:image" content="https://brianbanna.com/regime-preview.gif">
-    <meta property="og:image:width" content="1280">
-    <meta property="og:image:height" content="720">
+    <meta property="og:image" content="https://brianbanna.com/og-regime.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     <meta property="og:type" content="article">
+    <meta property="og:site_name" content="Brian Banna">
+    <meta property="og:locale" content="en-US">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Systematic Regime Trading · Brian Banna">
-    <meta name="twitter:description" content="5-model ensemble regime detection on US equity market data, benchmarked against SPY.">
-    <meta name="twitter:image" content="https://brianbanna.com/regime-preview.gif">
+    <meta name="twitter:title" content="Market Regime Modeling for Systematic Trading · Brian Banna">
+    <meta name="twitter:description" content="5 model ensemble regime detection on US equity market data, benchmarked against SPY.">
+    <meta name="twitter:image" content="https://brianbanna.com/og-regime.png">
 
     <link rel="preconnect" href="https://cdn.plot.ly" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,9 +28,9 @@
 
     <link rel="stylesheet" href="css/style.css">
 
-    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js" charset="utf-8"></script>
-    <script src="js/chart_data_inline.js"></script>
-    <script src="js/crisis_data.js"></script>
+    <script defer src="https://cdn.plot.ly/plotly-2.27.0.min.js" charset="utf-8"></script>
+    <script defer src="js/chart_data_inline.js"></script>
+    <script defer src="js/crisis_data.js"></script>
 </head>
 <body>
 
@@ -42,7 +45,7 @@
         <div class="ticker-track">
             <span class="ticker-item"><b>SPY</b> <span class="t-down">−55.2% MAX DD</span></span>
             <span class="ticker-item"><b>REGIME</b> <span class="t-up">−27.7% MAX DD</span></span>
-            <span class="ticker-item"><b>SHARPE</b> <span class="t-gold">0.70 vs 0.46</span></span>
+            <span class="ticker-item"><b>SHARPE</b> <span class="t-gold">0.70 vs 0.45</span></span>
             <span class="ticker-item"><b>CAGR</b> <span class="t-up">+10.2%</span></span>
             <span class="ticker-item"><b>LEAD</b> <span class="t-gold">6 DAYS</span></span>
             <span class="ticker-item"><b>2008 CRISIS</b> <span class="t-up">+$2,160</span></span>
@@ -50,10 +53,10 @@
             <span class="ticker-item"><b>PREDICTIONS</b> <span class="t-gold">3,771</span></span>
             <span class="ticker-item"><b>MODELS</b> <span class="t-gold">5</span></span>
             <span class="ticker-item"><b>EXEC LAG</b> <span>T+1</span></span>
-            <!-- duplicate for seamless loop -->
+            <!-- duplicate for continuous loop -->
             <span class="ticker-item"><b>SPY</b> <span class="t-down">−55.2% MAX DD</span></span>
             <span class="ticker-item"><b>REGIME</b> <span class="t-up">−27.7% MAX DD</span></span>
-            <span class="ticker-item"><b>SHARPE</b> <span class="t-gold">0.70 vs 0.46</span></span>
+            <span class="ticker-item"><b>SHARPE</b> <span class="t-gold">0.70 vs 0.45</span></span>
             <span class="ticker-item"><b>CAGR</b> <span class="t-up">+10.2%</span></span>
             <span class="ticker-item"><b>LEAD</b> <span class="t-gold">6 DAYS</span></span>
             <span class="ticker-item"><b>2008 CRISIS</b> <span class="t-up">+$2,160</span></span>
@@ -83,7 +86,7 @@
         <div class="hero-lower">
             <div>
                 <p class="tagline">
-                    A five-model ensemble that classifies market regimes and adjusts equity allocation in real time. Built on <em>fifteen years</em> of out-of-sample data, walk-forward, no peeking.
+                    A 5 model ensemble that classifies market regimes and adjusts equity allocation in real time. Built on <em>15 years</em> of out of sample data, walk forward, no peeking.
                 </p>
                 <a href="#hook" class="scroll-hint">
                     <span>Begin reading</span>
@@ -93,12 +96,12 @@
 
             <aside class="hero-preview" aria-label="Key performance summary">
                 <div class="hero-preview-head">
-                    <span><span class="live-dot"></span>OUT-OF-SAMPLE · 2008–2024</span>
+                    <span><span class="live-dot"></span>OUT-OF-SAMPLE · 2006–2020</span>
                     <span>SPY BENCH</span>
                 </div>
                 <div class="hero-preview-row">
                     <span class="hp-label">Sharpe Ratio</span>
-                    <span class="hp-value hp-gold">0.70<span class="hp-delta up">+52%</span></span>
+                    <span class="hp-value hp-gold">0.70<span class="hp-delta up">+56%</span></span>
                 </div>
                 <div class="hero-preview-row">
                     <span class="hp-label">CAGR</span>
@@ -122,7 +125,7 @@
         <div class="badges">
             <div class="badge">
                 <div class="value"><span class="gold-val">0.70</span></div>
-                <div class="label">Sharpe<span class="delta neutral">vs 0.46</span></div>
+                <div class="label">Sharpe<span class="delta neutral">vs 0.45</span></div>
                 <div class="spark" aria-hidden="true"><span style="height:40%"></span><span style="height:55%"></span><span style="height:70%"></span><span style="height:82%"></span><span style="height:60%"></span><span style="height:75%"></span><span style="height:90%"></span><span style="height:55%"></span></div>
             </div>
             <div class="badge">
@@ -197,7 +200,7 @@
         <h2>Equity curves, <em>after costs.</em></h2>
         <div class="side-note">
             <strong>Benchmarks</strong>
-            Five strategies tested against SPY buy-and-hold over 15 years of out-of-sample data. All results include 7 bps transaction costs and one-day execution lag.
+            5 strategies tested against SPY buy and hold over 15 years of out of sample data. All results include 7 bps transaction costs and 1 day execution lag.
         </div>
     </div>
 
@@ -206,7 +209,7 @@
 
     <div class="chart-container">
         <img src="assets/figures/02_drawdown.png" alt="Drawdown comparison" loading="lazy" decoding="async">
-        <div class="chart-caption">Drawdown from peak. Buy-and-hold hit −55% in 2008. The regime strategy cut that in half while delivering higher returns (10.2% vs 9.6% CAGR).</div>
+        <div class="chart-caption">Drawdown from peak. Buy and hold hit −55% in 2008. The regime strategy cut that in half while delivering higher returns (10.2% vs 9.6% CAGR).</div>
     </div>
 
     <div class="table-wrap">
@@ -217,7 +220,7 @@
             <tr><td>Binary Regime</td><td>7.5%</td><td>12.5%</td><td>0.49</td><td class="negative">−35.8%</td><td>10.6×</td></tr>
             <tr><td>Vol-Managed</td><td>6.6%</td><td class="positive">10.5%</td><td>0.47</td><td class="positive">−23.7%</td><td>1.7×</td></tr>
             <tr><td>SMA 200</td><td>7.0%</td><td>11.7%</td><td>0.47</td><td class="positive">−21.9%</td><td>6.0×</td></tr>
-            <tr><td>Buy &amp; Hold (SPY)</td><td>9.6%</td><td class="negative">20.1%</td><td>0.46</td><td class="negative">−55.2%</td><td>0.0×</td></tr>
+            <tr><td>Buy &amp; Hold (SPY)</td><td>9.6%</td><td class="negative">20.1%</td><td>0.45</td><td class="negative">−55.2%</td><td>0.0×</td></tr>
         </tbody>
     </table>
     </div>
@@ -273,11 +276,11 @@
     </ul>
 
     <p>
-        Walk-forward validation, expanding window, quarterly refit. Fifty-nine windows, 3,771 out-of-sample predictions. SPY benchmark. One-day execution lag. Asymmetric confirmation filters.
+        Walk forward validation, expanding window, quarterly refit. 59 windows, 3,771 out of sample predictions. SPY benchmark. 1 day execution lag. Asymmetric confirmation filters.
     </p>
 
     <details>
-        <summary>Walk-forward loop</summary>
+        <summary>Walk forward loop</summary>
         <pre><code>while train_end_idx + step_days <= n_total:
     train = feature_df.iloc[:train_end_idx]
     test  = feature_df.iloc[train_end_idx:test_end_idx]
@@ -303,7 +306,7 @@
 
     <div class="chart-container">
         <img src="assets/figures/14_prediction_accuracy.png" alt="Prediction accuracy" loading="lazy" decoding="async">
-        <div class="chart-caption">Realized volatility over the next 5, 10, and 20 days by predicted regime. Calm: 12%. Turbulent: 22%. Clear separation across all horizons.</div>
+        <div class="chart-caption">Realised volatility over the next 5, 10, and 20 days by predicted regime. Calm: 12%. Turbulent: 22%. Clear separation across all horizons.</div>
     </div>
 
     <div class="chart-container">
@@ -344,7 +347,7 @@
 
     <div class="chart-container">
         <img src="assets/figures/09_regime_performance.png" alt="Regime performance" loading="lazy" decoding="async">
-        <div class="chart-caption">Calm markets: Sharpe 1.10. Eighty-one percent of total return comes from 52% of trading days.</div>
+        <div class="chart-caption">Calm markets: Sharpe 1.10. 81% of total return comes from 52% of trading days.</div>
     </div>
 </section>
 
@@ -479,7 +482,7 @@
 
     <div class="chart-container">
         <img src="assets/figures/12_model_agreement.png" alt="Model agreement" loading="lazy" decoding="async">
-        <div class="chart-caption">Pairwise agreement between the five models. Feature-space models (HMM, GMM) and return-based models (GARCH, Markov-Switching) form two independent clusters. Healthy diversification.</div>
+        <div class="chart-caption">Pairwise agreement between the 5 models. Feature-space models (HMM, GMM) and return-based models (GARCH, Markov-Switching) form 2 independent clusters. Healthy diversification.</div>
     </div>
 
     <div class="chart-container">
@@ -496,7 +499,7 @@
 <footer class="colophon">
     <div class="editorial">
         <div class="colophon-row">
-            <div class="colophon-mark">— Brian Banna</div>
+            <div class="colophon-mark">Brian Banna</div>
             <div class="colophon-meta">
                 <a href="https://brianbanna.com">brianbanna.com</a>
                 · Repository on
@@ -507,7 +510,7 @@
 </footer>
 
 <script>
-(function() {
+document.addEventListener('DOMContentLoaded', function() {
     /* Mark body as JS-enabled so reveal animations activate */
     document.body.classList.add('js');
 
@@ -570,14 +573,14 @@
             var elV = document.getElementById('sim-verdict');
 
             elS.textContent = sh.toFixed(2);
-            elS.style.color = sh > 0.46 ? UP : DOWN;
+            elS.style.color = sh > 0.45 ? UP : DOWN;
 
             elC.textContent = ca.toFixed(1) + '%';
             elC.style.color = ca > 9.6 ? UP : ca > 0 ? FG : DOWN;
 
             elM.textContent = md.toFixed(0).replace('-', '−') + '%';
 
-            if (sh > 0.46) {
+            if (sh > 0.45) {
                 elV.textContent = 'Outperforms SPY at this cost level.';
                 elV.style.color = UP;
             } else if (sh > 0) {
@@ -779,7 +782,7 @@
         }
         requestAnimationFrame(tick);
     });
-})();
+});
 </script>
 </body>
 </html>

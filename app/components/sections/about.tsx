@@ -2,16 +2,18 @@
 import React from "react";
 
 const stack = {
-  Languages: ["Python", "R", "Scala", "Java", "TypeScript", "SQL"],
+  Languages: ["Python", "C++", "R", "SQL", "Java", "Scala"],
   "Quant / ML": [
     "NumPy",
     "Pandas",
+    "statsmodels",
+    "arch",
+    "hmmlearn",
     "scikit-learn",
     "PyTorch",
-    "TensorFlow",
-    "statsmodels",
+    "vectorbt",
   ],
-  "Data / Infra": ["PostgreSQL", "Jupyter", "Git", "Docker", "Linux", "Plotly"],
+  "Tools / Viz": ["Matplotlib", "Plotly", "Excel (VBA)", "Git", "CI/CD"],
 };
 
 export const AboutSection: React.FC = () => {
@@ -41,8 +43,8 @@ export const AboutSection: React.FC = () => {
                 <img
                   src="/profile.jpg"
                   alt="Brian Banna"
-                  width={2048}
-                  height={2048}
+                  width={800}
+                  height={800}
                   loading="lazy"
                   decoding="async"
                   className="w-full h-full object-cover transition-transform duration-[1200ms] hover:scale-[1.02]"
@@ -60,40 +62,34 @@ export const AboutSection: React.FC = () => {
           <div className="col-span-12 md:col-span-8 lg:col-span-8">
             <div className="space-y-6 font-serif text-[18px] md:text-[19px] leading-[1.7] text-fg/85 max-w-[62ch]">
               <p className="text-[22px] md:text-[24px] leading-[1.5] text-fg">
-                I'm a Master's student in Data Science with a minor in
-                Financial Engineering at EPFL, focused on quantitative
-                modelling, financial data analysis and commodities trading
-                research.
+                I'm currently a Quant Analyst Intern at Cargill in Geneva for
+                the summer. In parallel, I'm pursuing my MSc in Data Science
+                with a minor in Financial Engineering at EPFL, after a BSc in
+                Computer Science and Engineering, also at EPFL.
               </p>
 
               <p>
-                My work focuses on quantitative modelling and financial data
-                analysis. I develop systematic models and research frameworks
-                to analyse market dynamics, with a particular interest in
-                commodities and trading strategies.
+                My work focuses on quantitative modelling in commodity and
+                power markets, translating physical fundamentals (S&amp;D
+                balances, storage, trade flows, inventories) into signals
+                across futures curves, spreads and differentials.
               </p>
 
               <p>
-                I previously worked in quantitative research related to
-                commodity markets, building market signals from production data,
-                refining capacity and global trade flows to analyse supply
-                demand dynamics, market exposures and asset dependencies.
-              </p>
-
-              <p>
-                In parallel, I have developed research projects around cross
-                border European power prices, commodity spread stat arb, futures
-                curve factor research and market regime modelling using HMM,
-                GARCH and regime switching models.
+                Before Cargill, I completed a Quantitative Analyst internship
+                at Pareto Economics in London, building commodity market
+                signals from production data, refining throughputs and global
+                trade flows to analyse supply and demand dynamics, market
+                exposures and asset dependencies.
               </p>
 
               <p>
                 Previously, I served as President and Head of Sales at Junior
-                Entreprise EPFL, Switzerland's largest student-run consultancy.
-                I led a 35-person team and managed more than CHF 500k in
-                project volume, driving 22% YoY revenue growth and personally
-                closing CHF 430k across projects in finance, commodities and
-                energy.
+                Entreprise EPFL, Switzerland's largest student run consultancy,
+                where I led a 35 person team. I personally closed CHF 430k in
+                projects across finance, commodities and energy, and managed
+                more than CHF 500k in total volume, driving 22% YoY revenue
+                growth.
               </p>
 
               <p>

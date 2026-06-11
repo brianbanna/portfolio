@@ -80,8 +80,8 @@ export function initNarrative(selector, config) {
         createCalendarHeatmap(heatmapContainer, {
             data: calendarData,
             countries: [
-                { code: "DE", label: "Germany — 846 negative hours" },
-                { code: "CH", label: "Switzerland — 529 negative hours" },
+                { code: "DE", label: "Germany: 846 negative hours" },
+                { code: "CH", label: "Switzerland: 529 negative hours" },
             ],
         });
     }
@@ -102,7 +102,7 @@ export function initNarrative(selector, config) {
                 genStackCtl = createGenerationStack(genContainer, {
                     series: deSeries,
                     country: "DE",
-                    label: "Germany — 12 May 2024",
+                    label: "Germany: 12 May 2024",
                 });
             }
         }
@@ -119,7 +119,7 @@ export function initNarrative(selector, config) {
             duckCtl = createDailyProfile(duckContainer, {
                 profiles: config.profilesData.countries.DE,
                 country: "DE",
-                label: "Germany — monthly price profile",
+                label: "Germany: monthly price profile",
                 width: 460,
                 height: 280,
             });
