@@ -30,11 +30,46 @@ jobs:
       - name: Deploy via lftp
         run: |
           sudo apt-get install -y lftp
-          lftp -u "${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }}" sftp://vs0hny.ftp.infomaniak.com -e "
-            set sftp:auto-confirm yes
-            set net:timeout 60
-            set net:max-retries 5
-            set net:reconnect-interval-base 5
-            mirror -R --delete --only-newer --parallel=2 --verbose ./out/ sites/brianbanna.com/
-            quit
-          "
+
+          # Resilience fix only. Shared Infomaniak hosting caps concurrent
+          # connections; parallelism is the usual cause of the "max-retries exceeded"
+          # the previous run hit. Single SFTP connection, single-file transfer
+          # (--parallel=1), bounded timeout and reconnect backoff. The full tree is
+          # uploaded every deploy via one mirror pass with the default time+size
+          # comparison (a fresh CI checkout makes every file newer than the remote, so
+          # everything re-uploads) -- correctness over transfer volume. Size-based
+          # delta optimization is deliberately deferred: it would mean per-file
+          # comparison rules that interact with --delete in ways not yet exercised
+          # against this live host.
+          mirror_once() {
+            lftp -u "${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }}" sftp://vs0hny.ftp.infomaniak.com -e "
+              set cmd:fail-exit yes
+              set sftp:auto-confirm yes
+              set net:timeout 30
+              set net:max-retries 3
+              set net:reconnect-interval-base 5
+              set net:reconnect-interval-max 60
+              set net:persist-retries 5
+              set net:connection-limit 1
+              mirror -R --delete --verbose --parallel=1 --no-perms --exclude='(^|/)\.DS_Store$' --exclude='(^|/)\._' --exclude='(^|/)Thumbs\.db$' ./out/ sites/brianbanna.com/
+              quit
+            "
+          }
+
+          # Step-level retry: up to 3 attempts, 60s between, fail only if all 3 fail.
+          # No set -x anywhere in this step so the credential-bearing command line is
+          # never echoed to the log.
+          for attempt in 1 2 3; do
+            echo "lftp mirror attempt ${attempt}/3"
+            if mirror_once; then
+              echo "lftp mirror succeeded on attempt ${attempt}"
+              exit 0
+            fi
+            echo "lftp mirror attempt ${attempt} failed"
+            if [ "${attempt}" -lt 3 ]; then
+              echo "waiting 60s before retry"
+              sleep 60
+            fi
+          done
+          echo "all 3 lftp mirror attempts failed" >&2
+          exit 1
