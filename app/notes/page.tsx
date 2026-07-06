@@ -48,7 +48,6 @@ export default function NotesPage() {
         <section className="relative bg-bg overflow-hidden border-b border-fg/5">
           <div className="noise" aria-hidden />
           <div className="editorial relative pt-36 md:pt-44 pb-12 md:pb-16">
-            <div className="section-marker mb-10">§ 04 · Notes</div>
             <h1 className="display text-[clamp(3rem,9vw,8rem)] text-fg leading-[0.9]">
               Notes.
             </h1>
@@ -63,19 +62,19 @@ export default function NotesPage() {
                 href={`/notes/${note.slug}`}
                 className="group grid grid-cols-12 gap-3 md:gap-6 py-7 md:py-8 border-b border-fg/15 transition-colors hover:bg-fg/[0.02] items-baseline"
               >
-                <div className="col-span-12 md:col-span-2 font-mono text-[11px] uppercase tracking-[0.16em] text-fg/55 tabular-nums">
+                <div className="col-span-12 md:col-span-2 text-[11px] uppercase tracking-[0.16em] text-fg/55 tabular-nums">
                   {dateFmt.format(new Date(note.date))}
                 </div>
                 <div className="col-span-12 md:col-span-7">
-                  <h2 className="font-serif text-xl md:text-2xl text-fg/90 group-hover:text-fg leading-snug transition-colors">
+                  <h2 className="text-xl md:text-2xl text-fg/90 group-hover:text-fg leading-snug transition-colors">
                     {note.title}
                   </h2>
-                  <p className="mt-3 font-serif text-[15px] md:text-base leading-[1.6] text-fg/60 max-w-xl">
+                  <p className="mt-3 text-[15px] md:text-base leading-[1.6] text-fg/60 max-w-xl">
                     {note.summary}
                   </p>
                 </div>
                 <div className="col-span-12 md:col-span-3 flex md:justify-end">
-                  <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-fg/55 border border-fg/15 px-2 py-1">
+                  <span className="text-[10px] uppercase tracking-[0.16em] text-fg/55 border border-fg/15 px-2 py-1">
                     {note.market}
                   </span>
                 </div>

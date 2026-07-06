@@ -22,6 +22,7 @@ export default function Home() {
       url: p.url,
       repository: p.repository,
       image: p.image,
+      imageAlt: p.imageAlt,
       date: p.date,
     }));
 

@@ -2,7 +2,13 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 
-const getEmail = () => "briannbanna" + "@" + "gmail.com";
+// Assembled from parts so the minifier cannot fold it into a literal.
+const getEmail = () => {
+  const user = "briannbanna";
+  const domain = "gmail";
+  const tld = "com";
+  return `${user}@${domain}.${tld}`;
+};
 
 const handleEmailClick = (e: React.MouseEvent) => {
   e.preventDefault();
@@ -23,13 +29,13 @@ export const Footer: React.FC = () => {
         <div className="flex flex-wrap items-baseline justify-between gap-x-10 gap-y-6">
           <Link
             href="/#home"
-            className="font-serif italic font-normal text-2xl md:text-3xl text-fg/85 hover:text-accent transition-colors"
+            className="display text-2xl md:text-3xl text-fg/85 hover:text-accent transition-colors"
           >
             Brian Banna.
           </Link>
           <div className="flex items-baseline gap-6">
             <span className="label">Direct</span>
-            <ul className="flex items-baseline gap-5 font-mono text-[13px] text-fg/70">
+            <ul className="flex items-baseline gap-5 text-[13px] text-fg/70">
               <li>
                 <button
                   onClick={handleEmailClick}

@@ -51,6 +51,9 @@ export const Project = defineDocumentType(() => ({
 		image: {
 			type: "string",
 		},
+		imageAlt: {
+			type: "string",
+		},
 	},
 	computedFields,
 }));

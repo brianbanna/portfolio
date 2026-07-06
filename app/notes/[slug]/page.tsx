@@ -78,12 +78,11 @@ export default function NotePage({ params }: { params: { slug: string } }) {
       <Navigation notesEnabled />
       <main className="flex-1">
         <article className="editorial pt-36 md:pt-44 pb-16 md:pb-24">
-          <div className="section-marker mb-10">§ 04 · Note</div>
           <h1 className="display text-[clamp(2.4rem,6vw,5rem)] text-fg leading-[0.95] text-balance max-w-4xl">
             {note.title}
           </h1>
 
-          <div className="mt-8 flex flex-wrap items-baseline gap-x-5 gap-y-2 font-mono text-[11px] uppercase tracking-[0.16em] text-fg/55">
+          <div className="mt-8 flex flex-wrap items-baseline gap-x-5 gap-y-2 text-[11px] uppercase tracking-[0.16em] text-fg/55">
             <span className="tabular-nums">
               {dateFmt.format(new Date(note.date))}
             </span>
@@ -97,7 +96,7 @@ export default function NotePage({ params }: { params: { slug: string } }) {
             )}
           </div>
 
-          <p className="mt-10 font-serif italic text-xl md:text-2xl leading-[1.45] text-fg/90 max-w-[58ch]">
+          <p className="mt-10 font-medium text-xl md:text-2xl leading-[1.45] text-fg/90 max-w-[58ch]">
             {note.summary}
           </p>
 
@@ -107,7 +106,7 @@ export default function NotePage({ params }: { params: { slug: string } }) {
 
           <div className="hairline my-12" />
 
-          <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-fg/55">
+          <p className="text-[11px] uppercase tracking-[0.16em] text-fg/55">
             Personal market notes based on public information only. Not
             investment advice.
           </p>
@@ -115,7 +114,7 @@ export default function NotePage({ params }: { params: { slug: string } }) {
           <div className="mt-12">
             <Link
               href="/notes"
-              className="font-mono text-[11px] uppercase tracking-[0.18em] text-fg/55 hover:text-fg transition-colors link-draw"
+              className="text-[11px] uppercase tracking-[0.18em] text-fg/55 hover:text-fg transition-colors link-draw"
             >
               All notes
             </Link>

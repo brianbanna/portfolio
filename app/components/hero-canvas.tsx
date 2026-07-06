@@ -129,7 +129,7 @@ export const HeroCanvas: React.FC<{
       ctx.lineWidth = 1;
       for (let i = 0; i < TENORS; i++) {
         const x = padX + (i / (TENORS - 1)) * plotW;
-        ctx.strokeStyle = `rgba(232, 228, 220, ${i === 0 || i === TENORS - 1 ? 0.06 : 0.025})`;
+        ctx.strokeStyle = `rgba(26, 23, 18, ${i === 0 || i === TENORS - 1 ? 0.1 : 0.04})`;
         ctx.beginPath();
         ctx.moveTo(x, padY * 0.4);
         ctx.lineTo(x, h - padY * 0.4);
@@ -137,7 +137,7 @@ export const HeroCanvas: React.FC<{
       }
 
       // Horizontal zero line
-      ctx.strokeStyle = "rgba(232, 228, 220, 0.04)";
+      ctx.strokeStyle = "rgba(26, 23, 18, 0.06)";
       ctx.beginPath();
       ctx.moveTo(padX, h / 2);
       ctx.lineTo(w - padX, h / 2);
@@ -157,11 +157,11 @@ export const HeroCanvas: React.FC<{
         ctx.lineWidth = isActive ? 1.4 : 0.8 + depth * 0.4;
 
         if (isActive) {
-          ctx.strokeStyle = `rgba(214, 189, 145, 0.85)`;
-          ctx.shadowColor = "rgba(214, 189, 145, 0.5)";
+          ctx.strokeStyle = "rgba(166, 72, 42, 0.9)";
+          ctx.shadowColor = "rgba(166, 72, 42, 0.35)";
           ctx.shadowBlur = glowBoost;
         } else {
-          ctx.strokeStyle = `rgba(232, 228, 220, ${alpha})`;
+          ctx.strokeStyle = `rgba(26, 23, 18, ${alpha})`;
           ctx.shadowBlur = 0;
         }
 
@@ -180,7 +180,7 @@ export const HeroCanvas: React.FC<{
         // Tenor ticks on active curve
         if (isActive) {
           ctx.shadowBlur = 0;
-          ctx.fillStyle = "rgba(214, 189, 145, 0.85)";
+          ctx.fillStyle = "rgba(166, 72, 42, 0.9)";
           const dotR = 1.6 * dotScale;
           for (let i2 = 0; i2 < TENORS; i2 += 2) {
             const x01 = i2 / (TENORS - 1);

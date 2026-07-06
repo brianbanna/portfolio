@@ -10,6 +10,7 @@ interface ProjectData {
   url?: string;
   repository?: string;
   image?: string;
+  imageAlt?: string;
 }
 
 interface Projects3DSliderProps {
@@ -24,27 +25,27 @@ const meta: Record<
   "Market Regime Modeling for Systematic Trading": {
     tag: "Regime Detection",
     domain: "US Equities",
-    highlight: "20y data · 0.70 Sharpe · lower drawdown vs SPY",
+    highlight: "HMM · GARCH · GMM · Sharpe 0.70",
   },
   "Cross-Border Price Transmission in European Power Markets": {
     tag: "Power Markets / Transmission",
     domain: "European Electricity",
-    highlight: "ENTSO-E · 301k observations · 5 bidding zones",
+    highlight: "ENTSO-E · 301k hours · 5 zones",
   },
   "Commodity Futures Curve Modeling and Factor Trading": {
     tag: "Futures Curves / Factors",
     domain: "Commodity Futures",
-    highlight: "19 markets · 2.4M observations · cost aware backtests",
+    highlight: "19 markets · 2.4M obs · roll adjusted",
   },
   "Adaptive Statistical Arbitrage in Commodity Spreads": {
     tag: "Stat Arb / Cointegration",
     domain: "Commodity Pairs",
-    highlight: "Adaptive hedge ratio",
+    highlight: "Cointegration · Kalman filter · Walk forward",
   },
   AirJav: {
     tag: "Signal Processing",
     domain: "ADS-B / Aviation",
-    highlight: "Real time flight tracking",
+    highlight: "Java · ADS-B · Signal processing",
   },
 };
 
@@ -75,7 +76,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
     if (diff < -total / 2) diff += total;
 
     const abs = Math.abs(diff);
-    let x = diff * 340;
+    let x = diff * 390;
     let rotateY = 0;
     let scale = 1;
     let opacity = 1;
@@ -84,17 +85,17 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
       scale = 1;
       opacity = 1;
     } else if (abs === 1) {
-      x = diff * 360;
+      x = diff * 415;
       rotateY = diff * -32;
       scale = 0.82;
       opacity = 0.55;
     } else if (abs === 2) {
-      x = diff * 310;
+      x = diff * 355;
       rotateY = diff * -44;
       scale = 0.66;
       opacity = 0.28;
     } else {
-      x = diff * 260;
+      x = diff * 300;
       rotateY = diff * -50;
       scale = 0.5;
       opacity = 0;
@@ -161,7 +162,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
       </div>
 
       {/* 3D carousel stage */}
-      <div className="relative w-full h-[380px] sm:h-[440px] md:h-[540px] flex items-center justify-center overflow-hidden">
+      <div className="relative w-full h-[420px] sm:h-[500px] md:h-[620px] flex items-center justify-center overflow-hidden">
         {/* Side fade masks */}
         <div className="absolute inset-0 bg-gradient-to-r from-bg via-transparent to-bg z-20 pointer-events-none" />
 
@@ -196,17 +197,17 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                 }}
               >
                 <div
-                  className="relative w-[280px] sm:w-[340px] md:w-[520px] aspect-[4/3] overflow-hidden group bg-paper border border-fg/15"
+                  className="relative w-[310px] sm:w-[400px] md:w-[600px] aspect-[4/3] overflow-hidden group bg-paper border border-fg/15"
                   style={{
                     boxShadow: isActive
-                      ? "0 40px 80px -20px rgba(0,0,0,0.9), 0 0 80px -20px rgba(212,206,192,0.10)"
-                      : "0 20px 50px -15px rgba(0,0,0,0.7)",
+                      ? "0 40px 80px -20px rgba(26,23,18,0.18), 0 0 80px -20px rgba(166,72,42,0.12)"
+                      : "0 20px 50px -15px rgba(26,23,18,0.12)",
                   }}
                 >
                   {slide.image ? (
                     <img
                       src={slide.image}
-                      alt={slide.title}
+                      alt={slide.imageAlt || slide.title}
                       loading={isActive ? "eager" : "lazy"}
                       decoding="async"
                       className={`w-full h-full object-cover transition-all duration-[1200ms] ${
@@ -224,23 +225,19 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                     </div>
                   )}
 
-                  {/* Editorial scrim */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/10 to-transparent pointer-events-none" />
-
-                  {/* Corner marks */}
-                  <div className="absolute top-0 left-0 w-5 h-5 border-t border-l border-fg/50" />
-                  <div className="absolute top-0 right-0 w-5 h-5 border-t border-r border-fg/50" />
-                  <div className="absolute bottom-0 left-0 w-5 h-5 border-b border-l border-fg/50" />
-                  <div className="absolute bottom-0 right-0 w-5 h-5 border-b border-r border-fg/50" />
+                  {/* Editorial scrim — dark like the preview artwork, not the page ground */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[rgb(20_18_15/0.92)] via-[rgb(20_18_15/0.15)] to-transparent pointer-events-none" />
+                  {/* Top scrim so the counter stays legible on light artwork */}
+                  <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-[rgb(20_18_15/0.75)] to-transparent pointer-events-none" />
 
                   {/* Number overlay */}
-                  <div className="absolute top-4 left-4 font-mono text-[10px] tracking-[0.18em] text-fg/60 uppercase">
+                  <div className="absolute top-4 left-4 text-[10px] tracking-[0.18em] text-bg/75 uppercase">
                     {String(index + 1).padStart(2, "0")} / {total}
                   </div>
 
                   {/* Title + actions only on active */}
                   <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7">
-                    <h3 className="display text-xl md:text-3xl text-fg leading-[1] mb-2 text-balance">
+                    <h3 className="display text-xl md:text-3xl text-bg leading-[1] mb-2 text-balance">
                       {slide.title}
                     </h3>
                     {isActive && (
@@ -250,8 +247,8 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                         transition={{ delay: 0.15 }}
                       >
                         {meta[slide.title]?.highlight && (
-                          <div className="mb-3 flex items-center gap-2 font-mono text-[10px] text-accent/90 uppercase tracking-wide">
-                            <span className="w-5 h-px bg-accent/60" />
+                          <div className="mb-3 flex items-center gap-2 text-[10px] text-bg/80 uppercase tracking-wide">
+                            <span className="w-5 h-px bg-accent" />
                             {meta[slide.title]?.highlight}
                           </div>
                         )}
@@ -261,7 +258,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                               href={slide.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="group/btn inline-flex items-center gap-1.5 px-3 py-1.5 bg-fg text-bg font-mono text-[10px] uppercase tracking-[0.14em] hover:bg-accent transition-colors"
+                              className="group/btn inline-flex items-center gap-1.5 px-3 py-1.5 bg-bg text-fg text-[10px] uppercase tracking-[0.14em] hover:bg-accent hover:text-bg transition-colors"
                             >
                               Live
                               <ArrowUpRight className="w-3 h-3" />
@@ -272,7 +269,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                               href={`https://github.com/${slide.repository}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-fg/25 text-fg/80 hover:text-fg hover:border-fg/60 font-mono text-[10px] uppercase tracking-[0.14em] transition-colors"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-bg/40 text-bg/90 hover:text-bg hover:border-bg/70 text-[10px] uppercase tracking-[0.14em] transition-colors"
                             >
                               <Github className="w-3 h-3" />
                               Source
@@ -323,11 +320,11 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                 transition={{ duration: 0.35 }}
               >
                 {active.question && (
-                  <p className="font-serif italic text-xl md:text-2xl leading-[1.35] text-fg text-balance max-w-2xl mb-4">
+                  <p className="text-xl md:text-2xl font-medium leading-[1.35] text-fg text-balance max-w-2xl mb-4">
                     {active.question}
                   </p>
                 )}
-                <p className="font-serif text-lg md:text-xl leading-[1.55] text-fg/80 text-pretty max-w-2xl">
+                <p className="text-lg md:text-xl leading-[1.55] text-fg/80 text-pretty max-w-2xl">
                   {active.description}
                 </p>
               </motion.div>
@@ -345,7 +342,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                     className="group flex items-center gap-4 text-left"
                   >
                     <span
-                      className={`font-mono text-[10px] tabular-nums transition-colors ${
+                      className={`text-[10px] tabular-nums transition-colors ${
                         isActive ? "text-accent" : "text-fg/35"
                       }`}
                     >
@@ -359,7 +356,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                       }`}
                     />
                     <span
-                      className={`font-serif text-sm md:text-base leading-tight transition-colors text-balance ${
+                      className={`text-sm md:text-base leading-tight transition-colors text-balance ${
                         isActive
                           ? "text-fg"
                           : "text-fg/45 group-hover:text-fg/80"

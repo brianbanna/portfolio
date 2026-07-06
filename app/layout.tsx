@@ -1,5 +1,5 @@
 import "../global.css";
-import { Inter, Source_Serif_4, JetBrains_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -11,9 +11,9 @@ export const metadata: Metadata = {
   description:
     "Quant Analyst Intern at Cargill. MSc Data Science with a minor in Financial Engineering at EPFL. Models that turn physical fundamentals into views on curves, spreads and regimes.",
   alternates: {
-    canonical: "https://brianbanna.com",
+    canonical: "https://brianbanna.com/",
   },
-  authors: [{ name: "Brian Banna", url: "https://brianbanna.com" }],
+  authors: [{ name: "Brian Banna", url: "https://brianbanna.com/" }],
   creator: "Brian Banna",
   publisher: "Brian Banna",
   keywords: [
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     title: "Brian Banna · Commodity Markets",
     description:
       "Quant Analyst Intern at Cargill. MSc Data Science with a minor in Financial Engineering at EPFL. Models that turn physical fundamentals into views on curves, spreads and regimes.",
-    url: "https://brianbanna.com",
+    url: "https://brianbanna.com/",
     siteName: "Brian Banna",
     images: [
       {
@@ -75,19 +75,35 @@ const inter = Inter({
   display: "swap",
 });
 
-const sourceSerif = Source_Serif_4({
-  subsets: ["latin"],
-  variable: "--font-serif",
-  display: "swap",
-  style: ["normal", "italic"],
-  weight: ["300", "400", "600"],
-});
+const profileSchema = {
+  "@context": "https://schema.org",
+  "@type": "ProfilePage",
+  mainEntity: {
+    "@type": "Person",
+    name: "Brian Banna",
+    jobTitle: "Quantitative Analyst Intern",
+    worksFor: { "@type": "Organization", name: "Cargill" },
+    alumniOf: { "@type": "CollegeOrUniversity", name: "EPFL" },
+    url: "https://brianbanna.com",
+    sameAs: [
+      "https://github.com/brianbanna",
+      "https://linkedin.com/in/brianbanna",
+    ],
+    knowsAbout: [
+      "Commodity markets",
+      "Futures curves",
+      "Systematic trading",
+      "Quantitative finance",
+    ],
+  },
+};
 
-const jetbrains = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-  display: "swap",
-});
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Brian Banna",
+  url: "https://brianbanna.com",
+};
 
 export default function RootLayout({
   children,
@@ -95,16 +111,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html
-      lang="en"
-      className={[
-        "dark",
-        inter.variable,
-        sourceSerif.variable,
-        jetbrains.variable,
-      ].join(" ")}
-    >
+    <html lang="en" className={inter.variable}>
       <body className="bg-bg text-fg font-sans antialiased selection:bg-accent/30 selection:text-fg">
+        <script
+          type="application/ld+json"
+          // rome-ignore lint/security/noDangerouslySetInnerHtml: static JSON-LD
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(profileSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          // rome-ignore lint/security/noDangerouslySetInnerHtml: static JSON-LD
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
         {children}
       </body>
     </html>

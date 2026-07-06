@@ -26,6 +26,9 @@ export const Navigation: React.FC<NavigationProps> = ({
   const [activeSection, setActiveSection] = useState("home");
   const [progress, setProgress] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  // On tall viewports the last section never reaches the observer band, so
+  // page bottom overrides the observer and forces the last section active.
+  const [atBottom, setAtBottom] = useState(false);
 
   useEffect(() => {
     let rafId = 0;
@@ -37,6 +40,7 @@ export const Navigation: React.FC<NavigationProps> = ({
         document.documentElement.scrollHeight - window.innerHeight;
       const p = docHeight > 0 ? scrollTop / docHeight : 0;
       setProgress(Math.max(0, Math.min(1, p)));
+      setAtBottom(docHeight > 0 && scrollTop >= docHeight - 2);
     };
     const onScroll = () => {
       if (pending) return;
@@ -68,6 +72,10 @@ export const Navigation: React.FC<NavigationProps> = ({
     });
     return () => observers.forEach((o) => o.disconnect());
   }, []);
+
+  const lastSectionId =
+    baseNavItems[baseNavItems.length - 1].href.slice(1);
+  const currentSection = atBottom ? lastSectionId : activeSection;
 
   const resolveHref = (href: string) =>
     href.startsWith("#") && !onHome ? `/${href}` : href;
@@ -105,26 +113,19 @@ export const Navigation: React.FC<NavigationProps> = ({
           <nav className="hidden md:flex items-center gap-1">
             {navItems.map((item) => {
               const isActive = item.href.startsWith("#")
-                ? onHome && activeSection === item.href.slice(1)
+                ? onHome && currentSection === item.href.slice(1)
                 : pathname.startsWith(item.href);
               return (
                 <Link
                   key={item.href}
                   href={resolveHref(item.href)}
                   onClick={(e) => handleClick(e, item.href)}
-                  className={`group relative px-4 py-2 font-mono text-[11px] tracking-[0.14em] uppercase transition-colors rounded-[2px] border before:absolute before:-inset-y-1.5 before:inset-x-0 before:content-[''] ${
+                  className={`group relative px-4 py-2 text-[11px] tracking-[0.14em] uppercase transition-colors rounded-[2px] border before:absolute before:-inset-y-1.5 before:inset-x-0 before:content-[''] ${
                     isActive
                       ? "border-fg/20 bg-fg/[0.05]"
                       : "border-transparent hover:border-fg/15 hover:bg-fg/[0.03]"
                   }`}
                 >
-                  <span
-                    className={`mr-1.5 tabular-nums ${
-                      isActive ? "text-accent" : "text-fg/35"
-                    } transition-colors`}
-                  >
-                    {item.num}
-                  </span>
                   <span
                     className={`${
                       isActive ? "text-fg" : "text-fg/55 group-hover:text-fg"
@@ -180,9 +181,6 @@ export const Navigation: React.FC<NavigationProps> = ({
                 onClick={(e) => handleClick(e, item.href)}
                 className="group flex items-baseline gap-5 py-2"
               >
-                <span className="font-mono text-xs text-accent tabular-nums">
-                  §{item.num}
-                </span>
                 <span className="display text-5xl text-fg transition-all">
                   {item.name}
                 </span>
