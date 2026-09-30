@@ -81,7 +81,7 @@ const profileSchema = {
   mainEntity: {
     "@type": "Person",
     name: "Brian Banna",
-    jobTitle: "Quantitative Analyst Intern",
+    jobTitle: "Quantitative Analyst",
     worksFor: { "@type": "Organization", name: "Cargill" },
     alumniOf: { "@type": "CollegeOrUniversity", name: "EPFL" },
     url: "https://brianbanna.com",
