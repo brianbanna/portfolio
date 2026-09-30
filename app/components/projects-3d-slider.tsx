@@ -37,10 +37,20 @@ const meta: Record<
     domain: "Commodity Futures",
     highlight: "19 markets · 2.4M obs · roll adjusted",
   },
-  "Adaptive Statistical Arbitrage in Commodity Spreads": {
-    tag: "Stat Arb / Cointegration",
-    domain: "Commodity Pairs",
-    highlight: "Cointegration · Kalman filter · Walk forward",
+  "Multi Leg Relative Value with Break Detection": {
+    tag: "Relative Value / Cointegration",
+    domain: "Commodity Baskets",
+    highlight: "In progress · Johansen · VECM · Break detection",
+  },
+  "Day Ahead Power Price Formation": {
+    tag: "Power Markets / Price Formation",
+    domain: "EPEX Day Ahead",
+    highlight: "In progress · EPEX · Merit order · with Axpo",
+  },
+  "Commodity Volatility Trading": {
+    tag: "Volatility / Options",
+    domain: "WTI Crude",
+    highlight: "In progress · OVX · HAR · Greeks",
   },
   AirJav: {
     tag: "Signal Processing",

@@ -64,10 +64,10 @@ export const AboutSection: React.FC = () => {
           <div className="col-span-12 md:col-span-8 lg:col-span-8">
             <div className="space-y-4 text-base leading-[1.62] text-fg/80 max-w-[64ch]">
               <p className="text-[19px] md:text-[21px] leading-[1.5] font-medium text-fg">
-                I'm a quant analyst at Cargill in Geneva, working on commodity
-                and power markets. I build models that read physical
-                fundamentals, storage, trade flows, inventories, and turn them
-                into positions on curves and spreads.
+                I'm a quant analyst on the freight trading desk at Cargill in
+                Geneva. I build models that read physical fundamentals in
+                freight, commodity and power markets, storage, trade flows,
+                inventories, and turn them into positions on curves and spreads.
               </p>
 
               <p>

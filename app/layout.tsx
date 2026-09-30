@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     template: "%s | Brian Banna",
   },
   description:
-    "Quant Analyst Intern at Cargill. MSc Data Science with a minor in Financial Engineering at EPFL. Models that turn physical fundamentals into views on curves, spreads and regimes.",
+    "Quant analyst on the freight trading desk at Cargill. MSc Data Science with a minor in Financial Engineering at EPFL. Models that turn physical fundamentals into views on curves, spreads and positioning.",
   alternates: {
     canonical: "https://brianbanna.com/",
   },
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Brian Banna · Commodity Markets",
     description:
-      "Quant Analyst Intern at Cargill. MSc Data Science with a minor in Financial Engineering at EPFL. Models that turn physical fundamentals into views on curves, spreads and regimes.",
+      "Quant analyst on the freight trading desk at Cargill. MSc Data Science with a minor in Financial Engineering at EPFL. Models that turn physical fundamentals into views on curves, spreads and positioning.",
     url: "https://brianbanna.com/",
     siteName: "Brian Banna",
     images: [
@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Brian Banna · Commodity Markets",
     description:
-      "Quant Analyst Intern at Cargill. MSc Data Science with a minor in Financial Engineering at EPFL. Models that turn physical fundamentals into views on curves, spreads and regimes.",
+      "Quant analyst on the freight trading desk at Cargill. MSc Data Science with a minor in Financial Engineering at EPFL. Models that turn physical fundamentals into views on curves, spreads and positioning.",
     images: ["https://brianbanna.com/og-home.png"],
   },
   icons: {

@@ -32,8 +32,8 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
           Selected work
         </h2>
         <p className="mt-6 max-w-xl text-lg text-fg/60 leading-relaxed">
-          Projects across European power markets, futures curve factors,
-          commodity spreads and market regime detection.
+          Projects across commodity relative value, power price formation,
+          volatility, futures curve factors and market regime detection.
         </p>
       </div>
 

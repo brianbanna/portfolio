@@ -44,9 +44,9 @@ export const HeroSection: React.FC = () => {
           {/* Tagline */}
           <div className="mt-14 md:mt-20 opacity-0 animate-[fade-up_1.2s_cubic-bezier(0.2,0.8,0.2,1)_0.8s_forwards]">
             <p className="text-xl md:text-2xl lg:text-[26px] leading-[1.45] text-fg/85 text-pretty max-w-3xl">
-              I'm a quant analyst at Cargill, working on commodity and power
-              markets. I turn supply and demand into views on futures curves
-              and spreads.
+              I'm a quant analyst on the freight trading desk at Cargill in
+              Geneva. I turn physical fundamentals into views on futures
+              curves, spreads and positioning.
             </p>
           </div>
         </div>

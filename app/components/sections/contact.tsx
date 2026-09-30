@@ -69,7 +69,7 @@ export const ContactSection: React.FC = () => {
             Get in touch
           </h2>
           <p className="mt-8 max-w-xl text-xl md:text-2xl text-fg/65 leading-[1.5]">
-            Happy to talk about commodity markets, models or project work.
+            Happy to talk about commodity and freight markets, models or project work.
           </p>
         </div>
 
