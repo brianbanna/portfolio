@@ -41,7 +41,7 @@ export const Footer: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleEmailClick}
-                  className="relative link-draw hover:text-fg before:absolute before:-inset-y-3 before:inset-x-0 before:content-['']"
+                  className="relative link-draw hover:text-fg before:absolute before:-inset-y-3 before:-inset-x-2 before:content-['']"
                 >
                   Email
                 </button>
@@ -51,7 +51,7 @@ export const Footer: React.FC = () => {
                   href="https://linkedin.com/in/brianbanna"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="relative link-draw hover:text-fg before:absolute before:-inset-y-3 before:inset-x-0 before:content-['']"
+                  className="relative link-draw hover:text-fg before:absolute before:-inset-y-3 before:-inset-x-2 before:content-['']"
                 >
                   LinkedIn
                 </a>
@@ -61,7 +61,7 @@ export const Footer: React.FC = () => {
                   href="https://github.com/brianbanna"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="relative link-draw hover:text-fg before:absolute before:-inset-y-3 before:inset-x-0 before:content-['']"
+                  className="relative link-draw hover:text-fg before:absolute before:-inset-y-3 before:-inset-x-2 before:content-['']"
                 >
                   GitHub
                 </a>

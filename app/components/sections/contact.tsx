@@ -87,7 +87,7 @@ export const ContactSection: React.FC = () => {
                     {c.num}
                   </div>
                   <div className="min-w-0 md:col-span-10 md:grid md:grid-cols-10 md:gap-6 md:items-center">
-                    <div className="md:col-span-3 text-[10px] sm:text-[11px] uppercase tracking-[0.16em] sm:tracking-[0.18em] text-fg/55 group-hover:text-fg transition-colors">
+                    <div className="md:col-span-3 text-[10px] sm:text-[11px] uppercase tracking-[0.16em] sm:tracking-[0.18em] text-fg/60 group-hover:text-fg transition-colors">
                       {c.label}
                     </div>
                     <div className="md:col-span-7 display text-[18px] sm:text-2xl md:text-[32px] text-fg/90 group-hover:text-fg tracking-tight leading-tight break-words">

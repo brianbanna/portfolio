@@ -82,7 +82,7 @@ export default function NotePage({ params }: { params: { slug: string } }) {
             {note.title}
           </h1>
 
-          <div className="mt-8 flex flex-wrap items-baseline gap-x-5 gap-y-2 text-[11px] uppercase tracking-[0.16em] text-fg/55">
+          <div className="mt-8 flex flex-wrap items-baseline gap-x-5 gap-y-2 text-[11px] uppercase tracking-[0.16em] text-fg/60">
             <span className="tabular-nums">
               {dateFmt.format(new Date(note.date))}
             </span>
@@ -106,7 +106,7 @@ export default function NotePage({ params }: { params: { slug: string } }) {
 
           <div className="hairline my-12" />
 
-          <p className="text-[11px] uppercase tracking-[0.16em] text-fg/55">
+          <p className="text-[11px] uppercase tracking-[0.16em] text-fg/60">
             Personal market notes based on public information only. Not
             investment advice.
           </p>
@@ -114,7 +114,7 @@ export default function NotePage({ params }: { params: { slug: string } }) {
           <div className="mt-12">
             <Link
               href="/notes"
-              className="text-[11px] uppercase tracking-[0.18em] text-fg/55 hover:text-fg transition-colors link-draw"
+              className="text-[11px] uppercase tracking-[0.18em] text-fg/60 hover:text-fg transition-colors link-draw"
             >
               All notes
             </Link>

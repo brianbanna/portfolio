@@ -277,7 +277,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
               onClick={() => setIsPaused((p) => !p)}
               aria-pressed={isPaused}
               aria-label={isPaused ? "Resume autoplay" : "Pause autoplay"}
-              className="p-4 -m-4 text-fg/55 hover:text-fg transition-colors"
+              className="p-4 -m-4 text-fg/60 hover:text-fg transition-colors"
             >
               {isPaused ? (
                 <Play className="w-3 h-3" />
@@ -290,7 +290,8 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
       </div>
 
       {/* 3D carousel stage */}
-      <div className="relative w-full h-[320px] sm:h-[500px] md:h-[620px] flex items-center justify-center overflow-hidden">
+      {/* Phones clip only sideways so the card shadow is not cut by the short stage */}
+      <div className="relative w-full h-[320px] sm:h-[500px] md:h-[620px] flex items-center justify-center overflow-x-clip sm:overflow-hidden">
         {/* Side fade masks — edge strips only, so the active card is never veiled; off on phones where the side cards are already out of frame */}
         <div className="hidden sm:block absolute inset-y-0 left-0 w-10 md:w-20 lg:w-40 xl:w-56 bg-gradient-to-r from-bg to-transparent z-20 pointer-events-none" />
         <div className="hidden sm:block absolute inset-y-0 right-0 w-10 md:w-20 lg:w-40 xl:w-56 bg-gradient-to-l from-bg to-transparent z-20 pointer-events-none" />
@@ -333,7 +334,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                     <img
                       src={slide.image}
                       alt={slide.imageAlt || slide.title}
-                      loading={isActive ? "eager" : "lazy"}
+                      loading="lazy"
                       decoding="async"
                       className={`w-full h-full object-cover transition-all duration-[1200ms] ${
                         isActive
@@ -488,11 +489,11 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                     type="button"
                     onClick={() => goTo(i)}
                     aria-current={isActive ? "true" : undefined}
-                    className="group flex items-center gap-4 text-left py-2 md:py-0"
+                    className="group flex items-center gap-4 text-left min-h-[44px] md:min-h-0"
                   >
                     <span
                       className={`text-[10px] tabular-nums transition-colors ${
-                        isActive ? "text-accent" : "text-fg/35"
+                        isActive ? "text-accent" : "text-fg/60"
                       }`}
                     >
                       {String(i + 1).padStart(2, "0")}

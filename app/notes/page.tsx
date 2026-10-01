@@ -62,7 +62,7 @@ export default function NotesPage() {
                 href={`/notes/${note.slug}`}
                 className="group grid grid-cols-12 gap-3 md:gap-6 py-7 md:py-8 border-b border-fg/15 transition-colors hover:bg-fg/[0.02] items-baseline"
               >
-                <div className="col-span-12 md:col-span-2 text-[11px] uppercase tracking-[0.16em] text-fg/55 tabular-nums">
+                <div className="col-span-12 md:col-span-2 text-[11px] uppercase tracking-[0.16em] text-fg/60 tabular-nums">
                   {dateFmt.format(new Date(note.date))}
                 </div>
                 <div className="col-span-12 md:col-span-7">
@@ -74,7 +74,7 @@ export default function NotesPage() {
                   </p>
                 </div>
                 <div className="col-span-12 md:col-span-3 flex md:justify-end">
-                  <span className="text-[10px] uppercase tracking-[0.16em] text-fg/55 border border-fg/15 px-2 py-1">
+                  <span className="text-[10px] uppercase tracking-[0.16em] text-fg/60 border border-fg/15 px-2 py-1">
                     {note.market}
                   </span>
                 </div>

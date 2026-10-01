@@ -11,6 +11,11 @@ ErrorDocument 404 /404.html
 # Types Apache does not know by default (showcase map data)
 AddType application/json .topojson
 
+# The host compresses text and js but no JSON; the showcase data files are up to 182 KB
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE application/json
+</IfModule>
+
 <IfModule mod_headers.c>
   Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
   Header always set X-Content-Type-Options "nosniff"
@@ -21,8 +26,8 @@ AddType application/json .topojson
   # revalidated on every load. Unhashed media is cached for a week; that includes
   # the showcase data files (json, topojson, csv), so a data refresh needs a new
   # file name to reach returning visitors within the week.
-  <FilesMatch "\.html$">
-    Header set Cache-Control "no-cache"
+  <FilesMatch "\.(html|txt|xml)$">
+    Header always set Cache-Control "no-cache"
   </FilesMatch>
   <FilesMatch "\.(jpe?g|png|svg|webp|woff2?|json|topojson|csv)$">
     Header set Cache-Control "public, max-age=604800"

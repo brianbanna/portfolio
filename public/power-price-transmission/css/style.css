@@ -3582,3 +3582,10 @@ body.is-iris-firing .scene__map::before {
         z-index: 2;
     }
 }
+
+/* The generic .scene__map svg sizing rule (width and height 100%) also hit the
+   legend's inline svg and stretched it to the map's size; restore its own box. */
+.arrow-legend svg {
+    width: 32px;
+    height: 10px;
+}
