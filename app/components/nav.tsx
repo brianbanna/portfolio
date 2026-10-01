@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Menu, X } from "lucide-react";
 
 const baseNavItems = [
@@ -26,9 +26,35 @@ export const Navigation: React.FC<NavigationProps> = ({
   const [activeSection, setActiveSection] = useState("home");
   const [progress, setProgress] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const firstMenuLinkRef = useRef<HTMLAnchorElement>(null);
   // On tall viewports the last section never reaches the observer band, so
   // page bottom overrides the observer and forces the last section active.
   const [atBottom, setAtBottom] = useState(false);
+
+  // Open menu behaves like a dialog: page scroll locked, Escape closes, focus
+  // moves in and back out, and it closes itself if the viewport grows past md.
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileMenuOpen(false);
+    };
+    const mq = window.matchMedia("(min-width: 768px)");
+    const onMq = (e: MediaQueryListEvent) => {
+      if (e.matches) setMobileMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    mq.addEventListener("change", onMq);
+    firstMenuLinkRef.current?.focus({ preventScroll: true });
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKey);
+      mq.removeEventListener("change", onMq);
+      toggleRef.current?.focus({ preventScroll: true });
+    };
+  }, [mobileMenuOpen]);
 
   useEffect(() => {
     let rafId = 0;
@@ -89,8 +115,14 @@ export const Navigation: React.FC<NavigationProps> = ({
       return;
     }
     e.preventDefault();
-    const el = document.querySelector(href);
-    if (el) el.scrollIntoView({ behavior: "smooth" });
+    const el = document.querySelector<HTMLElement>(href);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+      // Keep native anchor semantics: URL hash updates and focus lands in the section
+      window.history.pushState(null, "", href);
+      if (!el.hasAttribute("tabindex")) el.setAttribute("tabindex", "-1");
+      el.focus({ preventScroll: true });
+    }
     setMobileMenuOpen(false);
   };
 
@@ -110,7 +142,7 @@ export const Navigation: React.FC<NavigationProps> = ({
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav aria-label="Primary" className="hidden md:flex items-center gap-1">
             {navItems.map((item) => {
               const isActive = item.href.startsWith("#")
                 ? onHome && currentSection === item.href.slice(1)
@@ -128,7 +160,7 @@ export const Navigation: React.FC<NavigationProps> = ({
                 >
                   <span
                     className={`${
-                      isActive ? "text-fg" : "text-fg/55 group-hover:text-fg"
+                      isActive ? "text-fg" : "text-fg/60 group-hover:text-fg"
                     } transition-colors`}
                   >
                     {item.name}
@@ -141,9 +173,13 @@ export const Navigation: React.FC<NavigationProps> = ({
           {/* Right cluster */}
           <div className="flex items-center">
             <button
+              ref={toggleRef}
+              type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="md:hidden text-fg p-[11px] -m-[7px]"
               aria-label="Toggle menu"
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-menu"
             >
               {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
@@ -171,12 +207,19 @@ export const Navigation: React.FC<NavigationProps> = ({
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-40 md:hidden bg-bg/98 backdrop-blur-xl">
-          <div className="flex flex-col items-start justify-center h-full gap-1 px-8">
+        <div
+          id="mobile-menu"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Navigation"
+          className="fixed inset-0 z-40 md:hidden bg-bg/[0.98] backdrop-blur-xl"
+        >
+          <nav className="flex flex-col items-start justify-center h-full gap-1 px-8">
             <div className="label mb-8">Navigation</div>
-            {navItems.map((item) => (
+            {navItems.map((item, i) => (
               <Link
                 key={item.href}
+                ref={i === 0 ? firstMenuLinkRef : undefined}
                 href={resolveHref(item.href)}
                 onClick={(e) => handleClick(e, item.href)}
                 className="group flex items-baseline gap-5 py-2"
@@ -186,7 +229,7 @@ export const Navigation: React.FC<NavigationProps> = ({
                 </span>
               </Link>
             ))}
-          </div>
+          </nav>
         </div>
       )}
     </>

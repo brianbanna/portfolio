@@ -62,7 +62,8 @@
     line-height: 1.4;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: rgb(var(--color-fg) / 0.55);
+    /* 0.6 is the lowest alpha of ink on paper that clears 4.5:1 */
+    color: rgb(var(--color-fg) / 0.6);
   }
 
   /* Display headline - Inter, hierarchy from weight and size */
@@ -174,6 +175,8 @@
   *::before,
   *::after {
     animation-duration: 0.001ms !important;
+    /* Delays must go too, or opacity-0 entrance elements stay invisible for the delay */
+    animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;

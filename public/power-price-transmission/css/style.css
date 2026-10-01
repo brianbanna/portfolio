@@ -3554,3 +3554,31 @@ body.is-iris-firing .scene__map::before {
         transform: none !important;
     }
 }
+
+/* ---------- Pointer and phone layout fixes ---------- */
+
+/* The explorer is a transparent 100dvh layer above the sticky map. Without this,
+   every click inside it landed on the section itself and never on a country,
+   so the detail sidebar was unreachable by pointer. The narrative section already
+   passes pointer events through; interactive chrome opts back in. */
+.scene__explorer {
+    pointer-events: none;
+}
+.explorer__intro,
+.explorer__timeline-wrap,
+.timeline,
+.explorer__sidebar {
+    pointer-events: auto;
+}
+
+@media (max-width: 900px) {
+    /* Map chrome kept its desktop placement on phones and painted over the
+       narrative cards: the legend caption clipped at the viewport edge and the
+       clock sat on the step 4 heatmap. Hide the legend; let cards pass over the clock. */
+    .arrow-legend {
+        display: none;
+    }
+    .map-clock {
+        z-index: 2;
+    }
+}

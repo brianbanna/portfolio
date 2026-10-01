@@ -1,6 +1,10 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Link from "next/link";
+
+// Inlined at build time (next.config.mjs env) so server HTML and the first
+// client render agree; new Date() at render time mismatched across new year.
+const BUILD_YEAR = process.env.NEXT_PUBLIC_BUILD_YEAR ?? "2026";
 
 // Assembled from parts so the minifier cannot fold it into a literal.
 const getEmail = () => {
@@ -16,14 +20,8 @@ const handleEmailClick = (e: React.MouseEvent) => {
 };
 
 export const Footer: React.FC = () => {
-  const [year, setYear] = useState<number>(new Date().getFullYear());
-
-  useEffect(() => {
-    setYear(new Date().getFullYear());
-  }, []);
-
   return (
-    <footer className="relative bg-bg section-rail overflow-hidden">
+    <footer className="relative bg-bg section-rail">
       {/* Colophon row: modest italic serif mark + mono meta */}
       <div className="editorial pt-14 md:pt-16 pb-10 md:pb-12">
         <div className="flex flex-wrap items-baseline justify-between gap-x-10 gap-y-6">
@@ -38,6 +36,7 @@ export const Footer: React.FC = () => {
             <ul className="flex items-baseline gap-5 text-[13px] text-fg/70">
               <li>
                 <button
+                  type="button"
                   onClick={handleEmailClick}
                   className="relative link-draw hover:text-fg before:absolute before:-inset-y-3 before:inset-x-0 before:content-['']"
                 >
@@ -71,7 +70,7 @@ export const Footer: React.FC = () => {
 
       {/* Bottom bar */}
       <div className="editorial pt-6 pb-8 border-t border-fg/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 label">
-        <span>© {year} Brian Banna</span>
+        <span>© {BUILD_YEAR} Brian Banna</span>
         <span>All rights reserved</span>
       </div>
     </footer>

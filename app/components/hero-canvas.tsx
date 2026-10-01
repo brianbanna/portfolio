@@ -97,6 +97,11 @@ export const HeroCanvas: React.FC<{
 
     let raf = 0;
     let startTime = performance.now();
+    // The loop only runs while the hero is on screen in a visible tab; the
+    // clock is shifted on resume so the curves continue instead of jumping.
+    let running = false;
+    let pausedAt = 0;
+    let inView = true;
 
     const draw = (now: number) => {
       const t = prefersReduced ? 0 : now - startTime;
@@ -196,13 +201,54 @@ export const HeroCanvas: React.FC<{
 
       ctx.shadowBlur = 0;
 
-      if (!prefersReduced) raf = requestAnimationFrame(draw);
+      if (!prefersReduced && running) raf = requestAnimationFrame(draw);
     };
 
-    raf = requestAnimationFrame(draw);
+    const start = () => {
+      if (running) return;
+      running = true;
+      if (pausedAt) {
+        startTime += performance.now() - pausedAt;
+        pausedAt = 0;
+      }
+      raf = requestAnimationFrame(draw);
+    };
+    const stop = () => {
+      if (!running) return;
+      running = false;
+      pausedAt = performance.now();
+      cancelAnimationFrame(raf);
+    };
+    const sync = () => {
+      if (inView && document.visibilityState === "visible") start();
+      else stop();
+    };
+
+    if (prefersReduced) {
+      // One static frame, no loop
+      raf = requestAnimationFrame(draw);
+    } else {
+      sync();
+    }
+
+    const observer =
+      typeof IntersectionObserver !== "undefined"
+        ? new IntersectionObserver(([entry]) => {
+            inView = entry.isIntersecting;
+            if (!prefersReduced) sync();
+          })
+        : null;
+    observer?.observe(canvas);
+    const onVisibility = () => {
+      if (!prefersReduced) sync();
+    };
+    document.addEventListener("visibilitychange", onVisibility);
 
     return () => {
+      running = false;
       cancelAnimationFrame(raf);
+      observer?.disconnect();
+      document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener("resize", resize);
     };
   }, []);

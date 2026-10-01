@@ -2,12 +2,13 @@ import { MetadataRoute } from "next";
 
 const baseUrl = "https://brianbanna.com";
 
-// lastModified = each page's last meaningful content commit
+// lastModified = each page's last meaningful content commit; the homepage is
+// regenerated every build, so it carries the build date
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
       url: `${baseUrl}/`,
-      lastModified: new Date("2026-07-03"),
+      lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 1,
     },

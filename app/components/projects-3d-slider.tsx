@@ -1,7 +1,19 @@
 "use client";
-import { useState, useCallback, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, ArrowUpRight, Github } from "lucide-react";
+import { useState, useCallback, useEffect, useRef } from "react";
+import {
+  motion,
+  AnimatePresence,
+  useReducedMotion,
+  type Transition,
+} from "framer-motion";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ArrowUpRight,
+  Github,
+  Pause,
+  Play,
+} from "lucide-react";
 
 interface ProjectData {
   title: string;
@@ -59,9 +71,20 @@ const meta: Record<
   },
 };
 
+const AUTOPLAY_MS = 5000;
+
 export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  // Explicit user pause: auto updating content needs a control (WCAG 2.2.2)
+  const [isPaused, setIsPaused] = useState(false);
+  // Autoplay only runs while the slider is on screen
+  const [inView, setInView] = useState(true);
+  // Bumped on every manual navigation so the autoplay timer restarts from 0
+  // instead of firing right after the click
+  const [autoplayKey, setAutoplayKey] = useState(0);
+  const reduceMotion = useReducedMotion();
+  const rootRef = useRef<HTMLDivElement>(null);
 
   const slides = projects.map((p, i) => ({ ...p, id: i }));
 
@@ -73,11 +96,65 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
     setCurrentIndex((prev) => (prev - 1 + slides.length) % slides.length);
   }, [slides.length]);
 
+  const restartAutoplay = () => setAutoplayKey((k) => k + 1);
+  const goNext = () => {
+    slideNext();
+    restartAutoplay();
+  };
+  const goPrev = () => {
+    slidePrev();
+    restartAutoplay();
+  };
+  const goTo = (index: number) => {
+    setCurrentIndex(index);
+    restartAutoplay();
+  };
+
   useEffect(() => {
-    if (isHovered || slides.length === 0) return;
-    const interval = setInterval(slideNext, 5000);
+    if (isHovered || isPaused || !inView || reduceMotion || slides.length < 2)
+      return;
+    const interval = setInterval(() => {
+      // Background tabs throttle timers; skip those ticks so no burst fires on return
+      if (document.visibilityState === "visible") slideNext();
+    }, AUTOPLAY_MS);
     return () => clearInterval(interval);
-  }, [isHovered, slides.length, slideNext]);
+    // autoplayKey is a deliberate dependency: it restarts the timer on manual navigation
+  }, [
+    isHovered,
+    isPaused,
+    inView,
+    reduceMotion,
+    slides.length,
+    slideNext,
+    autoplayKey,
+  ]);
+
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { threshold: 0.2 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "ArrowRight") {
+      e.preventDefault();
+      goNext();
+    } else if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      goPrev();
+    }
+  };
+
+  const cardTransition: Transition = reduceMotion
+    ? { duration: 0 }
+    : { type: "spring", stiffness: 260, damping: 32, mass: 1 };
+  const fade = (duration: number): Transition =>
+    reduceMotion ? { duration: 0 } : { duration };
 
   const getSlideStyle = (index: number) => {
     const total = slides.length;
@@ -129,34 +206,39 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
 
   return (
     <div
+      ref={rootRef}
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Selected work"
       className="relative w-full"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onKeyDown={onKeyDown}
     >
       {/* Metadata header — reads like a research plate caption */}
       <div className="editorial mb-8 md:mb-10">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div className="flex items-center gap-5 label">
             <span className="text-accent tabular-nums">({activeNum})</span>
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="wait" initial={false}>
               <motion.span
                 key={active.title + "tag"}
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.3 }}
+                exit={{ opacity: 0, y: -6, transition: fade(0.12) }}
+                transition={fade(0.3)}
               >
                 {activeMeta?.tag || "Project"}
               </motion.span>
             </AnimatePresence>
-            <span className="text-fg/25">/</span>
-            <AnimatePresence mode="wait">
+            <span className="text-fg/25 hidden md:inline">/</span>
+            <AnimatePresence mode="wait" initial={false}>
               <motion.span
                 key={active.title + "domain"}
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.3 }}
+                exit={{ opacity: 0, y: -6, transition: fade(0.12) }}
+                transition={fade(0.3)}
                 className="hidden md:inline"
               >
                 {activeMeta?.domain}
@@ -164,17 +246,32 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
             </AnimatePresence>
           </div>
           <div className="flex items-center gap-6 label tabular-nums">
-            <span>
-              {activeNum} / {total}
+            {/* Single text node so a live announcement reads the whole counter */}
+            <span aria-live={isPaused ? "polite" : "off"}>
+              {`${activeNum} / ${total}`}
             </span>
+            <button
+              type="button"
+              onClick={() => setIsPaused((p) => !p)}
+              aria-pressed={isPaused}
+              aria-label={isPaused ? "Resume autoplay" : "Pause autoplay"}
+              className="p-4 -m-4 text-fg/55 hover:text-fg transition-colors"
+            >
+              {isPaused ? (
+                <Play className="w-3 h-3" />
+              ) : (
+                <Pause className="w-3 h-3" />
+              )}
+            </button>
           </div>
         </div>
       </div>
 
       {/* 3D carousel stage */}
-      <div className="relative w-full h-[420px] sm:h-[500px] md:h-[620px] flex items-center justify-center overflow-hidden">
-        {/* Side fade masks */}
-        <div className="absolute inset-0 bg-gradient-to-r from-bg via-transparent to-bg z-20 pointer-events-none" />
+      <div className="relative w-full h-[320px] sm:h-[500px] md:h-[620px] flex items-center justify-center overflow-hidden">
+        {/* Side fade masks — edge strips only, so the active card is never veiled; off on phones where the side cards are already out of frame */}
+        <div className="hidden sm:block absolute inset-y-0 left-0 w-10 md:w-20 lg:w-40 xl:w-56 bg-gradient-to-r from-bg to-transparent z-20 pointer-events-none" />
+        <div className="hidden sm:block absolute inset-y-0 right-0 w-10 md:w-20 lg:w-40 xl:w-56 bg-gradient-to-l from-bg to-transparent z-20 pointer-events-none" />
 
         <div
           className="relative w-full h-full flex items-center justify-center"
@@ -195,16 +292,12 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                   scale: style.scale,
                   opacity: style.opacity,
                 }}
-                transition={{
-                  type: "spring",
-                  stiffness: 260,
-                  damping: 32,
-                  mass: 1,
-                }}
+                transition={cardTransition}
                 style={{
                   zIndex: isActive ? 15 : style.zIndex,
                   pointerEvents: isActive ? "auto" : "none",
                 }}
+                aria-hidden={!isActive}
               >
                 <div
                   className="relative w-[310px] sm:w-[400px] md:w-[600px] aspect-[4/3] overflow-hidden group bg-paper border border-fg/15"
@@ -235,8 +328,9 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                     </div>
                   )}
 
-                  {/* Editorial scrim — dark like the preview artwork, not the page ground */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[rgb(20_18_15/0.92)] via-[rgb(20_18_15/0.15)] to-transparent pointer-events-none" />
+                  {/* Editorial scrim — dark like the preview artwork, not the page ground;
+                      mid stop at 0.4 keeps the title legible on bright artwork */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[rgb(20_18_15/0.92)] via-[rgb(20_18_15/0.4)] to-transparent pointer-events-none" />
                   {/* Top scrim so the counter stays legible on light artwork */}
                   <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-[rgb(20_18_15/0.75)] to-transparent pointer-events-none" />
 
@@ -245,49 +339,54 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                     {String(index + 1).padStart(2, "0")} / {total}
                   </div>
 
-                  {/* Title + actions only on active */}
+                  {/* Title + actions. The action block stays mounted on every card and
+                      only fades, so the title does not jump when a card becomes active */}
                   <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7">
                     <h3 className="display text-xl md:text-3xl text-bg leading-[1] mb-2 text-balance">
                       {slide.title}
                     </h3>
-                    {isActive && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.15 }}
-                      >
-                        {meta[slide.title]?.highlight && (
-                          <div className="mb-3 flex items-center gap-2 text-[10px] text-bg/80 uppercase tracking-wide">
-                            <span className="w-5 h-px bg-accent" />
-                            {meta[slide.title]?.highlight}
-                          </div>
-                        )}
-                        <div className="flex items-center gap-2">
-                          {slide.url && (
-                            <a
-                              href={slide.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="group/btn inline-flex items-center gap-1.5 px-3 py-1.5 bg-bg text-fg text-[10px] uppercase tracking-[0.14em] hover:bg-accent hover:text-bg transition-colors"
-                            >
-                              Live
-                              <ArrowUpRight className="w-3 h-3" />
-                            </a>
-                          )}
-                          {slide.repository && (
-                            <a
-                              href={`https://github.com/${slide.repository}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-bg/40 text-bg/90 hover:text-bg hover:border-bg/70 text-[10px] uppercase tracking-[0.14em] transition-colors"
-                            >
-                              <Github className="w-3 h-3" />
-                              Source
-                            </a>
-                          )}
+                    <motion.div
+                      initial={false}
+                      animate={{ opacity: isActive ? 1 : 0, y: isActive ? 0 : 8 }}
+                      transition={
+                        reduceMotion
+                          ? { duration: 0 }
+                          : { duration: 0.3, delay: isActive ? 0.15 : 0 }
+                      }
+                    >
+                      {meta[slide.title]?.highlight && (
+                        <div className="mb-3 flex items-center gap-2 text-[10px] text-bg/80 uppercase tracking-wide">
+                          <span className="w-5 h-px bg-accent" />
+                          {meta[slide.title]?.highlight}
                         </div>
-                      </motion.div>
-                    )}
+                      )}
+                      <div className="flex items-center gap-2">
+                        {slide.url && (
+                          <a
+                            href={slide.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            tabIndex={isActive ? 0 : -1}
+                            className="group/btn inline-flex items-center gap-1.5 px-3 py-1.5 bg-bg text-fg text-[10px] uppercase tracking-[0.14em] hover:bg-accent hover:text-bg transition-colors"
+                          >
+                            Live
+                            <ArrowUpRight className="w-3 h-3" />
+                          </a>
+                        )}
+                        {slide.repository && (
+                          <a
+                            href={`https://github.com/${slide.repository}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            tabIndex={isActive ? 0 : -1}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-bg/40 text-bg/90 hover:text-bg hover:border-bg/70 text-[10px] uppercase tracking-[0.14em] transition-colors"
+                          >
+                            <Github className="w-3 h-3" />
+                            Source
+                          </a>
+                        )}
+                      </div>
+                    </motion.div>
                   </div>
 
                   {/* Active accent line */}
@@ -300,18 +399,20 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
           })}
         </div>
 
-        {/* Nav buttons */}
+        {/* Nav buttons — 44px tap targets */}
         <button
-          onClick={slidePrev}
-          className="absolute left-2 md:left-8 z-30 p-2.5 border border-fg/20 bg-bg/60 backdrop-blur-sm hover:bg-fg/10 hover:border-fg/50 transition-all"
-          aria-label="Previous"
+          type="button"
+          onClick={goPrev}
+          className="absolute left-2 md:left-8 z-30 p-3.5 border border-fg/20 bg-bg/60 backdrop-blur-sm hover:bg-fg/10 hover:border-fg/50 transition-all"
+          aria-label="Previous project"
         >
-          <ChevronLeft className="w-4 h-4 text-fg/70 group-hover:text-fg" />
+          <ChevronLeft className="w-4 h-4 text-fg/70" />
         </button>
         <button
-          onClick={slideNext}
-          className="absolute right-2 md:right-8 z-30 p-2.5 border border-fg/20 bg-bg/60 backdrop-blur-sm hover:bg-fg/10 hover:border-fg/50 transition-all"
-          aria-label="Next"
+          type="button"
+          onClick={goNext}
+          className="absolute right-2 md:right-8 z-30 p-3.5 border border-fg/20 bg-bg/60 backdrop-blur-sm hover:bg-fg/10 hover:border-fg/50 transition-all"
+          aria-label="Next project"
         >
           <ChevronRight className="w-4 h-4 text-fg/70" />
         </button>
@@ -320,25 +421,32 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
       {/* Footer: description + indicator rail */}
       <div className="editorial mt-8 md:mt-12">
         <div className="grid grid-cols-12 gap-6 md:gap-10 items-start">
-          <div className="col-span-12 md:col-span-7">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={active.title + "desc"}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.35 }}
-              >
-                {active.question && (
-                  <p className="text-xl md:text-2xl font-medium leading-[1.35] text-fg text-balance max-w-2xl mb-4">
-                    {active.question}
+          {/* Every caption is stacked in one grid cell so the block keeps the height of
+              the tallest one: no layout jump below the slider on each change */}
+          <div className="col-span-12 md:col-span-7 grid">
+            {slides.map((s, i) => {
+              const isActive = i === currentIndex;
+              return (
+                <motion.div
+                  key={s.id}
+                  className="[grid-area:1/1]"
+                  initial={false}
+                  animate={{ opacity: isActive ? 1 : 0, y: isActive ? 0 : 8 }}
+                  transition={fade(0.35)}
+                  style={{ pointerEvents: isActive ? "auto" : "none" }}
+                  aria-hidden={!isActive}
+                >
+                  {s.question && (
+                    <p className="text-xl md:text-2xl font-medium leading-[1.35] text-fg text-balance max-w-2xl mb-4">
+                      {s.question}
+                    </p>
+                  )}
+                  <p className="text-lg md:text-xl leading-[1.55] text-fg/80 text-pretty max-w-2xl">
+                    {s.description}
                   </p>
-                )}
-                <p className="text-lg md:text-xl leading-[1.55] text-fg/80 text-pretty max-w-2xl">
-                  {active.description}
-                </p>
-              </motion.div>
-            </AnimatePresence>
+                </motion.div>
+              );
+            })}
           </div>
           <div className="col-span-12 md:col-span-5 flex flex-col gap-4">
             <div className="label">Index</div>
@@ -348,8 +456,10 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                 return (
                   <button
                     key={s.id}
-                    onClick={() => setCurrentIndex(i)}
-                    className="group flex items-center gap-4 text-left"
+                    type="button"
+                    onClick={() => goTo(i)}
+                    aria-current={isActive ? "true" : undefined}
+                    className="group flex items-center gap-4 text-left py-2 md:py-0"
                   >
                     <span
                       className={`text-[10px] tabular-nums transition-colors ${
@@ -369,7 +479,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                       className={`text-sm md:text-base leading-tight transition-colors text-balance ${
                         isActive
                           ? "text-fg"
-                          : "text-fg/45 group-hover:text-fg/80"
+                          : "text-fg/60 group-hover:text-fg/85"
                       }`}
                     >
                       {s.title}

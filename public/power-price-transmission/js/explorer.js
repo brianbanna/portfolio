@@ -616,6 +616,9 @@ export function initExplorer(config) {
     if (sidebar) {
         document.querySelectorAll(".country").forEach((el) => {
             const toggle = () => {
+                // Country detail belongs to the explorer. The narrative passes
+                // pointer events through to the map, so ignore clicks from there.
+                if (!state.active) return;
                 const iso = el.getAttribute("data-iso");
                 if (!iso) return;
                 if (sidebarActiveCountry === iso) {

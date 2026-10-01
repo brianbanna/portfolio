@@ -5,12 +5,33 @@ RewriteCond %{HTTPS} !=on [OR]
 RewriteCond %{HTTP_HOST} ^www\. [NC]
 RewriteRule ^ https://brianbanna.com%{REQUEST_URI} [R=301,L]
 
+# Static export: unknown paths must get Next's 404 page, not Apache's default
+ErrorDocument 404 /404.html
+
+# Types Apache does not know by default (showcase map data)
+AddType application/json .topojson
+
 <IfModule mod_headers.c>
   Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
   Header always set X-Content-Type-Options "nosniff"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
   Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=()"
+
+  # HTML names the hashed chunks and old chunks disappear on deploy, so HTML is
+  # revalidated on every load. Unhashed media is cached for a week.
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+  <FilesMatch "\.(jpe?g|png|svg|webp|woff2?|json|topojson|csv)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+  # Hashed build output never changes under the same name (If sections merge
+  # last, so this wins over FilesMatch for fonts under /_next/)
   <If "%{REQUEST_URI} =~ m#^/_next/#">
     Header set Cache-Control "public, max-age=31536000, immutable"
   </If>
+
+  # mod_deflate suffixes ETags with -gzip, which defeats If-None-Match
+  # revalidation; strip it on the way in so no-cache HTML can still 304
+  RequestHeader edit "If-None-Match" '^"((.*)-gzip)"$' '"$1", "$2"'
 </IfModule>

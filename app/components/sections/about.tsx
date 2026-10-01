@@ -26,8 +26,10 @@ export const AboutSection: React.FC = () => {
   return (
     <section
       id="about"
-      className="relative bg-bg overflow-hidden section-rail scroll-mt-24"
+      aria-labelledby="about-heading"
+      className="relative bg-bg section-rail scroll-mt-24"
     >
+      {/* No overflow-hidden on the section: it clipped the rail dot and broke the sticky portrait */}
       <div
         className="absolute inset-0 bg-grid-fg bg-grid-64 opacity-30 [mask-image:linear-gradient(to_bottom,black,transparent)]"
         aria-hidden
@@ -36,7 +38,10 @@ export const AboutSection: React.FC = () => {
 
       <div className="editorial relative py-16 md:py-24">
         {/* Section heading */}
-        <h2 className="display text-3xl md:text-4xl text-fg mb-8 md:mb-10">
+        <h2
+          id="about-heading"
+          className="display text-3xl md:text-4xl text-fg mb-8 md:mb-10"
+        >
           About
         </h2>
 

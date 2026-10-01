@@ -594,6 +594,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /* ─── Plotly charts ─── */
+    /* Deferred cdn.plot.ly script failed (blocked or offline): say so instead of leaving empty boxes */
+    if (typeof Plotly === 'undefined') {
+        document.querySelectorAll('.interactive-chart').forEach(function (el) {
+            el.innerHTML = '<p class="mono" style="padding:24px;font-size:12px;letter-spacing:0.04em;opacity:0.7">Chart library could not load (cdn.plot.ly unreachable). Reload to try again.</p>';
+        });
+    }
     if (typeof CHART_DATA === 'undefined' || typeof Plotly === 'undefined') return;
 
     var D   = CHART_DATA;

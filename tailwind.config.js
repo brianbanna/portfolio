@@ -70,9 +70,10 @@ module.exports = {
 					"100%": { opacity: "1", transform: "translateY(0)" },
 				},
 				"rise": {
-					"0%": { opacity: "0", transform: "translateY(40px)", filter: "blur(6px)" },
-					"60%": { opacity: "1", filter: "blur(0)" },
-					"100%": { opacity: "1", transform: "translateY(0)", filter: "blur(0)" },
+					// Opacity and transform only: a blur filter on the LCP headline paints on the main thread
+					"0%": { opacity: "0", transform: "translateY(40px)" },
+					"60%": { opacity: "1" },
+					"100%": { opacity: "1", transform: "translateY(0)" },
 				},
 			},
 		},

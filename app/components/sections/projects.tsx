@@ -22,13 +22,17 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
   return (
     <section
       id="projects"
+      aria-labelledby="projects-heading"
       className="relative bg-bg section-rail scroll-mt-24"
     >
       <div className="noise" aria-hidden />
 
       {/* Section header */}
       <div className="editorial pt-20 md:pt-28 pb-10 md:pb-14">
-        <h2 className="display text-[clamp(2.5rem,6vw,5rem)] text-fg leading-[0.98] text-balance">
+        <h2
+          id="projects-heading"
+          className="display text-[clamp(2.5rem,6vw,5rem)] text-fg leading-[0.98] text-balance"
+        >
           Selected work
         </h2>
         <p className="mt-6 max-w-xl text-lg text-fg/60 leading-relaxed">

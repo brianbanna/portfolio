@@ -42,7 +42,7 @@ export const metadata: Metadata = {
         height: 630,
       },
     ],
-    locale: "en-US",
+    locale: "en_US",
     type: "website",
   },
   robots: {
@@ -65,7 +65,11 @@ export const metadata: Metadata = {
   },
   icons: {
     shortcut: "/favicon.svg",
-    icon: "/favicon.svg",
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
   },
 };
 

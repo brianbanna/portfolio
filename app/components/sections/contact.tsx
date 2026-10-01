@@ -50,22 +50,26 @@ export const ContactSection: React.FC = () => {
   return (
     <section
       id="contact"
-      className="relative bg-bg overflow-hidden section-rail scroll-mt-24"
+      aria-labelledby="contact-heading"
+      className="relative bg-bg section-rail scroll-mt-24"
     >
       <div
         className="absolute inset-0 bg-grid-fg bg-grid-64 opacity-30 [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]"
         aria-hidden
       />
-      <div
-        className="absolute -bottom-1/3 left-1/2 -translate-x-1/2 w-[120vw] h-[70vh] bg-[radial-gradient(ellipse_at_center,rgb(166_72_42/0.04),transparent_60%)] pointer-events-none"
-        aria-hidden
-      />
+      {/* Glow is clipped by its own wrapper, not the section, so the rail dot stays whole */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
+        <div className="absolute -bottom-1/3 left-1/2 -translate-x-1/2 w-[120vw] h-[70vh] bg-[radial-gradient(ellipse_at_center,rgb(166_72_42/0.04),transparent_60%)]" />
+      </div>
       <div className="noise" aria-hidden />
 
       <div className="editorial relative py-28 md:py-44">
         {/* Section header */}
         <div className="mb-14 md:mb-20">
-          <h2 className="display text-[clamp(2.4rem,7vw,5.8rem)] text-fg leading-[0.95]">
+          <h2
+            id="contact-heading"
+            className="display text-[clamp(2.4rem,7vw,5.8rem)] text-fg leading-[0.95]"
+          >
             Get in touch
           </h2>
           <p className="mt-8 max-w-xl text-xl md:text-2xl text-fg/65 leading-[1.5]">
@@ -101,6 +105,7 @@ export const ContactSection: React.FC = () => {
               return c.onClick ? (
                 <button
                   key={c.num}
+                  type="button"
                   onClick={c.onClick}
                   className="w-full text-left"
                 >

@@ -19,10 +19,11 @@ jobs:
           node-version: "20"
 
       - name: Install pnpm
-        run: npm install -g pnpm@9
+        run: npm install -g pnpm@10
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        # Frozen so CI builds the exact dependency set the local build was checked against
+        run: pnpm install --frozen-lockfile
 
       - name: Build static site
         run: pnpm build
@@ -35,12 +36,16 @@ jobs:
           # connections; parallelism is the usual cause of the "max-retries exceeded"
           # the previous run hit. Single SFTP connection, single-file transfer
           # (--parallel=1), bounded timeout and reconnect backoff. The full tree is
-          # uploaded every deploy via one mirror pass with the default time+size
-          # comparison (a fresh CI checkout makes every file newer than the remote, so
-          # everything re-uploads) -- correctness over transfer volume. Size-based
-          # delta optimization is deliberately deferred: it would mean per-file
-          # comparison rules that interact with --delete in ways not yet exercised
-          # against this live host.
+          # uploaded every deploy with the default time+size comparison (a fresh CI
+          # checkout makes every file newer than the remote, so everything
+          # re-uploads) -- correctness over transfer volume.
+          #
+          # Two passes, ordered so a visitor never gets HTML that names chunks the
+          # host does not have yet: hashed /_next/static is uploaded first and never
+          # deleted (old chunks are immutable and harmless, a few hundred KB per
+          # deploy), then everything else is mirrored with --delete, excluding that
+          # directory. Previously one --delete pass removed the old chunks before the
+          # new HTML landed, and any cached HTML pointed at 404 chunks after deploy.
           mirror_once() {
             lftp -u "${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }}" sftp://vs0hny.ftp.infomaniak.com -e "
               set cmd:fail-exit yes
@@ -51,7 +56,8 @@ jobs:
               set net:reconnect-interval-max 60
               set net:persist-retries 5
               set net:connection-limit 1
-              mirror -R --delete --verbose --parallel=1 --no-perms --exclude='(^|/)\.DS_Store$' --exclude='(^|/)\._' --exclude='(^|/)Thumbs\.db$' ./out/ sites/brianbanna.com/
+              mirror -R --verbose --parallel=1 --no-perms --exclude='(^|/)\.DS_Store$' --exclude='(^|/)\._' --exclude='(^|/)Thumbs\.db$' ./out/_next/static/ sites/brianbanna.com/_next/static/
+              mirror -R --delete --verbose --parallel=1 --no-perms --exclude='^_next/static/' --exclude='(^|/)\.DS_Store$' --exclude='(^|/)\._' --exclude='(^|/)Thumbs\.db$' ./out/ sites/brianbanna.com/
               quit
             "
           }

@@ -440,6 +440,26 @@
         </div>
     </footer>
 
+    <script>
+        // d3, topojson-client and scrollama come from cdn.jsdelivr.net through the
+        // importmap. If that module graph never links (blocked CDN, slow network),
+        // init() never runs and the loader would sit forever. Replace it with a message.
+        (function () {
+            function failLoader(reason) {
+                var loader = document.querySelector(".app-loading");
+                if (!loader) return;
+                var text = loader.querySelector(".app-loading__text");
+                if (text) text.textContent = "The page could not load its libraries (" + reason + "). Reload to try again.";
+                var dots = loader.querySelector(".app-loading__dots");
+                if (dots) dots.remove();
+            }
+            window.addEventListener("error", function (e) {
+                var t = e.target;
+                if (t && t.tagName === "SCRIPT" && t.type === "module") failLoader("script blocked");
+            }, true);
+            setTimeout(function () { failLoader("timed out"); }, 15000);
+        })();
+    </script>
     <script type="module" src="js/main.js"></script>
 </body>
 </html>
