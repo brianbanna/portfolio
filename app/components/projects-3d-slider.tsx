@@ -101,6 +101,10 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
   const stageControls = useAnimationControls();
   const [snapCards, setSnapCards] = useState(false);
   const jumpToken = useRef(0);
+  const jumpPending = useRef(false);
+  const jumpTarget = useRef(0);
+  // Bumped each time a jump lands; drives the fade back in
+  const [landedJumps, setLandedJumps] = useState(0);
 
   const slides = projects.map((p, i) => ({ ...p, id: i }));
 
@@ -113,35 +117,56 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
   }, [slides.length]);
 
   const restartAutoplay = () => setAutoplayKey((k) => k + 1);
+
+  // Snap to the jump's target and schedule the fade back in
+  const landJump = (index: number) => {
+    jumpPending.current = false;
+    setSnapCards(true);
+    setCurrentIndex(index);
+    setLandedJumps((n) => n + 1);
+  };
+  // Any navigation that arrives while a jump is fading out commits that jump
+  // at once, so the new action applies on top of it and the stage never stays
+  // hidden. The token bump drops the jump's own continuation.
+  const settlePendingJump = () => {
+    if (!jumpPending.current) return;
+    jumpToken.current += 1;
+    landJump(jumpTarget.current);
+  };
+
   const goNext = () => {
+    settlePendingJump();
     slideNext();
     restartAutoplay();
   };
   const goPrev = () => {
+    settlePendingJump();
     slidePrev();
     restartAutoplay();
   };
   const goTo = async (index: number) => {
-    if (index === currentIndex) return;
+    if (index === currentIndex && !jumpPending.current) return;
     restartAutoplay();
     const span = Math.abs(index - currentIndex);
     const distance = Math.min(span, slides.length - span);
     if (reduceMotion || distance <= 1) {
-      jumpToken.current += 1;
+      settlePendingJump();
       setCurrentIndex(index);
       return;
     }
     const token = ++jumpToken.current;
+    jumpPending.current = true;
+    jumpTarget.current = index;
+    // An interrupted controls animation never resolves, so a superseded jump
+    // simply never continues; the token check covers the resolved case
     await stageControls.start({ opacity: 0, transition: { duration: 0.15 } });
-    // A later click superseded this jump while the stage was fading out
     if (token !== jumpToken.current) return;
-    setSnapCards(true);
-    setCurrentIndex(index);
+    landJump(index);
   };
 
-  // Runs after the snapped positions have been committed
+  // Runs after each landing has committed the snapped card positions
   useEffect(() => {
-    if (!snapCards) return;
+    if (landedJumps === 0) return;
     let cancelled = false;
     stageControls
       .start({ opacity: 1, transition: { duration: 0.25 } })
@@ -151,7 +176,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
     return () => {
       cancelled = true;
     };
-  }, [snapCards, stageControls]);
+  }, [landedJumps, stageControls]);
 
   useEffect(() => {
     if (

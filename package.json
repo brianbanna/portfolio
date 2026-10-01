@@ -13,7 +13,8 @@
     "build": "next build && node scripts/prune-unpublished-notes.mjs",
     "start": "next start",
     "fmt": "pnpm rome check . --apply-unsafe && pnpm rome format . --write",
-    "check:site": "node scripts/audit/behaviour-tests.js && node scripts/audit/showcase-tests.js"
+    "check:site": "node scripts/audit/behaviour-tests.js && node scripts/audit/showcase-tests.js",
+    "check:headers": "node scripts/audit/headers-check.mjs"
   },
   "dependencies": {
     "@next/mdx": "^13.5.4",

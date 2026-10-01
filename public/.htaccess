@@ -28,17 +28,23 @@ AddType application/json .topojson
   # revalidated on every load. Unhashed media is cached for a week; that includes
   # the showcase data files (json, topojson, csv), so a data refresh needs a new
   # file name to reach returning visitors within the week.
-  # The showcase pages' own scripts and styles are not hashed either, so they
-  # revalidate like HTML; a cached old module next to new HTML would break the page.
-  <FilesMatch "\.(html|txt|xml|js|mjs|css)$">
+  <FilesMatch "\.(html|txt|xml)$">
     Header always set Cache-Control "no-cache"
+  </FilesMatch>
+  # The showcase pages' own scripts and styles are not hashed either, so they
+  # revalidate like HTML; a cached old module next to new HTML would break the
+  # page. Plain "Header set" on purpose: "always" writes a separate header table
+  # that the <If> below cannot override, so /_next/ chunks would carry both
+  # no-cache and immutable (verified on Apache 2.4.67).
+  <FilesMatch "\.(js|mjs|css)$">
+    Header set Cache-Control "no-cache"
   </FilesMatch>
   <FilesMatch "\.(jpe?g|png|svg|webp|woff2?|json|topojson|csv)$">
     Header set Cache-Control "public, max-age=604800"
   </FilesMatch>
-  # Hashed build output and versioned vendor files never change under the same
-  # name (If sections merge last, so this wins over both FilesMatch blocks)
-  <If "%{REQUEST_URI} =~ m#^/_next/|/vendor/#">
+  # Hashed build output and versioned vendor bundles never change under the
+  # same name (If sections merge last, so this wins over the FilesMatch blocks)
+  <If "%{REQUEST_URI} =~ m#^/_next/|/vendor/.+-\d+\.\d+\.\d+\.min\.js$#">
     Header set Cache-Control "public, max-age=31536000, immutable"
   </If>
 

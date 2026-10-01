@@ -145,6 +145,36 @@ const counter = (page) =>
       JSON.stringify(jump)
     );
 
+    // Races during a jump's 150 ms fade out: the stage must never stay hidden,
+    // and the latest action must win on top of the pending jump
+    const race = (secondAction, delayMs) =>
+      page.evaluate(
+        async ({ secondAction, delayMs }) => {
+          const root = document.querySelector("[aria-roledescription='carousel']");
+          const stage = root.querySelector("div[style*='perspective']");
+          const rows = () => [...root.querySelectorAll(".grid button")].filter((b) => /^\d\d/.test(b.textContent.trim()));
+          const counter = () => root.querySelector("span[aria-live]").textContent.trim().slice(0, 2);
+          const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+          // Start from 01 with the stage settled
+          if (counter() !== "01") { rows()[0].click(); await wait(900); }
+          rows()[3].click(); // jump 01 -> 04 (distance 3)
+          await wait(delayMs);
+          if (secondAction === "index02") rows()[1].click();
+          if (secondAction === "index07") rows()[6].click(); // 1 step from 01 via wrap
+          if (secondAction === "arrowRight") root.querySelector("button[aria-label='Next project']").click();
+          await wait(1200);
+          return { counter: counter(), opacity: getComputedStyle(stage).opacity };
+        },
+        { secondAction, delayMs }
+      );
+    await page.mouse.move(5, 5);
+    const r1 = await race("index02", 40);
+    check("slider race: index 02 during jump fade out lands on 02, stage visible", r1.counter === "02" && r1.opacity === "1", JSON.stringify(r1));
+    const r2 = await race("index07", 150);
+    check("slider race: wrap neighbour 07 at +150ms lands on 07, stage visible", r2.counter === "07" && r2.opacity === "1", JSON.stringify(r2));
+    const r3 = await race("arrowRight", 40);
+    check("slider race: Next during jump fade out applies on top of the jump (05)", r3.counter === "05" && r3.opacity === "1", JSON.stringify(r3));
+
     // Card CTAs: visual pill stays small, hit area reaches 44px
     const cta = await page.evaluate(() => {
       const a = [...document.querySelectorAll("[aria-roledescription='carousel'] a")].find((x) => x.tabIndex === 0);

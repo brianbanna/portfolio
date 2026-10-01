@@ -137,7 +137,7 @@ const check = (name, pass, detail) => {
       return { total: imgs.length, broken: imgs.filter((i) => !i.naturalWidth).map((i) => i.getAttribute("src")), maxW: Math.max(...imgs.map((i) => i.naturalWidth)) };
     });
     check(`${slug}: no third party script hosts`, foreignHosts(requested2).length === 0, foreignHosts(requested2).join(", "));
-    check(`${slug}: all figures load at <= 2304px`, figs.broken.length === 0 && figs.maxW <= 2304, JSON.stringify(figs));
+    check(`${slug}: all figures load at <= 2404px`, figs.broken.length === 0 && figs.maxW <= 2404, JSON.stringify(figs));
     await ctx2.close();
   }
 

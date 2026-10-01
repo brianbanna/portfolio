@@ -175,6 +175,9 @@ export const HeroCanvas: React.FC<{
           // the falloff has no visible steps. shadowBlur blurred a full viewport
           // layer every frame, which is expensive wherever the canvas is
           // rasterised in software.
+          // save/restore keeps the round caps and joins to the halo only (the
+          // current path is not part of the saved state, so it survives)
+          ctx.save();
           ctx.lineJoin = "round";
           ctx.lineCap = "round";
           for (const [alphaStep, widthFactor] of [
@@ -186,6 +189,7 @@ export const HeroCanvas: React.FC<{
             ctx.lineWidth = 1.4 + glowBoost * widthFactor;
             ctx.stroke();
           }
+          ctx.restore();
           ctx.strokeStyle = "rgba(166, 72, 42, 0.9)";
           ctx.lineWidth = 1.4;
         } else {
