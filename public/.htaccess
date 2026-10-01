@@ -11,9 +11,11 @@ ErrorDocument 404 /404.html
 # Types Apache does not know by default (showcase map data)
 AddType application/json .topojson
 
-# The host compresses text and js but no JSON; the showcase data files are up to 182 KB
+# An AddOutputFilterByType here replaces the host's server level list rather
+# than extending it (adding only JSON turned off gzip for HTML, CSS and JS), so
+# every compressible type is listed. JSON is the addition: showcase data is up to 182 KB.
 <IfModule mod_deflate.c>
-  AddOutputFilterByType DEFLATE application/json
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml text/javascript application/javascript application/x-javascript application/json application/xml application/rss+xml image/svg+xml
 </IfModule>
 
 <IfModule mod_headers.c>
