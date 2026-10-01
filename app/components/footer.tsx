@@ -4,7 +4,10 @@ import Link from "next/link";
 
 // Inlined at build time (next.config.mjs env) so server HTML and the first
 // client render agree; new Date() at render time mismatched across new year.
-const BUILD_YEAR = process.env.NEXT_PUBLIC_BUILD_YEAR ?? "2026";
+const BUILD_YEAR = process.env.NEXT_PUBLIC_BUILD_YEAR;
+if (!BUILD_YEAR) {
+  throw new Error("NEXT_PUBLIC_BUILD_YEAR is not set; see next.config.mjs env");
+}
 
 // Assembled from parts so the minifier cannot fold it into a literal.
 const getEmail = () => {

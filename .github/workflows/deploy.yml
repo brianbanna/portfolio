@@ -19,7 +19,8 @@ jobs:
           node-version: "20"
 
       - name: Install pnpm
-        run: npm install -g pnpm@10
+        # Same version as package.json packageManager so CI and local cannot drift
+        run: npm install -g pnpm@10.27.0
 
       - name: Install dependencies
         # Frozen so CI builds the exact dependency set the local build was checked against

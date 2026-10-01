@@ -446,6 +446,9 @@
         // init() never runs and the loader would sit forever. Replace it with a message.
         (function () {
             function failLoader(reason) {
+                // main.js sets this once it has linked; a slow or failed data load
+                // after that point is its own report, not a library failure
+                if (window.__pptLinked) return;
                 var loader = document.querySelector(".app-loading");
                 if (!loader) return;
                 var text = loader.querySelector(".app-loading__text");

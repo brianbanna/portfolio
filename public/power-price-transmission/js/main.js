@@ -3,6 +3,10 @@ import { initNarrative } from "./narrative.js";
 import { initExplorer } from "./explorer.js";
 import { loadJSON } from "./utils/data.js";
 
+// Tells the inline loader watchdog in index.html that the module graph linked;
+// from here on data failures are reported by init() itself.
+window.__pptLinked = true;
+
 // Entry point. Wires the map and the scrollytelling narrative together
 // once the DOM is ready. Individual modules are responsible for their
 // own rendering; this file only coordinates their lifecycle.

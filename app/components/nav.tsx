@@ -52,7 +52,13 @@ export const Navigation: React.FC<NavigationProps> = ({
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", onKey);
       mq.removeEventListener("change", onMq);
-      toggleRef.current?.focus({ preventScroll: true });
+      // Hand focus back to the toggle only when the close dropped it (Escape
+      // on a menu link leaves it on body); a menu link click already moved it
+      // into the target section and must keep it there.
+      const active = document.activeElement;
+      if (!active || active === document.body) {
+        toggleRef.current?.focus({ preventScroll: true });
+      }
     };
   }, [mobileMenuOpen]);
 
@@ -117,9 +123,12 @@ export const Navigation: React.FC<NavigationProps> = ({
     e.preventDefault();
     const el = document.querySelector<HTMLElement>(href);
     if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-      // Keep native anchor semantics: URL hash updates and focus lands in the section
-      window.history.pushState(null, "", href);
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      el.scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
+      // Keep native anchor semantics: URL hash updates and focus lands in the
+      // section. Replace (not push) and keep Next's history state: its popstate
+      // handler ignores entries with a null state, which would strand Back.
+      window.history.replaceState(window.history.state, "", href);
       if (!el.hasAttribute("tabindex")) el.setAttribute("tabindex", "-1");
       el.focus({ preventScroll: true });
     }
@@ -210,7 +219,6 @@ export const Navigation: React.FC<NavigationProps> = ({
         <div
           id="mobile-menu"
           role="dialog"
-          aria-modal="true"
           aria-label="Navigation"
           className="fixed inset-0 z-40 md:hidden bg-bg/[0.98] backdrop-blur-xl"
         >

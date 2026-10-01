@@ -76,6 +76,9 @@ const AUTOPLAY_MS = 5000;
 export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  // Keyboard focus inside the carousel also pauses rotation, or a focused
+  // link would rotate away into an aria-hidden card
+  const [isFocused, setIsFocused] = useState(false);
   // Explicit user pause: auto updating content needs a control (WCAG 2.2.2)
   const [isPaused, setIsPaused] = useState(false);
   // Autoplay only runs while the slider is on screen
@@ -85,6 +88,8 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
   const [autoplayKey, setAutoplayKey] = useState(0);
   const reduceMotion = useReducedMotion();
   const rootRef = useRef<HTMLDivElement>(null);
+  const prevBtnRef = useRef<HTMLButtonElement>(null);
+  const nextBtnRef = useRef<HTMLButtonElement>(null);
 
   const slides = projects.map((p, i) => ({ ...p, id: i }));
 
@@ -111,7 +116,14 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
   };
 
   useEffect(() => {
-    if (isHovered || isPaused || !inView || reduceMotion || slides.length < 2)
+    if (
+      isHovered ||
+      isFocused ||
+      isPaused ||
+      !inView ||
+      reduceMotion ||
+      slides.length < 2
+    )
       return;
     const interval = setInterval(() => {
       // Background tabs throttle timers; skip those ticks so no burst fires on return
@@ -121,6 +133,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
     // autoplayKey is a deliberate dependency: it restarts the timer on manual navigation
   }, [
     isHovered,
+    isFocused,
     isPaused,
     inView,
     reduceMotion,
@@ -140,13 +153,17 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
     return () => observer.disconnect();
   }, []);
 
+  // Arrow keys navigate and park focus on the matching arrow button, so focus
+  // never stays on a card that has just rotated out of view
   const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "ArrowRight") {
       e.preventDefault();
       goNext();
+      nextBtnRef.current?.focus();
     } else if (e.key === "ArrowLeft") {
       e.preventDefault();
       goPrev();
+      prevBtnRef.current?.focus();
     }
   };
 
@@ -213,6 +230,11 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
       className="relative w-full"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onFocusCapture={() => setIsFocused(true)}
+      onBlurCapture={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null))
+          setIsFocused(false);
+      }}
       onKeyDown={onKeyDown}
     >
       {/* Metadata header — reads like a research plate caption */}
@@ -222,7 +244,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
             <span className="text-accent tabular-nums">({activeNum})</span>
             <AnimatePresence mode="wait" initial={false}>
               <motion.span
-                key={active.title + "tag"}
+                key={`${active.title}-tag`}
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6, transition: fade(0.12) }}
@@ -234,7 +256,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
             <span className="text-fg/25 hidden md:inline">/</span>
             <AnimatePresence mode="wait" initial={false}>
               <motion.span
-                key={active.title + "domain"}
+                key={`${active.title}-domain`}
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6, transition: fade(0.12) }}
@@ -297,7 +319,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                   zIndex: isActive ? 15 : style.zIndex,
                   pointerEvents: isActive ? "auto" : "none",
                 }}
-                aria-hidden={!isActive}
+                aria-hidden={!isActive || undefined}
               >
                 <div
                   className="relative w-[310px] sm:w-[400px] md:w-[600px] aspect-[4/3] overflow-hidden group bg-paper border border-fg/15"
@@ -401,6 +423,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
 
         {/* Nav buttons — 44px tap targets */}
         <button
+          ref={prevBtnRef}
           type="button"
           onClick={goPrev}
           className="absolute left-2 md:left-8 z-30 p-3.5 border border-fg/20 bg-bg/60 backdrop-blur-sm hover:bg-fg/10 hover:border-fg/50 transition-all"
@@ -409,6 +432,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
           <ChevronLeft className="w-4 h-4 text-fg/70" />
         </button>
         <button
+          ref={nextBtnRef}
           type="button"
           onClick={goNext}
           className="absolute right-2 md:right-8 z-30 p-3.5 border border-fg/20 bg-bg/60 backdrop-blur-sm hover:bg-fg/10 hover:border-fg/50 transition-all"
@@ -431,10 +455,15 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                   key={s.id}
                   className="[grid-area:1/1]"
                   initial={false}
-                  animate={{ opacity: isActive ? 1 : 0, y: isActive ? 0 : 8 }}
+                  animate={{
+                    opacity: isActive ? 1 : 0,
+                    y: isActive ? 0 : 8,
+                    // Hidden captions must not match find in page or select all
+                    transitionEnd: { visibility: isActive ? "visible" : "hidden" },
+                  }}
                   transition={fade(0.35)}
                   style={{ pointerEvents: isActive ? "auto" : "none" }}
-                  aria-hidden={!isActive}
+                  aria-hidden={!isActive || undefined}
                 >
                   {s.question && (
                     <p className="text-xl md:text-2xl font-medium leading-[1.35] text-fg text-balance max-w-2xl mb-4">

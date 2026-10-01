@@ -18,7 +18,9 @@ AddType application/json .topojson
   Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=()"
 
   # HTML names the hashed chunks and old chunks disappear on deploy, so HTML is
-  # revalidated on every load. Unhashed media is cached for a week.
+  # revalidated on every load. Unhashed media is cached for a week; that includes
+  # the showcase data files (json, topojson, csv), so a data refresh needs a new
+  # file name to reach returning visitors within the week.
   <FilesMatch "\.html$">
     Header set Cache-Control "no-cache"
   </FilesMatch>

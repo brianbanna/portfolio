@@ -37,7 +37,8 @@ export default function Home() {
         Skip to content
       </a>
       <Navigation notesEnabled={notesEnabled} />
-      <main id="main">
+      {/* Focusable so the skip link lands here in every browser */}
+      <main id="main" tabIndex={-1} className="outline-none">
         <HeroSection />
         <AboutSection />
         <ProjectsSection projects={projects} />
