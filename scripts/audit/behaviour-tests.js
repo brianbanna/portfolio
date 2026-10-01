@@ -2,7 +2,17 @@
 //   pnpm build && (cd out && python3 -m http.server 3000)
 //   npx playwright install chromium   (once)
 //   pnpm check:site                   (or: node scripts/audit/<file> http://localhost:3000)
-const { chromium, devices } = require("playwright");
+const playwright = require("playwright");
+const { devices } = playwright;
+// BROWSER=chromium (default) | firefox | webkit
+const ENGINE = process.env.BROWSER || "chromium";
+const engine = playwright[ENGINE];
+if (!engine) throw new Error(`Unknown BROWSER "${ENGINE}"`);
+// Firefox has no mobile emulation mode; keep viewport, scale factor and touch
+const phone = (name) => {
+  const { isMobile, ...rest } = devices[name];
+  return ENGINE === "firefox" ? rest : { isMobile, ...rest };
+};
 
 const BASE = process.argv[2] || "http://localhost:3000";
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -19,7 +29,7 @@ const counter = (page) =>
   });
 
 (async () => {
-  const browser = await chromium.launch();
+  const browser = await engine.launch();
 
   // Desktop: console errors, autoplay reset, keyboard, canvas pause
   {
@@ -104,6 +114,47 @@ const counter = (page) =>
     const bad = tabbable.filter((c) => c.hidden === "true" && c.links.some((t) => t !== -1));
     check("slider: inactive cards are aria-hidden with untabbable links", bad.length === 0 && tabbable.length === 7, JSON.stringify(tabbable));
 
+    // Index jump of 2+ positions: stage fades out and back, cards land in place
+    await page.evaluate(() => document.activeElement?.blur());
+    const jump = await page.evaluate(async () => {
+      const root = document.querySelector("[aria-roledescription='carousel']");
+      const stage = root.querySelector("div[style*='perspective']");
+      const rows = [...root.querySelectorAll("button[aria-current], .grid button")].filter((b) => /^\d\d/.test(b.textContent.trim()));
+      const from = Number(root.querySelector("span[aria-live]").textContent.slice(0, 2)) - 1;
+      const to = (from + 3) % rows.length;
+      rows[to].click();
+      const samples = [];
+      const t0 = performance.now();
+      while (performance.now() - t0 < 900) {
+        samples.push(Number(getComputedStyle(stage).opacity));
+        await new Promise((r) => requestAnimationFrame(r));
+      }
+      const active = [...stage.children].find((c) => c.getAttribute("aria-hidden") !== "true");
+      return {
+        from: from + 1,
+        to: to + 1,
+        minOpacity: Math.min(...samples),
+        endOpacity: samples[samples.length - 1],
+        counter: root.querySelector("span[aria-live]").textContent.trim(),
+        activeTransform: active?.style.transform,
+      };
+    });
+    check(
+      "slider: index jump of 3 crossfades the stage and lands centred",
+      jump.minOpacity < 0.2 && jump.endOpacity === 1 && jump.counter.startsWith(String(jump.to).padStart(2, "0")) && /none|translateX\(0px\)/.test(jump.activeTransform || "none"),
+      JSON.stringify(jump)
+    );
+
+    // Card CTAs: visual pill stays small, hit area reaches 44px
+    const cta = await page.evaluate(() => {
+      const a = [...document.querySelectorAll("[aria-roledescription='carousel'] a")].find((x) => x.tabIndex === 0);
+      if (!a) return null;
+      const r = a.getBoundingClientRect();
+      const before = getComputedStyle(a, "::before");
+      return { h: Math.round(r.height), hit: Math.round(r.height + 2 * Math.abs(parseFloat(before.top))) };
+    });
+    check("slider: card CTA hit area at least 44px", !!cta && cta.hit >= 44, JSON.stringify(cta));
+
     // Nav click updates the hash and moves focus into the section
     await page.click("nav[aria-label='Primary'] a[href='#about']");
     await sleep(900);
@@ -132,7 +183,7 @@ const counter = (page) =>
 
   // Mobile: menu dialog behaviour, separator, overflow, tap targets
   {
-    const ctx = await browser.newContext({ ...devices["iPhone 13"] });
+    const ctx = await browser.newContext(phone("iPhone 13"));
     const page = await ctx.newPage();
     const errors = [];
     page.on("pageerror", (e) => errors.push(`pageerror: ${e.message}`));
@@ -182,6 +233,6 @@ const counter = (page) =>
 
   await browser.close();
   const failed = results.filter((r) => !r.pass).length;
-  console.log(`\n${results.length - failed}/${results.length} checks passed`);
+  console.log(`\n${results.length - failed}/${results.length} checks passed (${ENGINE})`);
   process.exit(failed ? 1 : 0);
 })();

@@ -1,8 +1,13 @@
 "use client";
 import { useState, useCallback, useEffect, useRef } from "react";
+// LazyMotion + m with the domAnimation bundle: the slider only needs animate,
+// exit and transitions, not layout or drag, so the full motion bundle is not shipped
 import {
-  motion,
+  LazyMotion,
+  domAnimation,
+  m,
   AnimatePresence,
+  useAnimationControls,
   useReducedMotion,
   type Transition,
 } from "framer-motion";
@@ -90,6 +95,12 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
   const rootRef = useRef<HTMLDivElement>(null);
   const prevBtnRef = useRef<HTMLButtonElement>(null);
   const nextBtnRef = useRef<HTMLButtonElement>(null);
+  // Index jumps of 2+ positions would spring every card through its
+  // neighbours with z-index swaps mid flight; instead the stage fades out,
+  // the cards snap to their new places, and the stage fades back in
+  const stageControls = useAnimationControls();
+  const [snapCards, setSnapCards] = useState(false);
+  const jumpToken = useRef(0);
 
   const slides = projects.map((p, i) => ({ ...p, id: i }));
 
@@ -110,10 +121,37 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
     slidePrev();
     restartAutoplay();
   };
-  const goTo = (index: number) => {
-    setCurrentIndex(index);
+  const goTo = async (index: number) => {
+    if (index === currentIndex) return;
     restartAutoplay();
+    const span = Math.abs(index - currentIndex);
+    const distance = Math.min(span, slides.length - span);
+    if (reduceMotion || distance <= 1) {
+      jumpToken.current += 1;
+      setCurrentIndex(index);
+      return;
+    }
+    const token = ++jumpToken.current;
+    await stageControls.start({ opacity: 0, transition: { duration: 0.15 } });
+    // A later click superseded this jump while the stage was fading out
+    if (token !== jumpToken.current) return;
+    setSnapCards(true);
+    setCurrentIndex(index);
   };
+
+  // Runs after the snapped positions have been committed
+  useEffect(() => {
+    if (!snapCards) return;
+    let cancelled = false;
+    stageControls
+      .start({ opacity: 1, transition: { duration: 0.25 } })
+      .then(() => {
+        if (!cancelled) setSnapCards(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [snapCards, stageControls]);
 
   useEffect(() => {
     if (
@@ -167,9 +205,10 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
     }
   };
 
-  const cardTransition: Transition = reduceMotion
-    ? { duration: 0 }
-    : { type: "spring", stiffness: 260, damping: 32, mass: 1 };
+  const cardTransition: Transition =
+    reduceMotion || snapCards
+      ? { duration: 0 }
+      : { type: "spring", stiffness: 260, damping: 32, mass: 1 };
   const fade = (duration: number): Transition =>
     reduceMotion ? { duration: 0 } : { duration };
 
@@ -222,6 +261,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
   const total = String(slides.length).padStart(2, "0");
 
   return (
+    <LazyMotion features={domAnimation} strict>
     <div
       ref={rootRef}
       role="region"
@@ -243,7 +283,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
           <div className="flex items-center gap-5 label">
             <span className="text-accent tabular-nums">({activeNum})</span>
             <AnimatePresence mode="wait" initial={false}>
-              <motion.span
+              <m.span
                 key={`${active.title}-tag`}
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -251,11 +291,11 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                 transition={fade(0.3)}
               >
                 {activeMeta?.tag || "Project"}
-              </motion.span>
+              </m.span>
             </AnimatePresence>
             <span className="text-fg/25 hidden md:inline">/</span>
             <AnimatePresence mode="wait" initial={false}>
-              <motion.span
+              <m.span
                 key={`${active.title}-domain`}
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -264,7 +304,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                 className="hidden md:inline"
               >
                 {activeMeta?.domain}
-              </motion.span>
+              </m.span>
             </AnimatePresence>
           </div>
           <div className="flex items-center gap-6 label tabular-nums">
@@ -296,16 +336,18 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
         <div className="hidden sm:block absolute inset-y-0 left-0 w-10 md:w-20 lg:w-40 xl:w-56 bg-gradient-to-r from-bg to-transparent z-20 pointer-events-none" />
         <div className="hidden sm:block absolute inset-y-0 right-0 w-10 md:w-20 lg:w-40 xl:w-56 bg-gradient-to-l from-bg to-transparent z-20 pointer-events-none" />
 
-        <div
+        <m.div
           className="relative w-full h-full flex items-center justify-center"
           style={{ perspective: "1400px" }}
+          initial={false}
+          animate={stageControls}
         >
           {slides.map((slide, index) => {
             const style = getSlideStyle(index);
             const isActive = index === currentIndex;
 
             return (
-              <motion.div
+              <m.div
                 key={slide.id}
                 className="absolute"
                 initial={false}
@@ -368,7 +410,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                     <h3 className="display text-xl md:text-3xl text-bg leading-[1] mb-2 text-balance">
                       {slide.title}
                     </h3>
-                    <motion.div
+                    <m.div
                       initial={false}
                       animate={{ opacity: isActive ? 1 : 0, y: isActive ? 0 : 8 }}
                       transition={
@@ -390,7 +432,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                             target="_blank"
                             rel="noopener noreferrer"
                             tabIndex={isActive ? 0 : -1}
-                            className="group/btn inline-flex items-center gap-1.5 px-3 py-1.5 bg-bg text-fg text-[10px] uppercase tracking-[0.14em] hover:bg-accent hover:text-bg transition-colors"
+                            className="group/btn relative inline-flex items-center gap-1.5 px-3 py-1.5 bg-bg text-fg text-[10px] uppercase tracking-[0.14em] hover:bg-accent hover:text-bg transition-colors before:absolute before:-inset-y-[9px] before:inset-x-0 before:content-['']"
                           >
                             Live
                             <ArrowUpRight className="w-3 h-3" />
@@ -402,14 +444,14 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                             target="_blank"
                             rel="noopener noreferrer"
                             tabIndex={isActive ? 0 : -1}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-bg/40 text-bg/90 hover:text-bg hover:border-bg/70 text-[10px] uppercase tracking-[0.14em] transition-colors"
+                            className="relative inline-flex items-center gap-1.5 px-3 py-1.5 border border-bg/40 text-bg/90 hover:text-bg hover:border-bg/70 text-[10px] uppercase tracking-[0.14em] transition-colors before:absolute before:-inset-y-[9px] before:inset-x-0 before:content-['']"
                           >
                             <Github className="w-3 h-3" />
                             Source
                           </a>
                         )}
                       </div>
-                    </motion.div>
+                    </m.div>
                   </div>
 
                   {/* Active accent line */}
@@ -417,10 +459,10 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                     <div className="absolute top-0 left-0 right-0 h-px bg-accent/70" />
                   )}
                 </div>
-              </motion.div>
+              </m.div>
             );
           })}
-        </div>
+        </m.div>
 
         {/* Nav buttons — 44px tap targets */}
         <button
@@ -452,7 +494,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
             {slides.map((s, i) => {
               const isActive = i === currentIndex;
               return (
-                <motion.div
+                <m.div
                   key={s.id}
                   className="[grid-area:1/1]"
                   initial={false}
@@ -474,7 +516,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                   <p className="text-lg md:text-xl leading-[1.55] text-fg/80 text-pretty max-w-2xl">
                     {s.description}
                   </p>
-                </motion.div>
+                </m.div>
               );
             })}
           </div>
@@ -522,6 +564,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
         </div>
       </div>
     </div>
+    </LazyMotion>
   );
 };
 

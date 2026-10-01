@@ -159,17 +159,6 @@ export const HeroCanvas: React.FC<{
         // Opacity by depth
         const alpha = 0.04 + depth * 0.28;
 
-        ctx.lineWidth = isActive ? 1.4 : 0.8 + depth * 0.4;
-
-        if (isActive) {
-          ctx.strokeStyle = "rgba(166, 72, 42, 0.9)";
-          ctx.shadowColor = "rgba(166, 72, 42, 0.35)";
-          ctx.shadowBlur = glowBoost;
-        } else {
-          ctx.strokeStyle = `rgba(26, 23, 18, ${alpha})`;
-          ctx.shadowBlur = 0;
-        }
-
         ctx.beginPath();
         const segments = 80;
         for (let s = 0; s <= segments; s++) {
@@ -180,11 +169,33 @@ export const HeroCanvas: React.FC<{
           if (s === 0) ctx.moveTo(px, py);
           else ctx.lineTo(px, py);
         }
+
+        if (isActive) {
+          // Glow as 3 wide, very low alpha strokes of the same path, stacked so
+          // the falloff has no visible steps. shadowBlur blurred a full viewport
+          // layer every frame, which is expensive wherever the canvas is
+          // rasterised in software.
+          ctx.lineJoin = "round";
+          ctx.lineCap = "round";
+          for (const [alphaStep, widthFactor] of [
+            [0.025, 1.0],
+            [0.035, 0.55],
+            [0.05, 0.25],
+          ]) {
+            ctx.strokeStyle = `rgba(166, 72, 42, ${alphaStep})`;
+            ctx.lineWidth = 1.4 + glowBoost * widthFactor;
+            ctx.stroke();
+          }
+          ctx.strokeStyle = "rgba(166, 72, 42, 0.9)";
+          ctx.lineWidth = 1.4;
+        } else {
+          ctx.strokeStyle = `rgba(26, 23, 18, ${alpha})`;
+          ctx.lineWidth = 0.8 + depth * 0.4;
+        }
         ctx.stroke();
 
         // Tenor ticks on active curve
         if (isActive) {
-          ctx.shadowBlur = 0;
           ctx.fillStyle = "rgba(166, 72, 42, 0.9)";
           const dotR = 1.6 * dotScale;
           for (let i2 = 0; i2 < TENORS; i2 += 2) {
@@ -198,8 +209,6 @@ export const HeroCanvas: React.FC<{
           }
         }
       });
-
-      ctx.shadowBlur = 0;
 
       if (!prefersReduced && running) raf = requestAnimationFrame(draw);
     };

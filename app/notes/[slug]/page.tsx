@@ -7,8 +7,6 @@ import { Navigation } from "../../components/nav";
 import { Footer } from "../../components/footer";
 import { NoteBody } from "../../components/note-body";
 
-export const dynamicParams = false;
-
 const dateFmt = new Intl.DateTimeFormat("en-GB", {
   day: "2-digit",
   month: "short",
