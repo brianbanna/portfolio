@@ -47,9 +47,9 @@ export const Navigation: React.FC<NavigationProps> = ({
       if (e.key !== "Tab") return;
       const root = menuRef.current;
       if (!root) return;
-      const items = [
-        ...root.querySelectorAll<HTMLElement>("a[href], button"),
-      ];
+      const items = Array.from(
+        root.querySelectorAll<HTMLElement>("a[href], button"),
+      );
       if (items.length === 0) return;
       const first = items[0];
       const last = items[items.length - 1];
