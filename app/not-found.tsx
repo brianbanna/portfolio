@@ -17,13 +17,10 @@ export const metadata: Metadata = {
 export default function NotFound() {
   return (
     <div className="min-h-screen bg-bg flex flex-col items-center justify-center gap-6">
-      <span className="text-[11px] uppercase tracking-[0.18em] text-fg/60">
-        404
-      </span>
-      <h1 className="display text-4xl md:text-6xl text-fg">Page not found</h1>
+      <h1 className="display text-4xl md:text-5xl font-normal text-fg">Page not found</h1>
       <Link
         href="/"
-        className="text-[11px] uppercase tracking-[0.18em] text-fg/60 hover:text-fg transition-colors link-draw"
+        className="font-sans text-[15px] text-muted hover:text-fg transition-colors link-draw"
       >
         Back to index
       </Link>

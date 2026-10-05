@@ -53,55 +53,28 @@ export const ContactSection: React.FC = () => {
       aria-labelledby="contact-heading"
       className="relative bg-bg section-rail scroll-mt-24"
     >
-      <div
-        className="absolute inset-0 bg-grid-fg bg-grid-64 opacity-30 [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]"
-        aria-hidden
-      />
-      {/* Glow is clipped by its own wrapper, not the section, so the rail dot stays whole */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
-        <div className="absolute -bottom-1/3 left-1/2 -translate-x-1/2 w-[120vw] h-[70vh] bg-[radial-gradient(ellipse_at_center,rgb(166_72_42/0.04),transparent_60%)]" />
-      </div>
-      <div className="noise" aria-hidden />
-
-      <div className="editorial relative py-28 md:py-44">
-        {/* Section header */}
-        <div className="mb-14 md:mb-20">
-          <h2
-            id="contact-heading"
-            className="display text-[clamp(2.4rem,7vw,5.8rem)] text-fg leading-[0.95]"
-          >
+      <div className="editorial relative py-16 md:py-24">
+        <div className="mb-12 md:mb-16">
+          <h2 id="contact-heading" className="chapter text-fg">
             Get in touch
           </h2>
-          <p className="mt-8 max-w-xl text-xl md:text-2xl text-fg/65 leading-[1.5]">
+          <p className="mt-5 max-w-[40rem] font-sans text-[1.125rem] leading-[1.6] text-fg">
             Happy to talk about commodity and freight markets, models or project work.
           </p>
         </div>
 
-        {/* Channels — hairline ledger, mono num replaces the icon column */}
-        <div className="mt-16 md:mt-20">
-          <div className="border-t border-fg/15">
-            {channels.map((c) => {
-              const content = (
-                <div className="group grid grid-cols-[2.5rem,1fr,2rem] md:grid-cols-12 gap-3 sm:gap-4 md:gap-6 items-center py-6 sm:py-7 md:py-8 border-b border-fg/15 transition-colors hover:bg-fg/[0.02]">
-                  <div className="md:col-span-1 text-[11px] tabular-nums text-fg/40 group-hover:text-accent transition-colors">
-                    {c.num}
-                  </div>
-                  <div className="min-w-0 md:col-span-10 md:grid md:grid-cols-10 md:gap-6 md:items-center">
-                    <div className="md:col-span-3 text-[10px] sm:text-[11px] uppercase tracking-[0.16em] sm:tracking-[0.18em] text-fg/60 group-hover:text-fg transition-colors">
-                      {c.label}
-                    </div>
-                    <div className="md:col-span-7 display text-[18px] sm:text-2xl md:text-[32px] text-fg/90 group-hover:text-fg tracking-tight leading-tight break-words">
-                      <span className="link-draw">{c.value}</span>
-                    </div>
-                  </div>
-                  <div className="md:col-span-1 flex justify-end">
-                    <span
-                      aria-hidden
-                      className="arrow-glyph text-base text-fg/35 group-hover:text-accent transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                    />
-                  </div>
+        <div className="border-t border-hairline">
+          {channels.map((c) => {
+            const content = (
+              <div className="group flex flex-col gap-1 border-b border-hairline py-6 sm:flex-row sm:items-baseline sm:gap-10 md:py-7">
+                <div className="w-28 shrink-0 font-sans text-[13px] text-muted">
+                  {c.label}
                 </div>
-              );
+                <div className="min-w-0 font-sans text-[1.125rem] font-medium leading-snug text-fg md:text-[1.25rem]">
+                  <span className="link-draw">{c.value}</span>
+                </div>
+              </div>
+            );
               return c.onClick ? (
                 <button
                   key={c.num}
@@ -124,7 +97,6 @@ export const ContactSection: React.FC = () => {
               );
             })}
           </div>
-        </div>
       </div>
     </section>
   );

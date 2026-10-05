@@ -73,14 +73,20 @@ export default function NotePage({ params }: { params: { slug: string } }) {
 
   return (
     <div className="bg-bg min-h-screen flex flex-col">
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:px-4 focus:py-2 focus:bg-fg focus:text-bg label"
+      >
+        Skip to content
+      </a>
       <Navigation notesEnabled />
-      <main className="flex-1">
+      <main id="main" tabIndex={-1} className="flex-1 outline-none">
         <article className="editorial pt-36 md:pt-44 pb-16 md:pb-24">
-          <h1 className="display text-[clamp(2.4rem,6vw,5rem)] text-fg leading-[0.95] text-balance max-w-4xl">
+          <h1 className="chapter text-fg text-balance max-w-4xl">
             {note.title}
           </h1>
 
-          <div className="mt-8 flex flex-wrap items-baseline gap-x-5 gap-y-2 text-[11px] uppercase tracking-[0.16em] text-fg/60">
+          <div className="mt-8 flex flex-wrap items-baseline gap-x-5 gap-y-2 font-sans text-[15px] text-muted">
             <span className="tabular-nums">
               {dateFmt.format(new Date(note.date))}
             </span>
@@ -89,12 +95,12 @@ export default function NotePage({ params }: { params: { slug: string } }) {
             {note.instruments && note.instruments.length > 0 && (
               <>
                 <span className="text-fg/25">/</span>
-                <span>{note.instruments.join(" · ")}</span>
+                <span>{note.instruments.join(", ")}</span>
               </>
             )}
           </div>
 
-          <p className="mt-10 font-medium text-xl md:text-2xl leading-[1.45] text-fg/90 max-w-[58ch]">
+          <p className="mt-10 max-w-[40rem] font-sans text-xl font-medium leading-[1.45] tracking-[-0.02em] text-fg md:text-2xl">
             {note.summary}
           </p>
 
@@ -104,7 +110,7 @@ export default function NotePage({ params }: { params: { slug: string } }) {
 
           <div className="hairline my-12" />
 
-          <p className="text-[11px] uppercase tracking-[0.16em] text-fg/60">
+          <p className="max-w-[40rem] font-sans text-[15px] leading-relaxed text-muted">
             Personal market notes based on public information only. Not
             investment advice.
           </p>
@@ -112,7 +118,7 @@ export default function NotePage({ params }: { params: { slug: string } }) {
           <div className="mt-12">
             <Link
               href="/notes"
-              className="text-[11px] uppercase tracking-[0.18em] text-fg/60 hover:text-fg transition-colors link-draw"
+              className="font-sans text-[15px] text-muted transition-colors hover:text-fg link-draw"
             >
               All notes
             </Link>

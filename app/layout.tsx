@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     template: "%s | Brian Banna",
   },
   description:
-    "Quant analyst on the freight trading desk at Cargill. MSc Data Science with a minor in Financial Engineering at EPFL. Models that turn physical fundamentals into views on curves, spreads and positioning.",
+    "Quant analyst on the freight trading desk at Cargill in Geneva. Translates physical fundamentals in freight, commodity and power markets into signals on price formation, relative value and volatility.",
   alternates: {
     canonical: "https://brianbanna.com/",
   },
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Brian Banna · Commodity Markets",
     description:
-      "Quant analyst on the freight trading desk at Cargill. MSc Data Science with a minor in Financial Engineering at EPFL. Models that turn physical fundamentals into views on curves, spreads and positioning.",
+      "Quant analyst on the freight trading desk at Cargill in Geneva. Translates physical fundamentals in freight, commodity and power markets into signals on price formation, relative value and volatility.",
     url: "https://brianbanna.com/",
     siteName: "Brian Banna",
     images: [
@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Brian Banna · Commodity Markets",
     description:
-      "Quant analyst on the freight trading desk at Cargill. MSc Data Science with a minor in Financial Engineering at EPFL. Models that turn physical fundamentals into views on curves, spreads and positioning.",
+      "Quant analyst on the freight trading desk at Cargill in Geneva. Translates physical fundamentals in freight, commodity and power markets into signals on price formation, relative value and volatility.",
     images: ["https://brianbanna.com/og-home.png"],
   },
   icons: {
@@ -73,9 +73,10 @@ export const metadata: Metadata = {
   },
 };
 
-const inter = Inter({
+const sans = Inter({
   subsets: ["latin"],
-  variable: "--font-inter",
+  weight: ["400", "500"],
+  variable: "--font-sans",
   display: "swap",
 });
 
@@ -115,8 +116,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body className="bg-bg text-fg font-sans antialiased selection:bg-accent/30 selection:text-fg">
+    <html lang="en" className={sans.variable}>
+      <body className="bg-bg text-fg font-sans antialiased selection:bg-fg/10 selection:text-fg">
         <script
           type="application/ld+json"
           // rome-ignore lint/security/noDangerouslySetInnerHtml: static JSON-LD

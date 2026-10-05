@@ -25,24 +25,17 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
       aria-labelledby="projects-heading"
       className="relative bg-bg section-rail scroll-mt-24"
     >
-      <div className="noise" aria-hidden />
-
-      {/* Section header */}
-      <div className="editorial pt-20 md:pt-28 pb-10 md:pb-14">
-        <h2
-          id="projects-heading"
-          className="display text-[clamp(2.5rem,6vw,5rem)] text-fg leading-[0.98] text-balance"
-        >
+      <div className="editorial pt-16 md:pt-24 pb-2">
+        <h2 id="projects-heading" className="chapter text-fg text-balance">
           Selected work
         </h2>
-        <p className="mt-6 max-w-xl text-lg text-fg/60 leading-relaxed">
+        <p className="mt-5 max-w-[40rem] font-sans text-[1.125rem] leading-[1.6] text-fg">
           Projects across commodity relative value, power price formation,
           volatility, futures curve factors and market regime detection.
         </p>
       </div>
 
-      {/* 3D project slider */}
-      <div className="py-16 md:py-24">
+      <div className="pt-8 pb-16 md:pb-24">
         <Projects3DSlider projects={projects} />
       </div>
     </section>

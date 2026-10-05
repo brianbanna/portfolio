@@ -43,13 +43,18 @@ export default function NotesPage() {
 
   return (
     <div className="bg-bg min-h-screen flex flex-col">
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:px-4 focus:py-2 focus:bg-fg focus:text-bg label"
+      >
+        Skip to content
+      </a>
       <Navigation notesEnabled />
-      <main className="flex-1">
+      <main id="main" tabIndex={-1} className="flex-1 outline-none">
         <section className="relative bg-bg overflow-hidden border-b border-fg/5">
-          <div className="noise" aria-hidden />
           <div className="editorial relative pt-36 md:pt-44 pb-12 md:pb-16">
-            <h1 className="display text-[clamp(3rem,9vw,8rem)] text-fg leading-[0.9]">
-              Notes.
+            <h1 className="chapter text-fg">
+              Notes
             </h1>
           </div>
         </section>
@@ -62,11 +67,11 @@ export default function NotesPage() {
                 href={`/notes/${note.slug}`}
                 className="group grid grid-cols-12 gap-3 md:gap-6 py-7 md:py-8 border-b border-fg/15 transition-colors hover:bg-fg/[0.02] items-baseline"
               >
-                <div className="col-span-12 md:col-span-2 text-[11px] uppercase tracking-[0.16em] text-fg/60 tabular-nums">
+                <div className="col-span-12 md:col-span-2 font-sans text-[14px] text-muted tabular-nums">
                   {dateFmt.format(new Date(note.date))}
                 </div>
                 <div className="col-span-12 md:col-span-7">
-                  <h2 className="text-xl md:text-2xl text-fg/90 group-hover:text-fg leading-snug transition-colors">
+                  <h2 className="font-sans text-xl font-medium tracking-[-0.02em] text-fg leading-snug md:text-2xl">
                     {note.title}
                   </h2>
                   <p className="mt-3 text-[15px] md:text-base leading-[1.6] text-fg/60 max-w-xl">
@@ -74,7 +79,7 @@ export default function NotesPage() {
                   </p>
                 </div>
                 <div className="col-span-12 md:col-span-3 flex md:justify-end">
-                  <span className="text-[10px] uppercase tracking-[0.16em] text-fg/60 border border-fg/15 px-2 py-1">
+                  <span className="font-sans text-[14px] text-muted">
                     {note.market}
                   </span>
                 </div>

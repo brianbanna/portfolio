@@ -24,9 +24,10 @@ export const Navigation: React.FC<NavigationProps> = ({
     ? [...baseNavItems, { num: "05", name: "Notes", href: "/notes" }]
     : baseNavItems;
   const [activeSection, setActiveSection] = useState("home");
-  const [progress, setProgress] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const atBottomRef = useRef(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const firstMenuLinkRef = useRef<HTMLAnchorElement>(null);
   // On tall viewports the last section never reaches the observer band, so
   // page bottom overrides the observer and forces the last section active.
@@ -39,7 +40,28 @@ export const Navigation: React.FC<NavigationProps> = ({
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setMobileMenuOpen(false);
+      if (e.key === "Escape") {
+        setMobileMenuOpen(false);
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const root = menuRef.current;
+      if (!root) return;
+      const items = [
+        ...root.querySelectorAll<HTMLElement>("a[href], button"),
+      ];
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active = document.activeElement;
+      const inside = active instanceof Node && root.contains(active);
+      if (e.shiftKey && (active === first || !inside)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (active === last || !inside)) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     const mq = window.matchMedia("(min-width: 768px)");
     const onMq = (e: MediaQueryListEvent) => {
@@ -65,24 +87,40 @@ export const Navigation: React.FC<NavigationProps> = ({
   useEffect(() => {
     let rafId = 0;
     let pending = false;
-    const update = () => {
+    let maxScroll = 0;
+    // scrollHeight forces layout. Read it off the scroll path, then the
+    // scroll handler only writes a transform, which stays on the compositor.
+    const measure = () => {
+      maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+    };
+    const paint = () => {
       pending = false;
-      const scrollTop = window.scrollY;
-      const docHeight =
-        document.documentElement.scrollHeight - window.innerHeight;
-      const p = docHeight > 0 ? scrollTop / docHeight : 0;
-      setProgress(Math.max(0, Math.min(1, p)));
-      setAtBottom(docHeight > 0 && scrollTop >= docHeight - 2);
+      const y = window.scrollY;
+      const bottom = maxScroll > 0 && y >= maxScroll - 2;
+      if (bottom !== atBottomRef.current) {
+        atBottomRef.current = bottom;
+        setAtBottom(bottom);
+      }
     };
     const onScroll = () => {
       if (pending) return;
       pending = true;
-      rafId = requestAnimationFrame(update);
+      rafId = requestAnimationFrame(paint);
     };
-    update();
+    measure();
+    paint();
+    const observer =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(() => {
+            measure();
+            paint();
+          })
+        : null;
+    observer?.observe(document.documentElement);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll, { passive: true });
     return () => {
+      observer?.disconnect();
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
       cancelAnimationFrame(rafId);
@@ -137,21 +175,20 @@ export const Navigation: React.FC<NavigationProps> = ({
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-50 bg-bg/70 backdrop-blur-xl border-b border-fg/5">
-        <div className="editorial flex items-center justify-between py-5">
-          {/* Monogram — no colored letters */}
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-hairline bg-bg">
+        <div className="editorial relative flex items-center justify-between py-4">
           <Link
             href={resolveHref("#home")}
             onClick={(e) => handleClick(e, "#home")}
-            className="group flex items-baseline gap-2"
+            className="font-sans text-[15px] font-medium tracking-[-0.02em] text-fg"
           >
-            <span className="display text-[22px] tracking-tighter text-fg">
-              Brian Banna
-            </span>
+            Brian Banna
           </Link>
 
-          {/* Desktop nav */}
-          <nav aria-label="Primary" className="hidden md:flex items-center gap-1">
+          <nav
+            aria-label="Primary"
+            className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-8 md:flex"
+          >
             {navItems.map((item) => {
               const isActive = item.href.startsWith("#")
                 ? onHome && currentSection === item.href.slice(1)
@@ -161,56 +198,30 @@ export const Navigation: React.FC<NavigationProps> = ({
                   key={item.href}
                   href={resolveHref(item.href)}
                   onClick={(e) => handleClick(e, item.href)}
-                  className={`group relative px-4 py-2 text-[11px] tracking-[0.14em] uppercase transition-colors rounded-[2px] border before:absolute before:-inset-y-1.5 before:inset-x-0 before:content-[''] ${
-                    isActive
-                      ? "border-fg/20 bg-fg/[0.05]"
-                      : "border-transparent hover:border-fg/15 hover:bg-fg/[0.03]"
+                  className={`relative py-2 text-[15px] transition-colors ${
+                    isActive ? "text-fg" : "text-muted hover:text-fg"
                   }`}
                 >
-                  <span
-                    className={`${
-                      isActive ? "text-fg" : "text-fg/60 group-hover:text-fg"
-                    } transition-colors`}
-                  >
-                    {item.name}
-                  </span>
+                  {item.name}
+                  {isActive && (
+                    <span className="absolute inset-x-0 -bottom-0.5 h-px bg-fg" />
+                  )}
                 </Link>
               );
             })}
           </nav>
 
-          {/* Right cluster */}
-          <div className="flex items-center">
-            <button
-              ref={toggleRef}
-              type="button"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden text-fg p-[11px] -m-[7px]"
-              aria-label="Toggle menu"
-              aria-expanded={mobileMenuOpen}
-              aria-controls="mobile-menu"
-            >
-              {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
-            </button>
-            {/* Spacer to balance the monogram width on desktop */}
-            <div className="hidden md:block w-[96px]" />
-          </div>
-        </div>
-
-        {/* Scroll progress hairline with chapter tick notches */}
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-fg/5">
-          <div
-            className="h-full bg-accent/80 origin-left will-change-transform"
-            style={{ transform: `scaleX(${progress})` }}
-          />
-          {baseNavItems.slice(1).map((item, i) => (
-            <span
-              key={item.href}
-              aria-hidden
-              className="absolute top-0 w-px h-[4px] bg-fg/25"
-              style={{ left: `${((i + 1) / baseNavItems.length) * 100}%` }}
-            />
-          ))}
+          <button
+            ref={toggleRef}
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="text-fg p-[11px] -m-[7px] md:hidden"
+            aria-label="Toggle menu"
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-menu"
+          >
+            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
         </div>
       </header>
 
@@ -218,23 +229,22 @@ export const Navigation: React.FC<NavigationProps> = ({
       {mobileMenuOpen && (
         <div
           id="mobile-menu"
+          ref={menuRef}
           role="dialog"
+          aria-modal="true"
           aria-label="Navigation"
-          className="fixed inset-0 z-40 md:hidden bg-bg/[0.98] backdrop-blur-xl"
+          className="fixed inset-0 z-40 md:hidden bg-bg"
         >
-          <nav className="flex flex-col items-start justify-center h-full gap-1 px-8">
-            <div className="label mb-8">Navigation</div>
+          <nav className="flex h-full flex-col items-start justify-center gap-1 px-8">
             {navItems.map((item, i) => (
               <Link
                 key={item.href}
                 ref={i === 0 ? firstMenuLinkRef : undefined}
                 href={resolveHref(item.href)}
                 onClick={(e) => handleClick(e, item.href)}
-                className="group flex items-baseline gap-5 py-2"
+                className="py-2 font-sans text-[2rem] font-medium tracking-[-0.03em] text-fg"
               >
-                <span className="display text-5xl text-fg transition-all">
-                  {item.name}
-                </span>
+                {item.name}
               </Link>
             ))}
           </nav>

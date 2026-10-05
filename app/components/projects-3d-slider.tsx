@@ -42,41 +42,48 @@ const meta: Record<
   "Market Regime Modeling for Systematic Trading": {
     tag: "Regime Detection",
     domain: "US Equities",
-    highlight: "HMM · GARCH · GMM · Sharpe 0.70",
+    highlight: "HMM, GARCH, GMM, Sharpe 0.70",
   },
   "Cross-Border Price Transmission in European Power Markets": {
     tag: "Power Markets / Transmission",
     domain: "European Electricity",
-    highlight: "ENTSO-E · 301k hours · 5 zones",
+    highlight: "ENTSO-E, 301k hours, 5 zones",
   },
   "Commodity Futures Curve Modeling and Factor Trading": {
     tag: "Futures Curves / Factors",
     domain: "Commodity Futures",
-    highlight: "19 markets · 2.4M obs · roll adjusted",
+    highlight: "19 markets, 2.4M obs, roll adjusted",
   },
   "Multi Leg Relative Value with Break Detection": {
     tag: "Relative Value / Cointegration",
     domain: "Commodity Baskets",
-    highlight: "In progress · Johansen · VECM · Break detection",
+    highlight: "In progress, Johansen, VECM, break detection",
   },
   "Day Ahead Power Price Formation": {
     tag: "Power Markets / Price Formation",
     domain: "EPEX Day Ahead",
-    highlight: "In progress · EPEX · Merit order · with Axpo",
+    highlight: "In progress, EPEX, merit order, with Axpo",
   },
   "Commodity Volatility Trading": {
     tag: "Volatility / Options",
     domain: "WTI Crude",
-    highlight: "In progress · OVX · HAR · Greeks",
+    highlight: "In progress, OVX, HAR, Greeks",
   },
   AirJav: {
     tag: "Signal Processing",
     domain: "ADS-B / Aviation",
-    highlight: "Java · ADS-B · Signal processing",
+    highlight: "Java, ADS-B, signal processing",
   },
 };
 
 const AUTOPLAY_MS = 5000;
+const CARD_SIZES = "(max-width: 639px) 310px, (max-width: 767px) 400px, 600px";
+
+function webpSrcSet(src: string) {
+  if (!/\.jpe?g$/i.test(src)) return null;
+  const at = (suffix: string) => src.replace(/\.jpe?g$/i, suffix);
+  return `${at("-640.webp")} 640w, ${at("-960.webp")} 960w, ${at(".webp")} 1200w`;
+}
 
 export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -233,7 +240,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
   const cardTransition: Transition =
     reduceMotion || snapCards
       ? { duration: 0 }
-      : { type: "spring", stiffness: 260, damping: 32, mass: 1 };
+      : { duration: 0.58, ease: [0.25, 1, 0.35, 1] };
   const fade = (duration: number): Transition =>
     reduceMotion ? { duration: 0 } : { duration };
 
@@ -244,7 +251,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
     if (diff < -total / 2) diff += total;
 
     const abs = Math.abs(diff);
-    let x = diff * 390;
+    let x = diff * 430;
     let rotateY = 0;
     let scale = 1;
     let opacity = 1;
@@ -253,19 +260,19 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
       scale = 1;
       opacity = 1;
     } else if (abs === 1) {
-      x = diff * 415;
-      rotateY = diff * -32;
-      scale = 0.82;
-      opacity = 0.55;
+      x = diff * 430;
+      rotateY = diff * -4;
+      scale = 0.95;
+      opacity = 0.4;
     } else if (abs === 2) {
-      x = diff * 355;
-      rotateY = diff * -44;
-      scale = 0.66;
-      opacity = 0.28;
+      x = diff * 430;
+      rotateY = diff * -8;
+      scale = 0.9;
+      opacity = 0.22;
     } else {
-      x = diff * 300;
-      rotateY = diff * -50;
-      scale = 0.5;
+      x = diff * 430;
+      rotateY = diff * -8;
+      scale = 0.9;
       opacity = 0;
     }
 
@@ -306,14 +313,14 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
       <div className="editorial mb-8 md:mb-10">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div className="flex items-center gap-5 label">
-            <span className="text-accent tabular-nums">({activeNum})</span>
             <AnimatePresence mode="wait" initial={false}>
               <m.span
                 key={`${active.title}-tag`}
-                initial={{ opacity: 0, y: 6 }}
+                initial={{ opacity: 0, y: 3 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6, transition: fade(0.12) }}
-                transition={fade(0.3)}
+                exit={{ opacity: 0, y: -3, transition: fade(0.12) }}
+                transition={fade(0.22)}
+                className="text-fg"
               >
                 {activeMeta?.tag || "Project"}
               </m.span>
@@ -322,10 +329,10 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
             <AnimatePresence mode="wait" initial={false}>
               <m.span
                 key={`${active.title}-domain`}
-                initial={{ opacity: 0, y: 6 }}
+                initial={{ opacity: 0, y: 3 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6, transition: fade(0.12) }}
-                transition={fade(0.3)}
+                exit={{ opacity: 0, y: -3, transition: fade(0.12) }}
+                transition={fade(0.22)}
                 className="hidden md:inline"
               >
                 {activeMeta?.domain}
@@ -358,18 +365,19 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
       {/* Phones clip only sideways so the card shadow is not cut by the short stage */}
       <div className="relative w-full h-[320px] sm:h-[500px] md:h-[620px] flex items-center justify-center overflow-x-clip sm:overflow-hidden">
         {/* Side fade masks — edge strips only, so the active card is never veiled; off on phones where the side cards are already out of frame */}
-        <div className="hidden sm:block absolute inset-y-0 left-0 w-10 md:w-20 lg:w-40 xl:w-56 bg-gradient-to-r from-bg to-transparent z-20 pointer-events-none" />
-        <div className="hidden sm:block absolute inset-y-0 right-0 w-10 md:w-20 lg:w-40 xl:w-56 bg-gradient-to-l from-bg to-transparent z-20 pointer-events-none" />
+        <div className="pointer-events-none absolute inset-y-0 left-0 z-20 hidden w-28 bg-gradient-to-r from-bg to-transparent sm:block md:w-40 lg:w-52" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-20 hidden w-28 bg-gradient-to-l from-bg to-transparent sm:block md:w-40 lg:w-52" />
 
         <m.div
           className="relative w-full h-full flex items-center justify-center"
-          style={{ perspective: "1400px" }}
+          style={{ perspective: "1800px" }}
           initial={false}
           animate={stageControls}
         >
           {slides.map((slide, index) => {
             const style = getSlideStyle(index);
             const isActive = index === currentIndex;
+            const sources = slide.image ? webpSrcSet(slide.image) : null;
 
             return (
               <m.div
@@ -386,30 +394,41 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                 style={{
                   zIndex: isActive ? 15 : style.zIndex,
                   pointerEvents: isActive ? "auto" : "none",
+                  backfaceVisibility: "hidden",
+                  visibility: style.opacity === 0 ? "hidden" : "visible",
                 }}
                 aria-hidden={!isActive || undefined}
               >
                 <div
-                  className="relative w-[310px] sm:w-[400px] md:w-[600px] aspect-[4/3] overflow-hidden group bg-paper border border-fg/15"
+                  className="relative w-[268px] sm:w-[400px] md:w-[600px] aspect-[4/3] overflow-hidden group bg-paper border border-fg/15"
                   style={{
                     boxShadow: isActive
-                      ? "0 40px 80px -20px rgba(26,23,18,0.18), 0 0 80px -20px rgba(166,72,42,0.12)"
-                      : "0 20px 50px -15px rgba(26,23,18,0.12)",
+                      ? "0 18px 36px -22px rgba(17,19,22,0.16)"
+                      : "0 10px 24px -18px rgba(17,19,22,0.08)",
                   }}
                 >
                   {slide.image ? (
-                    <img
-                      src={slide.image}
-                      alt={slide.imageAlt || slide.title}
-                      loading="lazy"
-                      decoding="async"
-                      className={`w-full h-full object-cover transition-all duration-[1200ms] ${
-                        isActive
-                          ? "grayscale-0 scale-100"
-                          : "grayscale contrast-125 scale-105"
-                      }`}
-                      draggable={false}
-                    />
+                    <picture>
+                      {sources && (
+                        <source
+                          type="image/webp"
+                          srcSet={sources}
+                          sizes={CARD_SIZES}
+                        />
+                      )}
+                      <img
+                        src={slide.image}
+                        alt={slide.imageAlt || slide.title}
+                        width={1200}
+                        height={900}
+                        sizes={CARD_SIZES}
+                        loading="lazy"
+                        decoding="async"
+                        fetchPriority={isActive ? "auto" : "low"}
+                        className={`h-full w-full object-cover ${isActive ? "" : "grayscale"}`}
+                        draggable={false}
+                      />
+                    </picture>
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-fg/10 to-fg/0 flex items-center justify-center">
                       <span className="display text-9xl text-fg/10 tabular-nums">
@@ -418,35 +437,27 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                     </div>
                   )}
 
-                  {/* Editorial scrim — dark like the preview artwork, not the page ground;
-                      mid stop at 0.4 keeps the title legible on bright artwork */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[rgb(20_18_15/0.92)] via-[rgb(20_18_15/0.4)] to-transparent pointer-events-none" />
-                  {/* Top scrim so the counter stays legible on light artwork */}
-                  <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-[rgb(20_18_15/0.75)] to-transparent pointer-events-none" />
-
-                  {/* Number overlay */}
-                  <div className="absolute top-4 left-4 text-[10px] tracking-[0.18em] text-bg/75 uppercase">
-                    {String(index + 1).padStart(2, "0")} / {total}
-                  </div>
+                  {/* Scrim keeps the title readable on bright artwork */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[rgb(17_19_22/0.9)] via-[rgb(17_19_22/0.28)] to-transparent pointer-events-none" />
 
                   {/* Title + actions. The action block stays mounted on every card and
                       only fades, so the title does not jump when a card becomes active */}
                   <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7">
-                    <h3 className="display text-xl md:text-3xl text-bg leading-[1] mb-2 text-balance">
+                    <h3 className={`display text-xl md:text-3xl text-bg leading-[1] mb-2 text-balance transition-opacity duration-300 ${isActive ? "opacity-100" : "opacity-0"}`}>
                       {slide.title}
                     </h3>
                     <m.div
                       initial={false}
-                      animate={{ opacity: isActive ? 1 : 0, y: isActive ? 0 : 8 }}
+                      animate={{ opacity: isActive ? 1 : 0, y: isActive ? 0 : 4 }}
                       transition={
                         reduceMotion
                           ? { duration: 0 }
-                          : { duration: 0.3, delay: isActive ? 0.15 : 0 }
+                          : { duration: 0.35, delay: isActive ? 0.06 : 0 }
                       }
                     >
                       {meta[slide.title]?.highlight && (
-                        <div className="mb-3 flex items-center gap-2 text-[10px] text-bg/80 uppercase tracking-wide">
-                          <span className="w-5 h-px bg-accent" />
+                        <div className="mb-3 flex items-center gap-2 font-sans text-[12px] text-bg/85">
+                          <span className="h-px w-5 bg-bg/80" />
                           {meta[slide.title]?.highlight}
                         </div>
                       )}
@@ -457,7 +468,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                             target="_blank"
                             rel="noopener noreferrer"
                             tabIndex={isActive ? 0 : -1}
-                            className="group/btn relative inline-flex items-center gap-1.5 px-3 py-1.5 bg-bg text-fg text-[10px] uppercase tracking-[0.14em] hover:bg-accent hover:text-bg transition-colors before:absolute before:-inset-y-[9px] before:inset-x-0 before:content-['']"
+                            className="group/btn relative inline-flex items-center gap-1.5 bg-bg px-3 py-1.5 font-sans text-[13px] text-fg transition-colors before:absolute before:-inset-y-[9px] before:inset-x-0 before:content-[''] hover:bg-fg hover:text-bg"
                           >
                             Live
                             <ArrowUpRight className="w-3 h-3" />
@@ -469,7 +480,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                             target="_blank"
                             rel="noopener noreferrer"
                             tabIndex={isActive ? 0 : -1}
-                            className="relative inline-flex items-center gap-1.5 px-3 py-1.5 border border-bg/40 text-bg/90 hover:text-bg hover:border-bg/70 text-[10px] uppercase tracking-[0.14em] transition-colors before:absolute before:-inset-y-[9px] before:inset-x-0 before:content-['']"
+                            className="relative inline-flex items-center gap-1.5 border border-bg/40 px-3 py-1.5 font-sans text-[13px] text-bg/90 transition-colors before:absolute before:-inset-y-[9px] before:inset-x-0 before:content-[''] hover:border-bg/80 hover:text-bg"
                           >
                             <Github className="w-3 h-3" />
                             Source
@@ -480,9 +491,6 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                   </div>
 
                   {/* Active accent line */}
-                  {isActive && (
-                    <div className="absolute top-0 left-0 right-0 h-px bg-accent/70" />
-                  )}
                 </div>
               </m.div>
             );
@@ -494,7 +502,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
           ref={prevBtnRef}
           type="button"
           onClick={goPrev}
-          className="absolute left-2 md:left-8 z-30 p-3.5 border border-fg/20 bg-bg/60 backdrop-blur-sm hover:bg-fg/10 hover:border-fg/50 transition-all"
+          className="absolute left-2 md:left-8 z-30 p-3.5 border border-fg/20 bg-bg/90 hover:bg-fg/10 hover:border-fg/50 transition-colors"
           aria-label="Previous project"
         >
           <ChevronLeft className="w-4 h-4 text-fg/70" />
@@ -503,7 +511,7 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
           ref={nextBtnRef}
           type="button"
           onClick={goNext}
-          className="absolute right-2 md:right-8 z-30 p-3.5 border border-fg/20 bg-bg/60 backdrop-blur-sm hover:bg-fg/10 hover:border-fg/50 transition-all"
+          className="absolute right-2 md:right-8 z-30 p-3.5 border border-fg/20 bg-bg/90 hover:bg-fg/10 hover:border-fg/50 transition-colors"
           aria-label="Next project"
         >
           <ChevronRight className="w-4 h-4 text-fg/70" />
@@ -525,20 +533,20 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                   initial={false}
                   animate={{
                     opacity: isActive ? 1 : 0,
-                    y: isActive ? 0 : 8,
+                    y: isActive ? 0 : 4,
                     // Hidden captions must not match find in page or select all
                     transitionEnd: { visibility: isActive ? "visible" : "hidden" },
                   }}
-                  transition={fade(0.35)}
+                  transition={fade(0.4)}
                   style={{ pointerEvents: isActive ? "auto" : "none" }}
                   aria-hidden={!isActive || undefined}
                 >
                   {s.question && (
-                    <p className="text-xl md:text-2xl font-medium leading-[1.35] text-fg text-balance max-w-2xl mb-4">
+                    <p className="mb-4 max-w-2xl font-sans text-xl font-medium leading-[1.35] tracking-[-0.02em] text-fg text-balance md:text-[1.35rem]">
                       {s.question}
                     </p>
                   )}
-                  <p className="text-lg md:text-xl leading-[1.55] text-fg/80 text-pretty max-w-2xl">
+                  <p className="max-w-2xl font-sans text-[1.0625rem] leading-[1.6] text-fg text-pretty">
                     {s.description}
                   </p>
                 </m.div>
@@ -546,7 +554,6 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
             })}
           </div>
           <div className="col-span-12 md:col-span-5 flex flex-col gap-4">
-            <div className="label">Index</div>
             <div className="flex flex-col gap-2">
               {slides.map((s, i) => {
                 const isActive = i === currentIndex;
@@ -560,15 +567,15 @@ export const Projects3DSlider = ({ projects }: Projects3DSliderProps) => {
                   >
                     <span
                       className={`text-[10px] tabular-nums transition-colors ${
-                        isActive ? "text-accent" : "text-fg/60"
+                        isActive ? "text-fg" : "text-muted"
                       }`}
                     >
                       {String(i + 1).padStart(2, "0")}
                     </span>
                     <span
-                      className={`h-px transition-all duration-500 ${
+                      className={`h-px transition-all duration-300 ease-[cubic-bezier(0.25,1,0.35,1)] ${
                         isActive
-                          ? "w-16 bg-accent"
+                          ? "w-16 bg-fg"
                           : "w-8 bg-fg/20 group-hover:w-12 group-hover:bg-fg/50"
                       }`}
                     />

@@ -234,7 +234,7 @@ const counter = (page) =>
       focusedText: document.activeElement?.textContent.trim(),
       role: document.getElementById("mobile-menu").getAttribute("role"),
     }));
-    check("mobile menu: opaque, scroll locked, focus moved in, aria wired", open.expanded === "true" && open.bodyOverflow === "hidden" && open.bg.startsWith("rgba(250, 248, 244") && open.focusedText === "Index" && open.role === "dialog", JSON.stringify(open));
+    check("mobile menu: opaque, scroll locked, focus moved in, aria wired", open.expanded === "true" && open.bodyOverflow === "hidden" && (open.bg.startsWith("rgb(243, 244, 246") || open.bg.startsWith("rgba(243, 244, 246")) && open.focusedText === "Index" && open.role === "dialog", JSON.stringify(open));
     await page.keyboard.press("Escape");
     await sleep(300);
     const closed = await page.evaluate(() => ({

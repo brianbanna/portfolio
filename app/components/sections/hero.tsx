@@ -7,48 +7,27 @@ export const HeroSection: React.FC = () => {
       id="home"
       className="relative min-h-screen w-full overflow-hidden bg-bg flex flex-col"
     >
-      {/* Ambient grid */}
       <div
-        className="absolute inset-0 bg-grid-fg bg-grid-64 opacity-[0.4] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_70%)]"
-        aria-hidden
-      />
-
-      {/* Bespoke hero canvas — term structure ribbon */}
-      <div
-        className="absolute inset-0 [mask-image:radial-gradient(ellipse_at_60%_55%,black_10%,transparent_75%)]"
+        className="hero-field absolute inset-0"
         aria-hidden
       >
         <HeroCanvas className="absolute inset-0 w-full h-full" />
       </div>
 
-      {/* Warm top glow */}
-      <div
-        className="absolute -top-1/3 left-1/2 -translate-x-1/2 w-[120vw] h-[80vh] bg-[radial-gradient(ellipse_at_center,rgb(166_72_42/0.04),transparent_60%)] pointer-events-none"
-        aria-hidden
-      />
-      <div className="noise" aria-hidden />
-
-      {/* Main content */}
-      <div className="relative z-10 flex-1 flex items-center pt-28 md:pt-36">
+      <div className="relative z-10 flex-1 flex items-center pt-28 md:pt-32">
         <div className="editorial w-full py-16 md:py-24">
-          {/* Display — name, capped at showcase scale */}
-          <h1 className="display text-fg leading-[0.95] text-balance">
-            <span className="block text-[clamp(2.6rem,7vw,5.8rem)] opacity-0 animate-[rise_1.6s_cubic-bezier(0.16,1,0.3,1)_0.1s_forwards]">
+          <h1 className="display text-fg leading-[0.98] text-balance">
+            <span className="block text-[clamp(2.75rem,5.5vw,4.25rem)] opacity-0 animate-[rise_1.15s_cubic-bezier(0.22,1,0.36,1)_0.04s_forwards]">
               Brian
             </span>
-            <span className="block text-[clamp(2.6rem,7vw,5.8rem)] -mt-1 md:-mt-2 opacity-0 animate-[rise_1.6s_cubic-bezier(0.16,1,0.3,1)_0.25s_forwards]">
+            <span className="block text-[clamp(2.75rem,5.5vw,4.25rem)] -mt-1 md:-mt-2 opacity-0 animate-[rise_1.15s_cubic-bezier(0.22,1,0.36,1)_0.1s_forwards]">
               Banna
             </span>
           </h1>
 
-          {/* Tagline */}
-          <div className="mt-14 md:mt-20 opacity-0 animate-[fade-up_1.2s_cubic-bezier(0.2,0.8,0.2,1)_0.8s_forwards]">
-            <p className="text-xl md:text-2xl lg:text-[26px] leading-[1.45] text-fg/85 text-pretty max-w-3xl">
-              I'm a quant analyst on the freight trading desk at Cargill in
-              Geneva. I turn physical fundamentals into views on futures
-              curves, spreads and positioning.
-            </p>
-          </div>
+          <p className="mt-8 max-w-[40rem] font-sans text-[1.0625rem] md:text-[1.125rem] leading-snug text-fg text-pretty opacity-0 animate-[fade-up_0.9s_cubic-bezier(0.22,1,0.36,1)_0.28s_forwards]">
+            Quant analyst (freight trading desk) at Cargill in Geneva.
+          </p>
         </div>
       </div>
     </section>

@@ -9,12 +9,13 @@ import React, { useEffect, useRef } from "react";
  * snapshot in time; the stack evokes the evolution of a forward curve.
  * One curve is highlighted in the accent color as the "current" state.
  *
- * Inexpensive — canvas2D, GPU-compositable, single RAF loop. Degrades to
- * blank on reduced motion.
+ * Canvas2D, one RAF loop at display refresh. The bitmap is capped so a
+ * retina laptop does not redraw a full 2x viewport, but every frame is
+ * painted so the curves do not step. Degrades to one static frame on
+ * reduced motion.
  *
- * "Curve Whisper": accepts an optional getVelocity callback read each
- * frame inside the RAF loop. Scroll velocity is smoothed and modulates
- * slope tilt, accent glow, and tenor dot pulse.
+ * getVelocity is optional. The homepage does not pass it, so the curves
+ * are not tied to scroll.
  */
 export const HeroCanvas: React.FC<{
   className?: string;
@@ -35,17 +36,24 @@ export const HeroCanvas: React.FC<{
       typeof window !== "undefined" &&
       window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
-    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let dpr = 1;
     let w = 0;
     let h = 0;
 
+    // Cap the bitmap so a retina laptop is not clearing ~6MP a frame, but
+    // stay above 1x. Thin strokes at 1x shimmer as they move.
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
       w = rect.width;
       h = rect.height;
-      canvas.width = Math.floor(w * dpr);
-      canvas.height = Math.floor(h * dpr);
+      const area = Math.max(w * h, 1);
+      let next = Math.min(window.devicePixelRatio || 1, 2);
+      const pixels = area * next * next;
+      const cap = 2_600_000;
+      if (pixels > cap) next *= Math.sqrt(cap / pixels);
+      dpr = Math.max(1, next);
+      canvas.width = Math.max(1, Math.floor(w * dpr));
+      canvas.height = Math.max(1, Math.floor(h * dpr));
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     resize();
@@ -53,7 +61,7 @@ export const HeroCanvas: React.FC<{
 
     // Term-structure model
     const TENORS = 13; // 13 contract months along x
-    const CURVES = 14; // number of stacked snapshots in depth
+    const CURVES = 10; // stacked snapshots in depth
 
     // Each curve has its own phase, regime (contango ↔ backwardation), curvature
     type CurveParams = {
@@ -66,7 +74,7 @@ export const HeroCanvas: React.FC<{
 
     const curves: CurveParams[] = Array.from({ length: CURVES }, (_, i) => ({
       phase: (i / CURVES) * Math.PI * 2,
-      speed: 0.0002 + Math.random() * 0.00025,
+      speed: 0.00026 + Math.random() * 0.0002,
       regime: Math.sin((i / CURVES) * Math.PI * 2),
       slope: 0.35 + Math.random() * 0.2,
       curvature: 0.25 + Math.random() * 0.3,
@@ -91,7 +99,7 @@ export const HeroCanvas: React.FC<{
       const curvature =
         c.curvature * Math.sin(x * Math.PI) * (0.6 + 0.4 * Math.cos(t * 0.0003));
       // gentle wobble at long end
-      const wobble = 0.035 * Math.sin(x * 6 + c.phase + t * 0.0006);
+      const wobble = 0.016 * Math.sin(x * 4 + c.phase + t * 0.00035);
       return slope * (x - 0.5) + curvature + wobble;
     };
 
@@ -103,7 +111,44 @@ export const HeroCanvas: React.FC<{
     let pausedAt = 0;
     let inView = true;
 
+    // One buffer, reused every frame. Allocating inside the loop would
+    // hitch the animation on garbage collection.
+    const SEGMENTS = 96;
+    const pts = new Float32Array((SEGMENTS + 1) * 2);
+
+    // Sample the model, then stroke through midpoints so the ribbon is a
+    // curve rather than a faceted polyline.
+    const trace = (
+      c: CurveParams,
+      i: number,
+      t: number,
+      velBias: number,
+      yOffset: number,
+      plotW: number,
+      plotH: number,
+      padX: number,
+    ) => {
+      for (let s = 0; s <= SEGMENTS; s++) {
+        const x01 = s / SEGMENTS;
+        const price = priceAt(c, x01, t + i * 120, velBias);
+        pts[s * 2] = padX + x01 * plotW;
+        pts[s * 2 + 1] = midY + yOffset - price * plotH * 0.42;
+      }
+      ctx.beginPath();
+      ctx.moveTo(pts[0], pts[1]);
+      for (let s = 1; s < SEGMENTS - 1; s++) {
+        const i2 = s * 2;
+        const mx = (pts[i2] + pts[i2 + 2]) / 2;
+        const my = (pts[i2 + 1] + pts[i2 + 3]) / 2;
+        ctx.quadraticCurveTo(pts[i2], pts[i2 + 1], mx, my);
+      }
+      ctx.lineTo(pts[SEGMENTS * 2], pts[SEGMENTS * 2 + 1]);
+    };
+
+    let midY = 0;
+
     const draw = (now: number) => {
+      if (running) raf = requestAnimationFrame(draw);
       const t = prefersReduced ? 0 : now - startTime;
 
       // Read + smooth velocity. Reduced-motion users get a hard zero.
@@ -114,27 +159,31 @@ export const HeroCanvas: React.FC<{
         const raw = -(getVelocityRef.current?.() ?? 0);
         // Clamp incoming to the documented range to avoid extreme values.
         const clamped = raw < -3 ? -3 : raw > 3 ? 3 : raw;
-        smoothedVel += (clamped - smoothedVel) * 0.08;
+        smoothedVel += (clamped - smoothedVel) * 0.06;
       }
 
-      const velBias = smoothedVel * 0.08;
+      const velBias = smoothedVel * 0.05;
       const absVel = Math.abs(smoothedVel);
-      const glowBoost = 14 + Math.min(absVel, 2) * 14;
+      const glowBoost = 6 + Math.min(absVel, 2) * 5;
       const dotScale = 1 + Math.min(absVel, 1.5) * 0.8;
 
       ctx.clearRect(0, 0, w, h);
+      ctx.lineJoin = "round";
+      ctx.lineCap = "round";
 
       // Layout padding
       const padX = w * 0.06;
       const padY = h * 0.18;
       const plotW = w - padX * 2;
       const plotH = h - padY * 2;
+      // Phones have no empty right margin, so the ribbon sits above the name.
+      midY = w < 720 ? h * 0.2 : h / 2;
 
       // Vertical tenor gridlines
       ctx.lineWidth = 1;
       for (let i = 0; i < TENORS; i++) {
         const x = padX + (i / (TENORS - 1)) * plotW;
-        ctx.strokeStyle = `rgba(26, 23, 18, ${i === 0 || i === TENORS - 1 ? 0.1 : 0.04})`;
+        ctx.strokeStyle = `rgba(17, 19, 22, ${i === 0 || i === TENORS - 1 ? 0.06 : 0.022})`;
         ctx.beginPath();
         ctx.moveTo(x, padY * 0.4);
         ctx.lineTo(x, h - padY * 0.4);
@@ -142,10 +191,10 @@ export const HeroCanvas: React.FC<{
       }
 
       // Horizontal zero line
-      ctx.strokeStyle = "rgba(26, 23, 18, 0.06)";
+      ctx.strokeStyle = "rgba(17, 19, 22, 0.05)";
       ctx.beginPath();
-      ctx.moveTo(padX, h / 2);
-      ctx.lineTo(w - padX, h / 2);
+      ctx.moveTo(padX, midY);
+      ctx.lineTo(w - padX, midY);
       ctx.stroke();
 
       // Draw curves from back to front
@@ -159,16 +208,7 @@ export const HeroCanvas: React.FC<{
         // Opacity by depth
         const alpha = 0.04 + depth * 0.28;
 
-        ctx.beginPath();
-        const segments = 80;
-        for (let s = 0; s <= segments; s++) {
-          const x01 = s / segments;
-          const price = priceAt(c, x01, t + i * 120, velBias);
-          const px = padX + x01 * plotW;
-          const py = h / 2 + yOffset - price * plotH * 0.42;
-          if (s === 0) ctx.moveTo(px, py);
-          else ctx.lineTo(px, py);
-        }
+        trace(c, i, t, velBias, yOffset, plotW, plotH, padX);
 
         if (isActive) {
           // Glow as 3 wide, very low alpha strokes of the same path, stacked so
@@ -181,32 +221,32 @@ export const HeroCanvas: React.FC<{
           ctx.lineJoin = "round";
           ctx.lineCap = "round";
           for (const [alphaStep, widthFactor] of [
-            [0.025, 1.0],
-            [0.035, 0.55],
-            [0.05, 0.25],
+            [0.018, 1.0],
+            [0.028, 0.55],
+            [0.04, 0.25],
           ]) {
-            ctx.strokeStyle = `rgba(166, 72, 42, ${alphaStep})`;
-            ctx.lineWidth = 1.4 + glowBoost * widthFactor;
+            ctx.strokeStyle = `rgba(30, 72, 120, ${alphaStep})`;
+            ctx.lineWidth = 1.2 + glowBoost * widthFactor;
             ctx.stroke();
           }
           ctx.restore();
-          ctx.strokeStyle = "rgba(166, 72, 42, 0.9)";
-          ctx.lineWidth = 1.4;
+          ctx.strokeStyle = "rgba(30, 72, 120, 0.92)";
+          ctx.lineWidth = 1.2;
         } else {
-          ctx.strokeStyle = `rgba(26, 23, 18, ${alpha})`;
-          ctx.lineWidth = 0.8 + depth * 0.4;
+          ctx.strokeStyle = `rgba(17, 19, 22, ${alpha})`;
+          ctx.lineWidth = 0.7 + depth * 0.32;
         }
         ctx.stroke();
 
         // Tenor ticks on active curve
         if (isActive) {
-          ctx.fillStyle = "rgba(166, 72, 42, 0.9)";
-          const dotR = 1.6 * dotScale;
+          ctx.fillStyle = "rgba(30, 72, 120, 0.92)";
+          const dotR = 1.3 * dotScale;
           for (let i2 = 0; i2 < TENORS; i2 += 2) {
             const x01 = i2 / (TENORS - 1);
             const price = priceAt(c, x01, t + CURVES * 120, velBias);
             const px = padX + x01 * plotW;
-            const py = h / 2 + yOffset - price * plotH * 0.42;
+            const py = midY + yOffset - price * plotH * 0.42;
             ctx.beginPath();
             ctx.arc(px, py, dotR, 0, Math.PI * 2);
             ctx.fill();
@@ -214,7 +254,6 @@ export const HeroCanvas: React.FC<{
         }
       });
 
-      if (!prefersReduced && running) raf = requestAnimationFrame(draw);
     };
 
     const start = () => {

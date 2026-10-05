@@ -4,21 +4,21 @@
 
 @layer base {
   :root {
-    /* Light paper palette: paper ground, ink foreground, deep sienna accent */
-    --paper: #faf8f4;
-    --ink: #1a1712;
-    --muted: #6e685c;
-    --hairline: #e3dfd6;
-    --accent: #a6482a;
+    /* Cool paper, carbon ink. The series blue is the live curve only. */
+    --paper: #f3f4f6;
+    --ink: #111316;
+    --muted: #5a626e;
+    --hairline: #d6dae0;
+    --accent: #1e4878;
 
     /* Channel triplets consumed as rgb(var(--x) / alpha) by Tailwind */
-    --color-bg: 250 248 244; /* paper */
-    --color-fg: 26 23 18; /* ink */
-    --color-paper: 240 237 230; /* panel tint, one step below the ground */
-    --color-ink: 26 23 18;
-    --color-accent: 166 72 42; /* sienna */
-    --color-muted: 110 104 92;
-    --color-hairline: 227 223 214;
+    --color-bg: 243 244 246;
+    --color-fg: 17 19 22;
+    --color-paper: 236 237 240;
+    --color-ink: 17 19 22;
+    --color-accent: 30 72 120;
+    --color-muted: 90 98 110;
+    --color-hairline: 214 218 224;
 
     /* Single accent: the per-section rewiring is collapsed */
     --section-accent: var(--color-accent);
@@ -27,22 +27,29 @@
   }
 
   html {
-    scroll-behavior: smooth;
+    /* Native scrolling. Smooth behaviour on the root fights trackpad
+       momentum and is what makes the page feel sticky and uneven. */
+    scroll-behavior: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
+    text-rendering: auto;
     font-feature-settings: "kern", "liga", "calt";
+    font-variant-numeric: tabular-nums;
   }
 
   body {
-    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
     background-color: rgb(var(--color-bg));
     color: rgb(var(--color-fg));
+    /* clip does not create a scroll container, so it does not disable
+       compositor scrolling the way overflow-x: hidden does. hidden stays
+       as the fallback where clip is not supported. */
     overflow-x: hidden;
+    overflow-x: clip;
   }
 
   ::selection {
-    background: rgb(var(--color-accent) / 0.32);
+    background: rgb(var(--color-fg) / 0.14);
     color: rgb(var(--color-fg));
   }
 
@@ -57,21 +64,27 @@
 
 @layer components {
   .label {
-    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-    font-size: 10px;
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    font-size: 13px;
     line-height: 1.4;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    /* 0.6 is the lowest alpha of ink on paper that clears 4.5:1 */
-    color: rgb(var(--color-fg) / 0.6);
+    letter-spacing: 0;
+    text-transform: none;
+    color: rgb(var(--color-muted));
   }
 
-  /* Display headline - Inter, hierarchy from weight and size */
   .display {
-    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-    font-weight: 700;
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 500;
     letter-spacing: -0.03em;
     line-height: 1.02;
+  }
+
+  .chapter {
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 500;
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    letter-spacing: -0.03em;
+    line-height: 1.15;
   }
 
   .editorial {
@@ -84,46 +97,29 @@
 
   .hairline {
     height: 1px;
-    background: linear-gradient(
-      to right,
-      transparent,
-      rgb(var(--color-fg) / 0.22) 20%,
-      rgb(var(--color-fg) / 0.22) 80%,
-      transparent
-    );
+    background: rgb(var(--color-hairline));
   }
 
-  /* Tinted divider rail + dot between sections — SHARED device */
   .section-rail {
-    position: relative;
+    border-top: 1px solid rgb(var(--color-hairline));
   }
-  .section-rail::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(
-      to right,
-      transparent 0%,
-      rgb(var(--section-accent) / 0.55) 18%,
-      rgb(var(--color-fg) / 0.18) 40%,
-      rgb(var(--color-fg) / 0.18) 60%,
-      rgb(var(--section-accent) / 0.55) 82%,
-      transparent 100%
-    );
+
+  /* Keeps the ribbon in the open field, off the name and the paragraph. */
+  .hero-field {
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 22%, transparent 32%);
+    mask-image: linear-gradient(to bottom, #000 0%, #000 22%, transparent 32%);
   }
-  .section-rail::after {
-    content: "";
-    position: absolute;
-    top: -4px;
-    left: 20px;
-    width: 8px;
-    height: 8px;
-    background: rgb(var(--section-accent));
-    border-radius: 50%;
-    box-shadow: 0 0 0 3px rgb(var(--color-bg)), 0 0 0 4px rgb(var(--section-accent) / 0.45);
+  @media (min-width: 768px) {
+    .hero-field {
+      -webkit-mask-image:
+        linear-gradient(to right, transparent 0%, transparent 30%, #000 46%),
+        linear-gradient(to bottom, #000 0%, #000 64%, transparent 86%);
+      mask-image:
+        linear-gradient(to right, transparent 0%, transparent 30%, #000 46%),
+        linear-gradient(to bottom, #000 0%, #000 64%, transparent 86%);
+      -webkit-mask-composite: source-in;
+      mask-composite: intersect;
+    }
   }
 
   /* Typographic arrow rendered as generated content (kept out of innerText) */
@@ -145,20 +141,11 @@
     background: currentColor;
     transform: scaleX(0);
     transform-origin: right;
-    transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .link-draw:hover::after {
     transform: scaleX(1);
     transform-origin: left;
-  }
-
-  .noise {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.035;
-    mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
   }
 
 }
